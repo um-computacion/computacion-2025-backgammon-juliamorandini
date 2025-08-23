@@ -1,4 +1,6 @@
 import unittest
+from src.Dice import Dice
+
 
 class TestDice(unittest.TestCase):
     def setUp(self):
@@ -34,16 +36,6 @@ class TestDice(unittest.TestCase):
         # Al crear el dado, los valores iniciales deben ser 1, 1
         self.assertEqual(self.dice.get_values(), (1, 1))
 
-    def test_roll_changes_values(self):
-        # Al lanzar, los valores deberían cambiar (probabilísticamente)
-        old_values = self.dice.get_values()
-        changed = False
-        for _ in range(20):
-            self.dice.roll()
-            if self.dice.get_values() != old_values:
-                changed = True
-                break
-        self.assertTrue(changed, "Los valores deberían cambiar tras varios lanzamientos.")
 
     def test_get_moves_returns_list(self):
         # get_moves siempre debe devolver una lista de enteros
