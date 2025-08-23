@@ -1,4 +1,5 @@
 import unittest
+from src.board import Board
 
 class TestBackgammonBoard(unittest.TestCase):
 
