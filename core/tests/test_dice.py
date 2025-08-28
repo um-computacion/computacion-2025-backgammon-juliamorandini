@@ -36,7 +36,6 @@ class TestDice(unittest.TestCase):
         # Al crear el dado, los valores iniciales deben ser 1, 1
         self.assertEqual(self.dice.get_values(), (1, 1))
 
-
     def test_get_moves_returns_list(self):
         # get_moves siempre debe devolver una lista de enteros
         self.dice.roll()
