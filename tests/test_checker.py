@@ -1,6 +1,6 @@
 # test_checker.py
 import unittest
-from src.Checker import Checker
+from core.Checker import Checker
 
 class TestChecker(unittest.TestCase):
 
