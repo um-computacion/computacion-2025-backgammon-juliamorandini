@@ -1,2 +1,2 @@
 class Dice:
-    
+    pass 

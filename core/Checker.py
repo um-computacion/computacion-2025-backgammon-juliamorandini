@@ -1,2 +1,2 @@
 class Checker:
-    
+    pass
