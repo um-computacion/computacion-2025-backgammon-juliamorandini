@@ -4,7 +4,7 @@ from core import BackgammonGame  # Asumiendo que la clase Game está en un archi
 class TestBackgammonGame(unittest.TestCase):
     def setUp(self):
         """Configuración inicial para cada test"""
-        self.game = Game()
+        self.game = BackgammonGame()
 
     def test_initial_board_setup(self):
         """Test para verificar la configuración inicial del tablero"""
