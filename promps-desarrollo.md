@@ -1,8 +1,6 @@
 observacion general: tiendo a dejar todos los comentarios y explicacion que el modelo escribe. Aunque se vea mas "sucio" el codigo siento que es util para poder enternder lo que se hace en esa fucnion es especifico
 model: github copilot con claude sonnet 3.5
 
-
-
 promp: 
 haz la clase dice basandote en los test de la clase, respetando un 90% de coverage
 respuesta: 
