@@ -1,2 +1,47 @@
 class Player:
-    pass
+    """A player in the Backgammon game."""
+
+    def __init__(self, name: str, color: str) -> None:
+        """Initialize a player with name and color.
+        
+        Args:
+            name: Player's name
+            color: Player's color ('white' or 'black')
+        """
+        if color not in ['white', 'black']:
+            raise ValueError("Color must be 'white' or 'black'")
+        
+        self.name = name
+        self.color = color
+        self.pieces_in_home = 0
+        self.pieces_on_bar = 0
+        self.pieces_removed = 0
+        self.current_position = 0
+        self.pieces_at_point = 0
+
+    def is_valid_move(self, dice_roll: int) -> bool:
+        """Check if a move is valid based on dice roll."""
+        new_position = self.current_position + dice_roll
+        return 0 <= new_position <= 23
+
+    def can_hit_opponent(self, opponent) -> bool:
+        """Check if can hit opponent's single piece."""
+        return (opponent.current_position == self.current_position and 
+                opponent.pieces_at_point == 1)
+
+    def can_bear_off(self) -> bool:
+        """Check if player can start bearing off pieces."""
+        return self.pieces_in_home == 15
+
+    def is_point_blocked(self, point: int, opponent) -> bool:
+        """Check if point is blocked by opponent."""
+        return (opponent.pieces_at_point >= 2 and 
+                opponent.current_position == point)
+
+    def has_won(self) -> bool:
+        """Check if player has won."""
+        return self.pieces_removed == 15
+
+    def can_reenter_from_bar(self, entry_point: int) -> bool:
+        """Check if piece can reenter from bar."""
+        return self.pieces_on_bar > 0 and 0 <= entry_point <= 23
