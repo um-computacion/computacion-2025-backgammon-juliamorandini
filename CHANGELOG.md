@@ -7,3 +7,6 @@ Fase 1 (estructura y algunos tests) tiempo limite: viernes 29 (creo)
 [08/09] test_game, documentacion de promp, test_player, readme
 [10/09] mejora de instrucciones copilot
 [15/09] agregado de patch a test_dice y correccion de codigo, cambio de branch a clases
+
+version 1.0.2
+[19/09] clase dice.py, player.py
