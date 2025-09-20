@@ -1,36 +1,40 @@
 class Player:
-    """A player in the Backgammon game."""
-
-    def __init__(self, name: str, color: str) -> None:
-        """Initialize a player with name and color.
-        
-        Args:
-            name: Player's name
-            color: Player's color ('white' or 'black')
-        """
+    """A player in Backgammon game."""
+    
+    def __init__(self, name, color):
+        """Create new player."""
+        # Check valid color
         if color not in ['white', 'black']:
             raise ValueError("Color must be 'white' or 'black'")
         
+        # Player basic info
         self.name = name
         self.color = color
-        self.pieces_in_home = 0
-        self.pieces_on_bar = 0
-        self.pieces_removed = 0
+        
+        # Game state
+        self.pieces_in_home = 0  # Pieces in home board
+        self.pieces_on_bar = 0   # Pieces on bar
+        self.pieces_removed = 0  # Pieces taken off
         self.current_position = 0
-        self.pieces_at_point = 0
+        self.pieces_at_point = 0 # Pieces at current point
 
-    def is_valid_move(self, dice_roll: int) -> bool:
-        """Check if a move is valid based on dice roll."""
-        new_position = self.current_position + dice_roll
-        return 0 <= new_position <= 23
+    def is_valid_move(self, dice_roll):
+        """Check if move is valid with dice roll."""
+        # Calculate new position
+        new_pos = self.current_position + dice_roll
+        # Check if in board
+        return 0 <= new_pos <= 23
 
-    def can_hit_opponent(self, opponent) -> bool:
-        """Check if can hit opponent's single piece."""
-        return (opponent.current_position == self.current_position and 
-                opponent.pieces_at_point == 1)
+    def can_hit_opponent(self, opponent):
+        """Check if can hit opponent piece."""
+        # Can hit if opponent has single piece
+        same_pos = opponent.current_position == self.current_position
+        single_piece = opponent.pieces_at_point == 1
+        return same_pos and single_piece
 
-    def can_bear_off(self) -> bool:
-        """Check if player can start bearing off pieces."""
+    def can_bear_off(self):
+        """Check if can bear off pieces."""
+        # Need all pieces in home to bear off
         return self.pieces_in_home == 15
 
     def is_point_blocked(self, point: int, opponent) -> bool:
@@ -40,6 +44,7 @@ class Player:
 
     def has_won(self) -> bool:
         """Check if player has won."""
+        # Win if all pieces removed
         return self.pieces_removed == 15
 
     def can_reenter_from_bar(self, entry_point: int) -> bool:
