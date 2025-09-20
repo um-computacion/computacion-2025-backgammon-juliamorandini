@@ -12,9 +12,9 @@ class Board:
         """Reset board to starting position."""
         self.points = [0] * 24
         # Set starting pieces
-        self.points[0] = -2  # Black pieces
-        self.points[5] = 5   # White pieces
-        self.points[7] = 3   # White pieces
+        self.points[0] = -2  # 2 Black pieces on 0 peak
+        self.points[5] = 5   # 5 White pieces on peak 5
+        self.points[7] = 3   # 3 White pieces on peak 7
         self.points[11] = 5  # White pieces
         self.points[12] = -5 # Black pieces
         self.points[16] = -3 # Black pieces
