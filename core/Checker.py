@@ -1,5 +1,4 @@
 class Checker:
-    """A checker piece in Backgammon."""
 
     def __init__(self, color: str, position: int) -> None:
         """Create a new checker.
