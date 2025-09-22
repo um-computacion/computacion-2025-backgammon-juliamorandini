@@ -10,4 +10,5 @@ Fase 1 (estructura y algunos tests) tiempo limite: viernes 29 (creo)
 
 version 1.0.2
 [19/09] clase dice.py, player.py
-[20/09] clase board.py, checker.py, agregado de promps de desarrollo, arreglos generales en palyer
+[20/09] clase board.py, checker.py, agregado de promps de desarrollo, arreglos generales en player
+[22/09] clase backgammon, promps de desarrollo 
