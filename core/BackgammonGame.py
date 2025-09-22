@@ -2,6 +2,8 @@ from core.board import Board
 from core.player import Player
 from core.Dice import Dice
 
+"""REVISAR"""
+
 class Game:
     """A Backgammon game."""
 
