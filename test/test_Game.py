@@ -1,10 +1,10 @@
 import unittest
-from core import BackgammonGame  # Asumiendo que la clase Game está en un archivo game.py
+from core.BackgammonGame import Game   # Asumiendo que la clase Game está en un archivo game.py
 
 class TestBackgammonGame(unittest.TestCase):
     def setUp(self):
         """Configuración inicial para cada test"""
-        self.game = BackgammonGame()
+        self.game = Game()  # Use Game instead of BackgammonGame
 
     def test_initial_board_setup(self):
         """Test para verificar la configuración inicial del tablero"""

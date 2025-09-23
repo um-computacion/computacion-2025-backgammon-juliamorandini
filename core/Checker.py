@@ -43,3 +43,20 @@ class Checker:
         if self.color == 'white':
             return self.position >= 18
         return self.position <= 5
+
+    def can_move_to(self, point, board):
+        """Check if can move to point."""
+        if not (0 <= point < 24):
+            return False
+            
+        if self.is_on_bar:
+            return not board.is_point_blocked(point, self.color)
+            
+        return True
+
+    def move(self, point, board):
+        """Try to move to point."""
+        if self.can_move_to(point, board):
+            self.position = point
+            return True
+        return False

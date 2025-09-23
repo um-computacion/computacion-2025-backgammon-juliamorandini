@@ -1,26 +1,50 @@
-import random
 from typing import Tuple, List
+import random
 
 class Dice:
-    """Class representing dice in Backgammon game."""
+    """Simple dice class for Backgammon."""
 
-    def __init__(self) -> None:
-        """Initialize dice with value 1."""
-        self._values = [1, 1]
+    def __init__(self):
+        """Initialize with two dice set to 1."""
+        self.die1 = 1
+        self.die2 = 1
 
-    def roll(self) -> Tuple[int, int]:
-        """Roll both dice and return their values."""
-        self._values = [random.randint(1, 6) for _ in range(2)]
-        return tuple(self._values)
+    def roll(self):
+        """Roll both dice."""
+        self.die1 = random.randint(1, 6)
+        self.die2 = random.randint(1, 6)
+        return (self.die1, self.die2)
 
-    def get_values(self) -> Tuple[int, int]:
-        """Return current dice values."""
-        return tuple(self._values)
+    def get_values(self):
+        """Get current dice values."""
+        return (self.die1, self.die2)
 
-    def is_double(self) -> bool:
+    def is_double(self):
         """Check if dice show same value."""
-        return self._values[0] == self._values[1]
+        return self.die1 == self.die2
 
-    def get_moves(self) -> List[int]:
-        """Return available moves based on dice values."""
-        return self._values * 2 if self.is_double() else self._values
+    def get_moves(self):
+        """Get available moves based on dice values."""
+        if self.is_double():
+            return [self.die1] * 4
+        return [self.die1, self.die2]
+
+    @property
+    def die1(self):
+        return self._die1
+
+    @die1.setter
+    def die1(self, value):
+        if not 1 <= value <= 6:
+            raise ValueError("Die value must be between 1 and 6")
+        self._die1 = value
+
+    @property
+    def die2(self):
+        return self._die2
+
+    @die2.setter
+    def die2(self, value):
+        if not 1 <= value <= 6:
+            raise ValueError("Die value must be between 1 and 6")
+        self._die2 = value
