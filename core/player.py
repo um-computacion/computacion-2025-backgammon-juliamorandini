@@ -2,23 +2,17 @@ class Player:
     """Player in Backgammon game."""
     
     def __init__(self, name: str, color: str):
-        """Create new player.
-        
-        Args:
-            name: Player's name
-            color: Player's color (white/black)
-        """
-        def __init__(self, name: str, color: str):
-            self.name = name
-            self.color = color
-            self.points = 0
-            self.pieces_in_home_board = 15
-            self.pieces_on_bar = 0
-            self.current_position = 0
-            self.pieces_at_point = 2
-            self.pieces = [1] * 15  # Create list with 15 pieces
-            self.pieces_removed = 0  
-
+        """Create new player."""
+        self.name = name
+        self.color = color
+        self.points = 0
+        self.pieces_in_home_board = 15
+        self.pieces_on_bar = 0
+        self.current_position = 0
+        self.pieces_at_point = 2
+        self.pieces = [1] * 15
+        self.pieces_removed = 0
+    
     def is_valid_move(self, dice_roll: int) -> bool:
         """Check if moving by dice_roll from current position is valid.
         

@@ -11,15 +11,15 @@ class Board:
     def reset(self):
         """Reset board to initial position."""
         self.points = [[] for _ in range(24)]
-        # Swap these two lines:
-        self.points[0] = ['W', 'W']  # White at point 0
-        self.points[23] = ['B', 'B']  # Black at point 23
-        self.points[5] = ['W'] * 5
-        self.points[7] = ['W'] * 3
-        self.points[11] = ['W'] * 5
-        self.points[12] = ['B'] * 5
-        self.points[16] = ['B'] * 3
-        self.points[18] = ['B'] * 5
+        # Traditional Backgammon setup:
+        self.points[0] = ['W', 'W']      # White at point 1
+        self.points[5] = ['B'] * 5       # Black at point 6 (was white)
+        self.points[7] = ['B'] * 3       # Black at point 8 (was white)  
+        self.points[11] = ['B'] * 5      # Black at point 12 (was white)
+        self.points[12] = ['W'] * 5      # White at point 13 (was black)
+        self.points[16] = ['W'] * 3      # White at point 17 (was black)
+        self.points[18] = ['W'] * 5      # White at point 19 (was black)
+        self.points[23] = ['B', 'B']     # Black at point 24
         self.bar = {'W': 0, 'B': 0}
         self.borne_off = {'W': 0, 'B': 0}
 

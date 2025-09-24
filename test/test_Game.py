@@ -32,17 +32,15 @@ class TestBackgammonGame(unittest.TestCase):
         self.assertFalse(result)
 
     def test_hitting_blot(self):
-        """Test para verificar la captura de fichas solitarias"""
-        # Configurar situación de blot
-        self.game.set_piece(5, 1) # Una ficha solitaria en posición 5
+        # Set an opponent's piece (black) at point 5
+        opponent_color = 'B' if self.game.current_player == 'white' else 'W'
+        self.game.board.points[5] = [opponent_color]  # Directly set opponent piece
         
         # Realizar movimiento de captura
         self.game.make_move(3, 5)
-        opponent_color = 'black' if self.game.current_player == 'white' else 'white' # Need to check opponent's bar pieces, not current player's
-        original_player = self.game.current_player
-        self.game.current_player = opponent_color  # Switch to opponent to check their bar count
-        self.assertEqual(self.game.get_bar_pieces(), 1)
-        self.game.current_player = original_player # Switch back
+        
+        # Verificar que la ficha fue capturada
+        self.assertEqual(self.game.get_opponent_bar_pieces(), 1)
 
     def test_bearing_off(self):
         """Test para verificar las reglas de salida de fichas"""

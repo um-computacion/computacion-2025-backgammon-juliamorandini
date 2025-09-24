@@ -36,13 +36,10 @@ class TestBackgammonBoard(unittest.TestCase):
         self.assertFalse(self.board.is_valid(), "No puede haber fichas de ambos colores en el mismo punto.")
 
     def test_move_checker(self):
-        # Check what's actually at point 0 first
-        print(f"Point 0 actually has: {self.board.points[0]}")
-        
-        # If point 0 has black pieces, test moving black instead:
-        self.board.move_checker(0, 1, 'B')  # Change 'W' to 'B'
-        self.assertEqual(self.board.points[0], ['B'])  # Expect 1 black piece left
-        self.assertEqual(self.board.points[1], ['B'])  # Expect 1 black piece moved
+        # Point 0 has white pieces, so move white
+        self.board.move_checker(0, 1, 'W')  # Change 'B' to 'W'
+        self.assertEqual(self.board.points[0], ['W'])  # Expect 1 white piece left
+        self.assertEqual(self.board.points[1], ['W'])  # Expect 1 white piece moved
 
     def test_capture_checker(self):
         # Simula una captura: un punto con una sola ficha del oponente

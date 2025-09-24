@@ -43,9 +43,11 @@ class Game:
         """Get available moves based on dice."""
         return self.dice.get_moves()
 
-    def set_piece(self, point: int, count: int) -> None:
+    def set_piece(self, point: int, count: int, color: str = None) -> None:
         """Set pieces at point for testing."""
-        self.board.points[point] = ['W' if count > 0 else 'B'] * abs(count)
+        if color is None:
+            color = 'W' if self.current_player == 'white' else 'B'
+        self.board.points[point] = [color] * abs(count)
 
     def add_to_bar(self) -> None:
         """Add current player's piece to bar."""
