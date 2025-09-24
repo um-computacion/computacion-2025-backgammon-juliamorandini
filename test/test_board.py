@@ -74,9 +74,6 @@ class TestBackgammonBoard(unittest.TestCase):
         # Solo se puede sacar fichas si todas están en el home
         self.board.points = [[] for _ in range(24)]
         self.board.points[18] = ['W'] * 15  # Todas en home
-        
-        # **CORRECCIÓN:** Usar bear_off() que SÍ existe, en lugar de can_bear_off()
-        # Verificar que bear_off funciona cuando hay fichas
         result = self.board.bear_off('W', 18)
         self.assertTrue(result, "Debe poder sacar fichas del home")
         

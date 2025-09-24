@@ -71,6 +71,8 @@ class Game:
         color = 'W' if self.current_player == 'white' else 'B'
         return self.board.borne_off[color] == 15
 
-    def get_valid_moves(self, dice_values: list) -> list:
-        """Get valid moves for given dice values."""
+    
+    def get_valid_moves(self) -> list:
+        """Get valid moves based on current dice values."""
+        dice_values = [self.dice.die1, self.dice.die2]
         return [v for v in dice_values if v <= 6]

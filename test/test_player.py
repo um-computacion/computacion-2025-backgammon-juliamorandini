@@ -35,6 +35,7 @@ class TestPlayers(unittest.TestCase):
         # Simular una situación donde se puede capturar
         self.player.current_position = 5
         self.opponent.current_position = 5
+        self.opponent.pieces_at_point = 1  # Add this line - vulnerable single piece
         self.assertTrue(self.player.can_hit_opponent(self.opponent))
 
     def test_bearing_off_conditions(self):
@@ -50,6 +51,7 @@ class TestPlayers(unittest.TestCase):
     def test_blocked_point(self):
         """Test para verificar puntos bloqueados"""
         # Simular un punto con 2 o más fichas del oponente
+        self.opponent.current_position = 5  # Add this line
         self.opponent.pieces_at_point = 2
         self.assertTrue(self.player.is_point_blocked(5, self.opponent))
 
