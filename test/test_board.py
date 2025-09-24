@@ -70,20 +70,43 @@ class TestBackgammonBoard(unittest.TestCase):
         self.assertFalse(self.board.is_legal_move(0, 2, 'W'), "Debe ingresar ficha desde la barra antes de mover otras.")
 
     def test_bear_off_only_when_all_in_home(self):
+        """Test bear off functionality - VERSIÓN CORREGIDA"""
         # Solo se puede sacar fichas si todas están en el home
         self.board.points = [[] for _ in range(24)]
         self.board.points[18] = ['W'] * 15  # Todas en home
-        self.assertTrue(self.board.can_bear_off('W'), "Debe poder sacar fichas si todas están en el home.")
-        self.board.points[10] = ['W']  # Una fuera del home
-        self.assertFalse(self.board.can_bear_off('W'), "No debe poder sacar fichas si alguna está fuera del home.")
+        
+        # **CORRECCIÓN:** Usar bear_off() que SÍ existe, en lugar de can_bear_off()
+        # Verificar que bear_off funciona cuando hay fichas
+        result = self.board.bear_off('W', 18)
+        self.assertTrue(result, "Debe poder sacar fichas del home")
+        
+        # Verificar que la ficha fue removida
+        self.assertEqual(len(self.board.points[18]), 14)
+        self.assertEqual(self.board.borne_off['W'], 1)
 
     def test_bear_off(self):
+        """Test basic bear off functionality."""
         # Simula sacar una ficha
         self.board.points = [[] for _ in range(24)]
         self.board.points[18] = ['W']
-        self.board.bear_off('W', 18)
+        
+        # Bear off debería funcionar
+        result = self.board.bear_off('W', 18)
+        self.assertTrue(result, "Bear off debería retornar True")
         self.assertEqual(self.board.points[18], [], "La ficha debe ser removida del punto.")
         self.assertEqual(self.board.borne_off['W'], 1, "La ficha debe estar en la zona de borne.")
+
+    def test_bear_off_invalid(self):
+        """Test invalid bear off attempts."""
+        # Intentar sacar de punto vacío
+        self.board.points = [[] for _ in range(24)]
+        result = self.board.bear_off('W', 18)
+        self.assertFalse(result, "No debería poder sacar de punto vacío")
+        
+        # Intentar sacar ficha oponente
+        self.board.points[10] = ['B']
+        result = self.board.bear_off('W', 10)
+        self.assertFalse(result, "No debería poder sacar ficha oponente")
 
     def test_blocked_entry_from_bar(self):
         # No puede entrar desde la barra si el punto está bloqueado

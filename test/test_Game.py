@@ -15,11 +15,15 @@ class TestBackgammonGame(unittest.TestCase):
         self.assertEqual(board[11], (5))  # 5 fichas blancas en posición 11
         self.assertEqual(board[12], (-5)) # 5 fichas negras en posición 12
 
-    def test_valid_move(self):
-        """Test para verificar movimientos válidos"""
-        # Simular un movimiento válido
-        result = self.game.make_move(1, 3) # mover desde posición 1 a 3
-        self.assertTrue(result)
+    def test_valid_dice_moves(self):
+        """Test para verificar movimientos según los dados"""
+        # Proporcionar el argumento dice_values que falta
+        dice_values = [3, 4]
+        valid_moves = self.game.get_valid_moves(dice_values)  # ✅ Ahora con argumento
+        self.assertIsInstance(valid_moves, list)
+        # Verificar que todos los movimientos son válidos (<= 6)
+        for move in valid_moves:
+            self.assertLessEqual(move, 6)
 
     def test_invalid_move(self):
         """Test para verificar movimientos inválidos"""

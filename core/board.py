@@ -70,3 +70,13 @@ class Board:
     def is_legal_move(self, from_point: int, to_point: int, color: str) -> bool:
         """Alias for is_valid_move."""
         return self.is_valid_move(from_point, to_point, color)
+    
+    def is_valid(self) -> bool:
+        """Check if board state is valid (no mixed checkers on points)."""
+        for point in self.points:
+            if point:
+                first_color = point[0]
+                for checker in point:
+                    if checker != first_color:
+                        return False  # Estado inválido del tablero
+        return True
