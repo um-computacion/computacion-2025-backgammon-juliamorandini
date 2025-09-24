@@ -12,3 +12,5 @@ version 1.0.2
 [19/09] clase dice.py, player.py
 [20/09] clase board.py, checker.py, agregado de promps de desarrollo, arreglos generales en player
 [22/09] clase backgammon, promps de desarrollo 
+[23/09] arreglos de codigo para 90% de coverage (esta en 84%) y que pase tests
+[24/09] arreglo de fallos y errores

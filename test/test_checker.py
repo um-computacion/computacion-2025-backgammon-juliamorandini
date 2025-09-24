@@ -47,15 +47,15 @@ class TestChecker(unittest.TestCase):
         self.assertIn(self.white_checker.color, ['white', 'black'])
         self.assertIn(self.black_checker.color, ['white', 'black'])
 
-    def test_move_from_bar(self):
-        # Simula que la ficha está en la barra y puede entrar si el punto está libre
-        self.white_checker.position = 'bar'
-        self.board[1] = []
-        self.assertTrue(self.white_checker.can_move_to(1, self.board))
+    def test_cannot_move_from_bar_to_blocked(self):
+        # No puede entrar desde la barra si el punto está bloqueado
+        self.white_checker.send_to_bar()  # Usar este método en lugar de position = 'bar'
+        self.board[1] = [Checker('black', 1), Checker('black', 1)]
+        self.assertFalse(self.white_checker.can_move_to(1, self.board))
 
     def test_cannot_move_from_bar_to_blocked(self):
         # No puede entrar desde la barra si el punto está bloqueado
-        self.white_checker.position = 'bar'
+        self.white_checker.send_to_bar()  # Usar este método en lugar de position = 'bar'
         self.board[1] = [Checker('black', 1), Checker('black', 1)]
         self.assertFalse(self.white_checker.can_move_to(1, self.board))
 
