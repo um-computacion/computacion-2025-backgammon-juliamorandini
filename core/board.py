@@ -11,15 +11,15 @@ class Board:
     def reset(self):
         """Reset board to initial position."""
         self.points = [[] for _ in range(24)]
-        # Initial setup with W/B notation
-        self.points[0] = ['B', 'B']
+        # Swap these two lines:
+        self.points[0] = ['W', 'W']  # White at point 0
+        self.points[23] = ['B', 'B']  # Black at point 23
         self.points[5] = ['W'] * 5
         self.points[7] = ['W'] * 3
         self.points[11] = ['W'] * 5
         self.points[12] = ['B'] * 5
         self.points[16] = ['B'] * 3
         self.points[18] = ['B'] * 5
-        self.points[23] = ['W', 'W']
         self.bar = {'W': 0, 'B': 0}
         self.borne_off = {'W': 0, 'B': 0}
 

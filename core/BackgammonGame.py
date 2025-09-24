@@ -16,8 +16,19 @@ class Game:
         }
 
     def get_board(self) -> list:
-        """Get current board state."""
-        return self.board.points
+        """Get current board state as point counts."""
+        board_state = []
+        for point in self.board.points:
+            if not point:  # Empty point
+                board_state.append(0)
+            else:
+                count = len(point)
+                # Negative for black, positive for white
+                if point[0] == 'B':
+                    board_state.append(-count)
+                else:
+                    board_state.append(count)
+        return board_state
 
     def make_move(self, from_point: int, to_point: int) -> bool:
         """Make a move if valid."""
@@ -56,12 +67,13 @@ class Game:
         color = 'W' if self.current_player == 'white' else 'B'
         return self.board.bear_off(color, point)
 
-    def setup_bearing_off_scenario(self) -> None:
+    def setup_bearing_off_scenario(self):
         """Setup board for bearing off test."""
         self.board.points = [[] for _ in range(24)]
-        self.set_piece(18, 1)
+        self.set_piece(23, 1)  # Place piece at point 23 instead
 
     def setup_winning_scenario(self) -> None:
+
         """Setup board for win condition test."""
         color = 'W' if self.current_player == 'white' else 'B'
         self.board.borne_off[color] = 15
@@ -76,3 +88,4 @@ class Game:
         """Get valid moves based on current dice values."""
         dice_values = [self.dice.die1, self.dice.die2]
         return [v for v in dice_values if v <= 6]
+    
