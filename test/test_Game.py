@@ -32,15 +32,35 @@ class TestBackgammonGame(unittest.TestCase):
         self.assertFalse(result)
 
     def test_hitting_blot(self):
-        # Set an opponent's piece (black) at point 5
-        opponent_color = 'B' if self.game.current_player == 'white' else 'W'
-        self.game.board.points[5] = [opponent_color]  # Directly set opponent piece
+        """Test capturing opponent's single piece"""
+        # Set up the board properly
+        self.game.board.reset()  # Clear board
         
-        # Realizar movimiento de captura
-        self.game.make_move(3, 5)
+        # Place pieces for capture scenario
+        if self.game.current_player == 'white':
+            # White player's turn - place white piece at point 3, black piece at point 5
+            self.game.board.points[3] = ['W']  # White piece to move
+            self.game.board.points[5] = ['B']  # Single black piece (vulnerable)
+            
+            # Make capturing move (white moves from 3 to 5)
+            result = self.game.make_move(3, 5)
+        else:
+            # Black player's turn - place black piece at point 3, white piece at point 5  
+            self.game.board.points[3] = ['B']  # Black piece to move
+            self.game.board.points[5] = ['W']  # Single white piece (vulnerable)
+            
+            # Make capturing move (black moves from 3 to 5)
+            result = self.game.make_move(3, 5)
         
-        # Verificar que la ficha fue capturada
-        self.assertEqual(self.game.get_opponent_bar_pieces(), 1)
+        # Verify the capture worked
+        self.assertTrue(result, "Move should be successful")
+        self.assertEqual(self.game.get_opponent_bar_pieces(), 1, "Opponent should have 1 piece on bar")
+        
+        # Additional verification
+        self.assertEqual(len(self.game.board.points[5]), 1, "Target point should have 1 piece")
+        self.assertEqual(self.game.board.points[5][0], 
+                        'W' if self.game.current_player == 'white' else 'B',
+                        "Target point should have mover's piece")
 
     def test_bearing_off(self):
         """Test para verificar las reglas de salida de fichas"""

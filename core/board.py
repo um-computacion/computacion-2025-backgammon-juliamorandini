@@ -10,16 +10,15 @@ class Board:
 
     def reset(self):
         """Reset board to initial position."""
-        self.points = [[] for _ in range(24)]
-        # Traditional Backgammon setup:
-        self.points[0] = ['W', 'W']      # White at point 1
-        self.points[5] = ['B'] * 5       # Black at point 6 (was white)
-        self.points[7] = ['B'] * 3       # Black at point 8 (was white)  
-        self.points[11] = ['B'] * 5      # Black at point 12 (was white)
-        self.points[12] = ['W'] * 5      # White at point 13 (was black)
-        self.points[16] = ['W'] * 3      # White at point 17 (was black)
-        self.points[18] = ['W'] * 5      # White at point 19 (was black)
-        self.points[23] = ['B', 'B']     # Black at point 24
+        self.points = [[] for _ in range(24)] #es como la 8va vez que cambio y reviso esto
+        self.points[0] = ['B', 'B']      # 2 black pieces at point 0
+        self.points[5] = ['W'] * 5       # 5 white pieces at point 5
+        self.points[7] = ['W'] * 3       # 3 white pieces at point 7  
+        self.points[11] = ['W'] * 5      # 5 white pieces at point 11
+        self.points[12] = ['B'] * 5      # 5 black pieces at point 12
+        self.points[16] = ['B'] * 3      # 3 black pieces at point 16
+        self.points[18] = ['B'] * 5      # 5 black pieces at point 18
+        self.points[23] = ['W', 'W']     # 2 white pieces at point 23
         self.bar = {'W': 0, 'B': 0}
         self.borne_off = {'W': 0, 'B': 0}
 
@@ -27,12 +26,21 @@ class Board:
         """Check if move is valid."""
         if not 0 <= from_point < 24 or not 0 <= to_point < 24:
             return False
-        if self.bar[color] > 0:
+        
+        # If player has pieces on bar, must move from bar first
+        if self.bar[color] > 0 and from_point != 'bar':
             return False
+        
+        # Check if from_point has player's pieces
         if not self.points[from_point] or self.points[from_point][0] != color:
             return False
-        if len(self.points[to_point]) >= 2 and self.points[to_point][0] != color:
+        
+        # Check if to_point is blocked by opponent
+        if (self.points[to_point] and 
+            len(self.points[to_point]) >= 2 and 
+            self.points[to_point][0] != color):
             return False
+        
         return True
 
     def move_checker(self, from_point: int, to_point: int, color: str) -> bool:
@@ -40,16 +48,21 @@ class Board:
         if not self.is_valid_move(from_point, to_point, color):
             return False
 
-        # Handle hitting opponent's blot
-        if self.points[to_point] and self.points[to_point][0] != color:
+        # Handle hitting opponent's blot (CAPTURE LOGIC)
+        if self.points[to_point] and len(self.points[to_point]) == 1 and self.points[to_point][0] != color:
+            # Capture opponent's single piece
             hit_color = self.points[to_point][0]
-            self.bar[hit_color] += 1
-            self.points[to_point] = []
+            self.bar[hit_color] += 1  # Send to bar
+            self.points[to_point] = []  # Clear the point
+            print(f"Captured {hit_color} piece at point {to_point}")  # Debug
 
         # Move checker
-        self.points[from_point].pop()
-        self.points[to_point].append(color)
-        return True
+        if self.points[from_point]:
+            checker = self.points[from_point].pop()
+            self.points[to_point].append(checker)
+            return True
+        
+        return False
 
     def bear_off(self, color: str, point: int) -> bool:
         """Remove piece from board."""

@@ -18,15 +18,15 @@ class Game:
     def get_board(self) -> list:
         """Get current board state as point counts."""
         board_state = []
-        for point in self.board.points:
+        for i, point in enumerate(self.board.points):
             if not point:  # Empty point
                 board_state.append(0)
             else:
                 count = len(point)
-                # Negative for black, positive for white
-                if point[0] == 'B':
+                # Check what color occupies the point
+                if point[0] == 'B':  # Black pieces
                     board_state.append(-count)
-                else:
+                else:  # White pieces
                     board_state.append(count)
         return board_state
 
@@ -91,3 +91,7 @@ class Game:
         dice_values = [self.dice.die1, self.dice.die2]
         return [v for v in dice_values if v <= 6]
     
+    def get_opponent_bar_pieces(self) -> int:
+        """Get number of pieces on bar for opponent player."""
+        opponent_color = 'B' if self.current_player == 'white' else 'W'
+        return self.board.bar[opponent_color] 

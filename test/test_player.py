@@ -1,7 +1,7 @@
 import unittest
-from core import Players as Player
+from core.player import Player
 
-class TestPlayers(unittest.TestCase):
+class TestPlayer(unittest.TestCase):
 
     def setUp(self):
         self.player = Player("Player 1", "white")
