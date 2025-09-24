@@ -17,6 +17,7 @@ class Player:
             self.current_position = 0
             self.pieces_at_point = 2
             self.pieces = [1] * 15  # Create list with 15 pieces
+            self.pieces_removed = 0  
 
     def is_valid_move(self, dice_roll: int) -> bool:
         """Check if moving by dice_roll from current position is valid.
@@ -47,7 +48,7 @@ class Player:
         """Check if player can bear off."""
         return self.pieces_in_home_board == 15
         
-        
+
     def is_point_blocked(self, point: int, opponent: 'Player') -> bool:
         """Check if point is blocked by opponent.
         
@@ -79,3 +80,7 @@ class Player:
             bool: True if point is secure, False otherwise
         """
         return self.pieces_at_point >= 2
+    
+    def has_won(self) -> bool:
+        """Check if player has won by bearing off all pieces."""
+        return self.pieces_removed == 15
