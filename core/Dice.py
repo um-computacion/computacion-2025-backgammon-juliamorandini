@@ -1,6 +1,7 @@
 from typing import Tuple, List, Optional
 import random
 
+
 class Dice:
     """Simple dice class for Backgammon."""
 
@@ -65,10 +66,10 @@ class Dice:
 
     def set_mock_rolls(self, values: Optional[List[Tuple[int, int]]]) -> None:
         """Set predetermined roll values for testing.
-        
+
         Args:
             values: List of tuples containing dice values
-            
+
         Raises:
             ValueError: If values is None, empty, or contains invalid dice values
         """
@@ -76,14 +77,14 @@ class Dice:
             raise ValueError("Mock values cannot be None")
         if not values:
             raise ValueError("Mock values list cannot be empty")
-            
+
         for value in values:
             if not isinstance(value, tuple) or len(value) != 2:
                 raise ValueError("Mock values must be tuples of length 2")
             v1, v2 = value
             if not (1 <= v1 <= 6 and 1 <= v2 <= 6):
                 raise ValueError("Die values must be between 1 and 6")
-                
+
         self._mock_values = values
         self._mock_index = 0
 

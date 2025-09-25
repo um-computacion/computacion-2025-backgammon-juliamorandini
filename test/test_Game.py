@@ -1,5 +1,8 @@
 import unittest
-from core.BackgammonGame import Game   # Asumiendo que la clase Game está en un archivo game.py
+from core.BackgammonGame import (
+    Game,
+)  # Asumiendo que la clase Game está en un archivo game.py
+
 
 class TestBackgammonGame(unittest.TestCase):
     def setUp(self):
@@ -13,13 +16,13 @@ class TestBackgammonGame(unittest.TestCase):
         self.assertEqual(board[0], (-2))  # 2 fichas negras en posición 0
         self.assertEqual(board[23], (2))  # 2 fichas blancas en posición 23
         self.assertEqual(board[11], (5))  # 5 fichas blancas en posición 11
-        self.assertEqual(board[12], (-5)) # 5 fichas negras en posición 12
+        self.assertEqual(board[12], (-5))  # 5 fichas negras en posición 12
 
     def test_valid_dice_moves(self):
         """Test para verificar movimientos según los dados"""
         # Proporcionar el argumento dice_values que falta
         dice_values = [3, 4]
-        valid_moves = self.game.get_valid_moves(dice_values)  # ✅ Ahora con argumento
+        valid_moves = self.game.get_valid_moves(dice_values)
         self.assertIsInstance(valid_moves, list)
         # Verificar que todos los movimientos son válidos (<= 6)
         for move in valid_moves:
@@ -28,39 +31,47 @@ class TestBackgammonGame(unittest.TestCase):
     def test_invalid_move(self):
         """Test para verificar movimientos inválidos"""
         # Simular un movimiento inválido
-        result = self.game.make_move(1, 8) # movimiento demasiado largo
+        result = self.game.make_move(1, 8)  # movimiento demasiado largo
         self.assertFalse(result)
 
     def test_hitting_blot(self):
         """Test capturing opponent's single piece"""
         # Set up the board properly
         self.game.board.reset()  # Clear board
-        
+
         # Place pieces for capture scenario
-        if self.game.current_player == 'white':
+        if self.game.current_player == "white":
             # White player's turn - place white piece at point 3, black piece at point 5
-            self.game.board.points[3] = ['W']  # White piece to move
-            self.game.board.points[5] = ['B']  # Single black piece (vulnerable)
-            
+            self.game.board.points[3] = ["W"]  # White piece to move
+            self.game.board.points[5] = ["B"]  # Single black piece (vulnerable)
+
             # Make capturing move (white moves from 3 to 5)
             result = self.game.make_move(3, 5)
         else:
-            # Black player's turn - place black piece at point 3, white piece at point 5  
-            self.game.board.points[3] = ['B']  # Black piece to move
-            self.game.board.points[5] = ['W']  # Single white piece (vulnerable)
-            
+            # Black player's turn - place black piece at point 3, white piece at point 5
+            self.game.board.points[3] = ["B"]  # Black piece to move
+            self.game.board.points[5] = ["W"]  # Single white piece (vulnerable)
+
             # Make capturing move (black moves from 3 to 5)
             result = self.game.make_move(3, 5)
-        
+
         # Verify the capture worked
         self.assertTrue(result, "Move should be successful")
-        self.assertEqual(self.game.get_opponent_bar_pieces(), 1, "Opponent should have 1 piece on bar")
-        
+        self.assertEqual(
+            self.game.get_opponent_bar_pieces(),
+            1,
+            "Opponent should have 1 piece on bar",
+        )
+
         # Additional verification
-        self.assertEqual(len(self.game.board.points[5]), 1, "Target point should have 1 piece")
-        self.assertEqual(self.game.board.points[5][0], 
-                        'W' if self.game.current_player == 'white' else 'B',
-                        "Target point should have mover's piece")
+        self.assertEqual(
+            len(self.game.board.points[5]), 1, "Target point should have 1 piece"
+        )
+        self.assertEqual(
+            self.game.board.points[5][0],
+            "W" if self.game.current_player == "white" else "B",
+            "Target point should have mover's piece",
+        )
 
     def test_bearing_off(self):
         """Test para verificar las reglas de salida de fichas"""
@@ -105,10 +116,10 @@ class TestBackgammonGame(unittest.TestCase):
         self.game.add_to_bar()
         # Verificar que solo se permiten movimientos desde la barra
         self.assertTrue(self.game.must_move_from_bar())
-        
-if __name__ == '__main__':
-    unittest.main()
 
+
+if __name__ == "__main__":
+    unittest.main()
 
 
 """Este conjunto de tests verifica las siguientes reglas del Backgammon:

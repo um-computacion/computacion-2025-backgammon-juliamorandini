@@ -1,6 +1,6 @@
 class Player:
     """Player in Backgammon game."""
-    
+
     def __init__(self, name: str, color: str):
         """Create new player."""
         self.name = name
@@ -12,13 +12,13 @@ class Player:
         self.pieces_at_point = 2
         self.pieces = [1] * 15
         self.pieces_removed = 0
-    
+
     def is_valid_move(self, dice_roll: int) -> bool:
         """Check if moving by dice_roll from current position is valid.
-        
+
         Args:
             dice_roll: The number of points to move (1-6)
-            
+
         Returns:
             bool: True if move is within board boundaries, False otherwise
         """
@@ -28,10 +28,10 @@ class Player:
 
     def can_reenter_from_bar(self, entry_point: int) -> bool:
         """Check if player can reenter from the bar at given entry point.
-        
+
         Args:
             entry_point: The point number where reentry is attempted
-            
+
         Returns:
             bool: True if reentry is possible, False otherwise
         """
@@ -41,26 +41,25 @@ class Player:
     def can_bear_off(self) -> bool:
         """Check if player can bear off."""
         return self.pieces_in_home_board == 15
-        
 
-    def is_point_blocked(self, point: int, opponent: 'Player') -> bool:
+    def is_point_blocked(self, point: int, opponent: "Player") -> bool:
         """Check if point is blocked by opponent.
-        
+
         Args:
             point: Point number to check
             opponent: Opponent player object
-            
+
         Returns:
             bool: True if point is blocked, False otherwise
         """
         return opponent.current_position == point and opponent.pieces_at_point >= 2
 
-    def can_hit_opponent(self, opponent: 'Player') -> bool:
+    def can_hit_opponent(self, opponent: "Player") -> bool:
         """Check if can hit opponent's piece.
-        
+
         Args:
             opponent: Opponent player object
-            
+
         Returns:
             bool: True if can hit opponent, False otherwise
         """
@@ -69,12 +68,12 @@ class Player:
 
     def is_point_secure(self) -> bool:
         """Check if current point is secure (2+ pieces).
-        
+
         Returns:
             bool: True if point is secure, False otherwise
         """
         return self.pieces_at_point >= 2
-    
+
     def has_won(self) -> bool:
         """Check if player has won by bearing off all pieces."""
         return self.pieces_removed == 15
