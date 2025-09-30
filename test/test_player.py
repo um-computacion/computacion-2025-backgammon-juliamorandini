@@ -1,6 +1,7 @@
 import unittest
 from core.player import Player
 
+
 class TestPlayer(unittest.TestCase):
 
     def setUp(self):
@@ -43,7 +44,7 @@ class TestPlayer(unittest.TestCase):
         # Simular que todas las piezas están en el cuadrante home
         self.player.pieces_in_home_board = 15
         self.assertTrue(self.player.can_bear_off())
-        
+
         # Simular que no todas las piezas están en el cuadrante home
         self.player.pieces_in_home_board = 10
         self.assertFalse(self.player.can_bear_off())
@@ -81,9 +82,9 @@ class TestPlayer(unittest.TestCase):
         self.player.pieces_at_point = 2
         self.assertTrue(self.player.is_point_secure())
 
-if __name__ == '__main__':
-    unittest.main()
 
+if __name__ == "__main__":
+    unittest.main()
 
 
 """esoecificaciones:

@@ -2,9 +2,10 @@ import unittest
 from core.Dice import Dice
 from unittest.mock import patch
 
+
 class TestDice(unittest.TestCase):
     """Test cases for the Dice class in Backgammon game.
-    
+
     This class contains unit tests that verify:
     - Dice roll values are within valid range (1-6)
     - Double rolls are correctly identified
@@ -17,7 +18,7 @@ class TestDice(unittest.TestCase):
         """Set up a new Dice instance before each test."""
         self.dice = Dice()
 
-    @patch('random.randint', side_effect=[5, 2])
+    @patch("random.randint", side_effect=[5, 2])
     def test_roll_different_values(self, mock_randint):
         """Test that rolling dice produces the expected mock values."""
         result = self.dice.roll()
@@ -65,7 +66,7 @@ class TestDice(unittest.TestCase):
 
     def test_reset_dice(self):
         # Si existe un método reset, debe volver a (1, 1)
-        if hasattr(self.dice, 'reset'):
+        if hasattr(self.dice, "reset"):
             self.dice.roll()
             self.dice.reset()
             self.assertEqual(self.dice.get_values(), (1, 1))
@@ -91,7 +92,7 @@ class TestDice(unittest.TestCase):
         """Test that mock rolls work correctly."""
         mock_values = [(3, 4), (6, 6), (1, 2)]
         self.dice.set_mock_rolls(mock_values)
-        
+
         for expected in mock_values:
             result = self.dice.roll()
             self.assertEqual(result, expected)
@@ -168,15 +169,16 @@ class TestDice(unittest.TestCase):
         """Test multiple consecutive rolls."""
         prev_values = self.dice.get_values()
         found_different = False
-        
+
         for _ in range(10):
             current_values = self.dice.roll()
             if current_values != prev_values:
                 found_different = True
                 break
             prev_values = current_values
-            
+
         self.assertTrue(found_different, "Consecutive rolls should eventually differ")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
