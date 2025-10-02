@@ -73,7 +73,7 @@ class TestBackgammonBoard(unittest.TestCase):
         # No se puede mover a un punto con 2 o más fichas del oponente
         self.board.points[5] = ["B", "B"]
         self.assertFalse(
-            self.board.is_legal_move(4, 5, "W"),
+            self.board.is_valid_move(4, 5, "W"),  # CORREGIDO: is_legal_move -> is_valid_move
             "No se puede mover a un punto bloqueado.",
         )
 
@@ -81,7 +81,7 @@ class TestBackgammonBoard(unittest.TestCase):
         # No se puede mover ficha desde un punto vacío
         self.board.points[10] = []
         self.assertFalse(
-            self.board.is_legal_move(10, 12, "W"),
+            self.board.is_valid_move(10, 12, "W"),  # CORREGIDO: is_legal_move -> is_valid_move
             "No se puede mover desde un punto vacío.",
         )
 
@@ -89,7 +89,7 @@ class TestBackgammonBoard(unittest.TestCase):
         # No se puede mover ficha del oponente
         self.board.points[8] = ["B"]
         self.assertFalse(
-            self.board.is_legal_move(8, 10, "W"),
+            self.board.is_valid_move(8, 10, "W"),  # CORREGIDO: is_legal_move -> is_valid_move
             "No se puede mover ficha del oponente.",
         )
 
@@ -97,7 +97,7 @@ class TestBackgammonBoard(unittest.TestCase):
         # Si hay fichas en la barra, deben entrar antes de mover otras fichas
         self.board.bar["W"] = 1
         self.assertFalse(
-            self.board.is_legal_move(0, 2, "W"),
+            self.board.is_valid_move(0, 2, "W"),  # CORREGIDO: is_legal_move -> is_valid_move
             "Debe ingresar ficha desde la barra antes de mover otras.",
         )
 
