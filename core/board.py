@@ -1,6 +1,7 @@
 """Module containing the Board class for Backgammon game."""
 
-from typing import List, Dict, Optional
+from typing import List, Dict
+
 
 class Board:
     """Backgammon board representation."""
@@ -29,12 +30,12 @@ class Board:
 
     def is_valid_move(self, from_point: int, to_point: int, color: str) -> bool:
         """Check if move is valid.
-        
+
         Args:
             from_point: Starting point (0-23)
             to_point: Target point (0-23)
             color: Color of moving piece ('W' or 'B')
-            
+
         Returns:
             bool: True if move is valid
         """
@@ -47,21 +48,23 @@ class Board:
         if not self.points[from_point] or self.points[from_point][0] != color:
             return False
 
-        if (self.points[to_point] and 
-            len(self.points[to_point]) >= 2 and 
-            self.points[to_point][0] != color):
+        if (
+            self.points[to_point]
+            and len(self.points[to_point]) >= 2
+            and self.points[to_point][0] != color
+        ):
             return False
 
         return True
 
     def move_checker(self, from_point: int, to_point: int, color: str) -> bool:
         """Move checker if valid.
-        
+
         Args:
             from_point: Starting point
             to_point: Target point
             color: Color of moving piece
-            
+
         Returns:
             bool: True if move was successful
         """
@@ -69,9 +72,11 @@ class Board:
             return False
 
         # Handle hitting opponent's blot
-        if (self.points[to_point] and 
-            len(self.points[to_point]) == 1 and 
-            self.points[to_point][0] != color):
+        if (
+            self.points[to_point]
+            and len(self.points[to_point]) == 1
+            and self.points[to_point][0] != color
+        ):
             hit_color = self.points[to_point][0]
             self.bar[hit_color] += 1
             self.points[to_point] = []
@@ -86,11 +91,11 @@ class Board:
 
     def bear_off(self, color: str, point: int) -> bool:
         """Remove piece from board.
-        
+
         Args:
             color: Color of piece to bear off
             point: Point to bear off from
-            
+
         Returns:
             bool: True if piece was borne off
         """
@@ -104,11 +109,11 @@ class Board:
 
     def can_enter_from_bar(self, color: str, point: int) -> bool:
         """Check if piece can enter from bar.
-        
+
         Args:
             color: Color of piece
             point: Target point
-            
+
         Returns:
             bool: True if piece can enter
         """
@@ -120,18 +125,17 @@ class Board:
 
     def can_bear_off(self, color: str) -> bool:
         """Check if player can bear off pieces.
-        
+
         Args:
             color: Color to check
-            
+
         Returns:
             bool: True if all pieces are in home board
         """
         if self.bar[color] > 0:
             return False
-            
+
         start = 18 if color == "W" else 0
-        end = 24 if color == "W" else 6
         
         # Check no pieces outside home board
         for i in range(0, start):
@@ -141,9 +145,10 @@ class Board:
 
     def is_valid(self) -> bool:
         """Check if board state is valid.
-        
+
         Returns:
             bool: True if no points have mixed colors
         """
-        return all(not point or all(c == point[0] for c in point) 
-                  for point in self.points)
+        return all(
+            not point or all(c == point[0] for c in point) for point in self.points
+        )
