@@ -53,12 +53,6 @@ class TestChecker(unittest.TestCase):
         self.white_checker.send_to_bar()  # Usar este método en lugar de position = 'bar'
         self.board[1] = [Checker("black", 1), Checker("black", 1)]
         self.assertFalse(self.white_checker.can_move_to(1, self.board))
-        
-    def test_cannot_move_from_bar_to_blocked(self):
-        # No puede entrar desde la barra si el punto está bloqueado
-        self.white_checker.send_to_bar()  # Usar este método en lugar de position = 'bar'
-        self.board[1] = [Checker("black", 1), Checker("black", 1)]
-        self.assertFalse(self.white_checker.can_move_to(1, self.board))
 
     def test_bear_off_allowed(self):
         # Simula que la ficha puede salir del tablero (bear off)
