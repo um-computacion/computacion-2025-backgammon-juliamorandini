@@ -1,3 +1,5 @@
+"""Module containing the main Backgammon game logic."""
+
 from core.board import Board
 from core.player import Player
 from core.Dice import Dice
@@ -19,7 +21,7 @@ class Game:
     def get_board(self) -> list:
         """Get current board state as point counts."""
         board_state = []
-        for i, point in enumerate(self.board.points):
+        for point in self.board.points:
             if not point:  # Empty point
                 board_state.append(0)
             else:

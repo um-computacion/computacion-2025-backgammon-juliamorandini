@@ -1,6 +1,6 @@
 import unittest
-from core.Dice import Dice
 from unittest.mock import patch
+from core.Dice import Dice
 
 
 class TestDice(unittest.TestCase):
@@ -19,7 +19,7 @@ class TestDice(unittest.TestCase):
         self.dice = Dice()
 
     @patch("random.randint", side_effect=[5, 2])
-    def test_roll_different_values(self, mock_randint):
+    def test_roll_different_values(self, _):
         """Test that rolling dice produces the expected mock values."""
         result = self.dice.roll()
         self.assertEqual(result, (5, 2))
