@@ -8,31 +8,17 @@ core/__init__.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 core/Dice.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 core/Dice.py:1:0: C0103: Module name "Dice" doesn't conform to snake_case naming style (invalid-name)
 ************* Module core.BackgammonGame
-core/BackgammonGame.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 core/BackgammonGame.py:1:0: C0103: Module name "BackgammonGame" doesn't conform to snake_case naming style (invalid-name)
-core/BackgammonGame.py:22:12: W0612: Unused variable 'i' (unused-variable)
 ************* Module core.board
-core/board.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-core/board.py:7:8: C0104: Disallowed name "bar" (disallowed-name)
+core/board.py:139:0: C0303: Trailing whitespace (trailing-whitespace)
+core/board.py:12:8: C0104: Disallowed name "bar" (disallowed-name)
 ************* Module core.player
 core/player.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 core/player.py:1:0: R0902: Too many instance attributes (9/7) (too-many-instance-attributes)
 ************* Module core.Checker
-core/Checker.py:9:0: C0325: Unnecessary parens after '=' keyword (superfluous-parens)
-core/Checker.py:40:0: C0303: Trailing whitespace (trailing-whitespace)
-core/Checker.py:44:0: C0303: Trailing whitespace (trailing-whitespace)
-core/Checker.py:49:0: C0325: Unnecessary parens after 'not' keyword (superfluous-parens)
-core/Checker.py:64:0: C0303: Trailing whitespace (trailing-whitespace)
-core/Checker.py:69:0: C0303: Trailing whitespace (trailing-whitespace)
-core/Checker.py:71:0: C0304: Final newline missing (missing-final-newline)
-core/Checker.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+core/Checker.py:100:0: C0325: Unnecessary parens after 'not' keyword (superfluous-parens)
 core/Checker.py:1:0: C0103: Module name "Checker" doesn't conform to snake_case naming style (invalid-name)
-core/Checker.py:1:0: C0115: Missing class docstring (missing-class-docstring)
-core/Checker.py:12:4: C0116: Missing function or method docstring (missing-function-docstring)
-core/Checker.py:19:4: C0116: Missing function or method docstring (missing-function-docstring)
-core/Checker.py:23:4: C0116: Missing function or method docstring (missing-function-docstring)
-core/Checker.py:27:4: C0116: Missing function or method docstring (missing-function-docstring)
-core/Checker.py:57:4: C0116: Missing function or method docstring (missing-function-docstring)
+core/Checker.py:3:0: W0611: Unused Optional imported from typing (unused-import)
 
 -----------------------------------
 Your code has been rated at 0.00/10
