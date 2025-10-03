@@ -14,3 +14,5 @@ version 1.0.2
 [22/09] clase backgammon, promps de desarrollo 
 [23/09] arreglos de codigo para 90% de coverage (esta en 84%) y que pase tests
 [24/09] arreglo de fallos y errores de test y codigo
+[25/09-03/10] arreglo de fallos y formato pylint 
+[03/10] agregado de test cli
