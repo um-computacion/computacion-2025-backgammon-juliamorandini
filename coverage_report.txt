@@ -7,7 +7,7 @@ core/__init__.py             6      0   100%
 core/board.py               65      8    88%   43, 56, 90, 103, 121, 123, 136, 143
 core/player.py              27      0   100%
 test/test_Game.py           50      1    98%   80
-test/test_board.py          67      1    99%   155
+test/test_board.py          67      1    99%   163
 test/test_checker.py        44      1    98%   79
 test/test_dice.py          121      2    98%   178, 184
 test/test_player.py         49      1    98%   87
