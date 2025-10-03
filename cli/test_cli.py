@@ -13,8 +13,6 @@ class CommandInterface(ABC):
     @abstractmethod
     def execute(self, *args):
         """Execute the command."""
-        pass
-
 
 class MoveCommand(CommandInterface):
     """Command for moving pieces."""
