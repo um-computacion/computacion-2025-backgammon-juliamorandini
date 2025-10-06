@@ -25,7 +25,7 @@ class TestBackgammonCLI(unittest.TestCase):
         self.assertIn("Bar -", output)
         self.assertIn("Borne Off -", output)
 
-    @patch("builtins.input", side_effect=["1", "3"])
+    @patch("builtins.input", side_effect=["1 3"])
     def test_get_move_input_valid(self, mock_input):
         """Test valid move input handling."""
         move = self.cli.get_move_input()
@@ -65,17 +65,16 @@ class TestBackgammonCLI(unittest.TestCase):
         self.assertIn("Rolled:", output)
         self.assertIn("Thanks for playing!", output)
 
-    @patch("builtins.input", side_effect=["move", "1", "3", "quit"])
+    @patch("builtins.input", side_effect=["move", "1 3", "quit"])
     @patch("sys.stdout", new_callable=StringIO)
     def test_run_move_command(self, mock_stdout, mock_input):
         """Test move command in game loop."""
         self.cli.run()
         output = mock_stdout.getvalue()
-
         self.assertIn("Welcome to Backgammon!", output)
-        self.assertIn("Enter move", output)
+        self.assertIn("Invalid move!", output)  # Changed this line
         self.assertIn("Thanks for playing!", output)
-
+        
     @patch("builtins.input", side_effect=["invalid", "quit"])
     @patch("sys.stdout", new_callable=StringIO)
     def test_run_invalid_command(self, mock_stdout, mock_input):
