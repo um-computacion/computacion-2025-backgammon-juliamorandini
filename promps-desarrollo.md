@@ -295,3 +295,6 @@ class Game:
                         self.board.move_checker(to_point, from_point, self.current_player)
                         
         return valid_moves
+
+
+promp: 

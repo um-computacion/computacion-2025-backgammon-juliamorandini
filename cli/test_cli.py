@@ -14,6 +14,7 @@ class CommandInterface(ABC):
     def execute(self, *args):
         """Execute the command."""
 
+
 class MoveCommand(CommandInterface):
     """Command for moving pieces."""
 
@@ -43,7 +44,7 @@ class TestBackgammonCLI(unittest.TestCase):
         self.assertIsInstance(self.roll_command, CommandInterface)
 
     @patch("sys.stdout", new_callable=StringIO)
-    def test_display_board(self, mock_stdout):
+    def test_display_board(self, mock_stdout):  # revisar que es mock_stdout
         """Test board display following Single Responsibility."""
         board = self.game.get_board()
         self.assertIsNotNone(board)
