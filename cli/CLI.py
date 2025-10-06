@@ -1,49 +1,7 @@
 """Command Line Interface module for Backgammon game."""
 
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict, Any, Callable
 from core.BackgammonGame import Game
-from abc import ABC, abstractmethod
-
-
-class CommandInterface(ABC):
-    """Interface for CLI commands following Interface Segregation Principle."""
-
-    @abstractmethod
-    def execute(self, *args):
-        """Execute the command."""
-        pass
-
-
-class MoveCommand(CommandInterface):
-    """Command for moving pieces."""
-
-    def execute(self, game: Game, from_point: int, to_point: int) -> bool:
-        """Execute move command.
-
-        Args:
-            game: Game instance
-            from_point: Starting point
-            to_point: Target point
-
-        Returns:
-            bool: True if move was successful
-        """
-        return game.make_move(from_point, to_point)
-
-
-class RollCommand(CommandInterface):
-    """Command for rolling dice."""
-
-    def execute(self, game: Game) -> Tuple[int, int]:
-        """Execute roll command.
-
-        Args:
-            game: Game instance
-
-        Returns:
-            Tuple[int, int]: Dice values
-        """
-        return game.dice.roll()
 
 
 class BackgammonCLI:
@@ -52,17 +10,16 @@ class BackgammonCLI:
     def __init__(self):
         """Initialize CLI with new game."""
         self.game = Game()
-        self.commands = {
-            "move": MoveCommand(),
-            "roll": RollCommand(),
+        self.is_running = True
+        self.commands: Dict[str, Any] = {
+            "move": self.handle_move,
+            "roll": self.handle_roll,
             "help": self.show_help,
             "quit": self.quit_game,
         }
-        self.is_running = True
 
     def display_board(self) -> None:
         """Display current board state."""
-        board = self.game.get_board()
         print("\nCurrent Board:")
         print("Points:  12 11 10  9  8  7    6  5  4  3  2  1")
         print("      +------------------+------------------+")
@@ -90,12 +47,8 @@ class BackgammonCLI:
         print("\n")
 
         # Display bar pieces
-        print(
-            f"Bar - White: {self.game.board.bar['W']} Black: {self.game.board.bar['B']}"
-        )
-        print(
-            f"Borne Off - White: {self.game.board.borne_off['W']} Black: {self.game.board.borne_off['B']}"
-        )
+        print(f"Bar - White: {self.game.board.bar['W']} Black: {self.game.board.bar['B']}")
+        print(f"Borne Off - White: {self.game.board.borne_off['W']} Black: {self.game.board.borne_off['B']}")
 
     def get_move_input(self) -> Optional[Tuple[int, int]]:
         """Get move input from user.
@@ -115,20 +68,45 @@ class BackgammonCLI:
 
     def show_help(self) -> None:
         """Display help text."""
-        print(
-            """
+        print("""
         Commands:
         - move <from> <to>: Move a checker
         - roll: Roll the dice
         - help: Show this help
         - quit: Exit game
-        """
-        )
+        """)
 
     def quit_game(self) -> None:
         """Exit the game."""
         self.is_running = False
         print("Thanks for playing!")
+
+    def handle_move(self) -> None:
+        """Handle move command."""
+        move = self.get_move_input()
+        if move:
+            from_point, to_point = move
+            if self.game.make_move(from_point, to_point):
+                print("Move successful!")
+            else:
+                print("Invalid move!")
+
+    def handle_roll(self) -> None:
+        """Handle roll command."""
+        values = self.game.dice.roll()
+        print(f"Rolled: {values}")
+
+    def process_command(self, command: str) -> None:
+        """Process user command.
+        
+        Args:
+            command: Command to process
+        """
+        command = command.lower().strip()
+        if command in self.commands:
+            self.commands[command]()
+        else:
+            print("Unknown command. Type 'help' for commands.")
 
     def run(self) -> None:
         """Main game loop."""
@@ -138,26 +116,8 @@ class BackgammonCLI:
         while self.is_running:
             self.display_board()
             print(f"\nCurrent player: {self.game.current_player}")
-
-            command = input("\nEnter command: ").lower().strip()
-
-            if command == "quit":
-                self.commands["quit"]()
-            elif command == "help":
-                self.commands["help"]()
-            elif command == "roll":
-                values = self.commands["roll"].execute(self.game)
-                print(f"Rolled: {values}")
-            elif command == "move":
-                move = self.get_move_input()
-                if move:
-                    from_point, to_point = move
-                    if self.commands["move"].execute(self.game, from_point, to_point):
-                        print("Move successful!")
-                    else:
-                        print("Invalid move!")
-            else:
-                print("Unknown command. Type 'help' for commands.")
+            command = input("\nEnter command: ")
+            self.process_command(command)
 
             if self.game.check_winner():
                 print(f"\n{self.game.current_player} wins!")
