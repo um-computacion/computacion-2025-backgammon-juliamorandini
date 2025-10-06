@@ -44,11 +44,16 @@ class TestBackgammonCLI(unittest.TestCase):
         self.assertIsInstance(self.roll_command, CommandInterface)
 
     @patch("sys.stdout", new_callable=StringIO)
-    def test_display_board(self, mock_stdout):  # revisar que es mock_stdout
+    def test_display_board(self, mock_stdout):
         """Test board display following Single Responsibility."""
         board = self.game.get_board()
+        print(board)  # This will be captured by mock_stdout
+        output = mock_stdout.getvalue()
+
         self.assertIsNotNone(board)
-        # Check if board points contain valid values
+        self.assertIsNotNone(output)
+        self.assertNotEqual(output.strip(), "")
+
         for point in board:
             self.assertIn(abs(point), range(0, 6))
 
@@ -64,8 +69,12 @@ class TestBackgammonCLI(unittest.TestCase):
     def test_roll_command(self, mock_stdout):
         """Test roll command execution."""
         values = self.roll_command.execute(self.game)
+        print(f"Rolled: {values}")  # This will be captured
+        output = mock_stdout.getvalue()
+
         self.assertTrue(1 <= values[0] <= 6)
         self.assertTrue(1 <= values[1] <= 6)
+        self.assertIn("Rolled:", output)
 
     @patch("builtins.input", return_value="q")
     def test_quit_command(self, mock_input):
@@ -77,7 +86,11 @@ class TestBackgammonCLI(unittest.TestCase):
     def test_display_state(self, mock_stdout):
         """Test game state display following Open/Closed principle."""
         current = self.game.current_player
+        print(f"Current player: {current}")  # This will be captured
+        output = mock_stdout.getvalue()
+
         self.assertIn(current, ["white", "black"])
+        self.assertIn("Current player:", output)
 
     @patch("builtins.input", side_effect=["invalid", "1", "3"])
     def test_input_validation(self, mock_input):
