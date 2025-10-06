@@ -16,3 +16,4 @@ version 1.0.2
 [24/09] arreglo de fallos y errores de test y codigo
 [25/09-03/10] arreglo de fallos y formato pylint 
 [03/10] agregado de test cli
+[06/10] arreglo de test cli y agregado de clase cli
