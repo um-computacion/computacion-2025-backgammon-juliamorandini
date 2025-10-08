@@ -1,0 +1,25 @@
+************* Module test
+test/__init__.py:1:0: F0010: error while code parsing: Unable to load file test/__init__.py:
+[Errno 2] No such file or directory: 'test/__init__.py' (parse-error)
+************* Module core
+core/__init__.py:7:0: C0304: Final newline missing (missing-final-newline)
+core/__init__.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+************* Module core.Dice
+core/Dice.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+core/Dice.py:1:0: C0103: Module name "Dice" doesn't conform to snake_case naming style (invalid-name)
+************* Module core.BackgammonGame
+core/BackgammonGame.py:1:0: C0103: Module name "BackgammonGame" doesn't conform to snake_case naming style (invalid-name)
+************* Module core.board
+core/board.py:139:0: C0303: Trailing whitespace (trailing-whitespace)
+core/board.py:12:8: C0104: Disallowed name "bar" (disallowed-name)
+************* Module core.player
+core/player.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+core/player.py:1:0: R0902: Too many instance attributes (9/7) (too-many-instance-attributes)
+************* Module core.Checker
+core/Checker.py:100:0: C0325: Unnecessary parens after 'not' keyword (superfluous-parens)
+core/Checker.py:1:0: C0103: Module name "Checker" doesn't conform to snake_case naming style (invalid-name)
+core/Checker.py:3:0: W0611: Unused Optional imported from typing (unused-import)
+
+-----------------------------------
+Your code has been rated at 0.00/10
+
