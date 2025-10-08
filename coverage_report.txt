@@ -1,5 +1,7 @@
 Name                     Stmts   Miss  Cover   Missing
 ------------------------------------------------------
+cli/CLI.py                  73      8    89%   65-67, 90, 123-124, 128-129
+cli/__init__.py              0      0   100%
 core/BackgammonGame.py      57      6    89%   69-70, 94-95, 99-100
 core/Checker.py             54     11    80%   36-41, 65, 67, 70, 101, 123
 core/Dice.py                63      0   100%
@@ -9,7 +11,8 @@ core/player.py              27      0   100%
 test/test_Game.py           50      1    98%   80
 test/test_board.py          67      1    99%   163
 test/test_checker.py        44      1    98%   79
+test/test_cli.py            74      1    99%   110
 test/test_dice.py          121      2    98%   178, 184
 test/test_player.py         49      1    98%   87
 ------------------------------------------------------
-TOTAL                      603     31    95%
+TOTAL                      750     40    95%
