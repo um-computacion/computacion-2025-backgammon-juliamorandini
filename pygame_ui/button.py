@@ -40,5 +40,39 @@ class Button:
         Draw the button on the surface.
         
         Args:
-            surface: Pygame
-            """
+            surface: Pygame surface to draw on
+        """
+        # Choose color based on hover state
+        current_color = self.hover_color if self.is_hovered else self.color
+        
+        # Draw button rectangle with rounded corners effect
+        pygame.draw.rect(surface, current_color, self.rect, border_radius=8)
+        pygame.draw.rect(surface, (0, 0, 0), self.rect, 2, border_radius=8)
+        
+        # Draw text centered on button
+        text_surface = self.font.render(self.text, True, self.text_color)
+        text_rect = text_surface.get_rect(center=self.rect.center)
+        surface.blit(text_surface, text_rect)
+    
+    def handle_event(self, event):
+        """
+        Handle mouse events for the button.
+        
+        Args:
+            event: Pygame event
+            
+        Returns:
+            True if button was clicked, False otherwise
+        """
+        if event.type == pygame.MOUSEMOTION:
+            # Update hover state based on mouse position
+            self.is_hovered = self.rect.collidepoint(event.pos)
+            return False
+        
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            # Check if button was clicked
+            if event.button == 1 and self.rect.collidepoint(event.pos):
+                return True
+        
+        return False
+    

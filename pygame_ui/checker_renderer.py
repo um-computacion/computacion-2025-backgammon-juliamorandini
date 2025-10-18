@@ -49,16 +49,16 @@ class CheckerRenderer:
         """
         x_pos = self._get_point_x_center(point_index)
         
-        # Determine if this is a top or bottom point
-        is_top = point_index <= 11
+        # Points 0-11 are on bottom, 12-23 are on top
+        is_top = point_index >= 12
         
         for i, color in enumerate(checkers):
             if is_top:
                 # Top points - stack downward
-                y_pos = self.inner_top + Config.POINT_HEIGHT - (i * Config.CHECKER_SPACING) - Config.CHECKER_RADIUS
+                y_pos = self.inner_top + 20 + (i * Config.CHECKER_SPACING)
             else:
                 # Bottom points - stack upward
-                y_pos = self.inner_bottom - Config.POINT_HEIGHT + (i * Config.CHECKER_SPACING) + Config.CHECKER_RADIUS
+                y_pos = self.inner_bottom - 20 - (i * Config.CHECKER_SPACING)
             
             self._draw_single_checker(surface, x_pos, y_pos, color)
     
@@ -159,29 +159,33 @@ class CheckerRenderer:
         """
         Get the X coordinate of the center of a point.
         
+        Board layout mapping:
+        Top row (left to right):    12 13 14 15 16 17 | BAR | 18 19 20 21 22 23
+        Bottom row (left to right):  11 10 9  8  7  6 | BAR | 5  4  3  2  1  0
+        
         Args:
             point_index: Point number (0-23)
             
         Returns:
             X coordinate of point center
         """
-        # Convert point index to visual index (0-11)
-        if point_index < 6:
+        # Determine which visual position (0-11, left to right)
+        if 0 <= point_index <= 5:
+            # Bottom right: points 0-5 (reversed: 5,4,3,2,1,0)
             visual_index = 5 - point_index
-        elif point_index < 12:
-            visual_index = point_index - 6
-        elif point_index < 18:
-            visual_index = 23 - point_index
-        else:
-            visual_index = point_index - 12
-        
-        # Calculate x position
-        if visual_index < 6:
-            # Right side
             section_start = Config.BAR_X + Config.BAR_WIDTH
-            x = section_start + (5 - visual_index) * Config.POINT_WIDTH
-        else:
-            # Left side
-            x = self.inner_left + (11 - visual_index) * Config.POINT_WIDTH
+        elif 6 <= point_index <= 11:
+            # Bottom left: points 6-11 (reversed: 11,10,9,8,7,6)
+            visual_index = 11 - point_index
+            section_start = self.inner_left
+        elif 12 <= point_index <= 17:
+            # Top left: points 12-17 (normal: 12,13,14,15,16,17)
+            visual_index = point_index - 12
+            section_start = self.inner_left
+        else:  # 18-23
+            # Top right: points 18-23 (normal: 18,19,20,21,22,23)
+            visual_index = point_index - 18
+            section_start = Config.BAR_X + Config.BAR_WIDTH
         
+        x = section_start + (visual_index * Config.POINT_WIDTH)
         return x + Config.POINT_WIDTH // 2
