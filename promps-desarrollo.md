@@ -462,3 +462,27 @@ class BackgammonCLI:
 if __name__ == "__main__":
     cli = BackgammonCLI()
     cli.run()
+
+promp: want to create a backgammon board using Pygame. Please create the visual board layout based on this reference image. Here are the specific characteristics I need: Board Structure:
+
+The board should be divided into two halves (left and right sides) separated by a central bar The board has a wooden texture background with a brown/orange color scheme There's a darker brown border/frame around the entire board
+
+Triangular Points:
+
+24 triangular points total (12 on each side of the board) Points alternate in color between two shades: a lighter tan/beige and a darker brown 6 points on the top of each half, 6 points on the bottom of each half The triangles should point inward (top triangles point down, bottom triangles point up) The triangles should be evenly spaced and properly sized
+
+Central Bar:
+
+A vertical green bar divides the board into left and right sections The bar has a wooden texture or pattern with brass-colored hinges (top and bottom) The bar should be proportional to the board size
+
+Right Side Panel:
+
+There's a panel on the far right side of the board This panel has a striped green/yellow diagonal pattern in its upper and lower sections The middle section matches the wooden board texture This appears to be the checker collection/bearing off area
+
+Color Scheme:
+
+Main board: Wood texture in orange/tan tones Dark border: Deep brown Alternating points: Light tan and dark brown Central bar: Green with brass hinges Right panel: Green/yellow diagonal stripes
+
+Important: For now, do NOT include dice or checker pieces. I only want the empty board layout rendered properly use SOLID principies, modular files, Each class has a single responsibility , Easy to maintain and test.
+
+can you help me do it step by step and in different comits, remembering that im a junior. can you also specify when i should make a new folder or file and where i should put all the things that you are givving me
