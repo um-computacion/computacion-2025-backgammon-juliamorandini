@@ -9,7 +9,7 @@ class TestPoint(unittest.TestCase):
 
     def setUp(self):
         """Setup test fixtures."""
-        pygame.init()
+        pygame.i nit()
         self.surface = pygame.Surface((100, 100))
         self.point = Point(0, 0, 50, 50)
 
