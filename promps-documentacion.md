@@ -93,3 +93,4 @@ classDiagram
     Game --> Dice
     Game --> Player
     BackgammonCLI --> Game
+obeservacion: esto no va a ser usado literalmente, solo como referencia

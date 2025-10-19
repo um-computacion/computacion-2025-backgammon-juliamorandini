@@ -18,3 +18,4 @@ version 1.0.2
 [03/10] agregado de test cli
 [06/10] arreglo de test cli y agregado de clase cli
 [18/10] agregado de pygame
+[19/10] diagrama UML
