@@ -1,13 +1,12 @@
 """
 Main entry point for the Backgammon game.
 This is the file you run to start the game.
+
+IMPORTANT: Run this file from the project root directory:
+    python main.py
 """
 import pygame
-import sys
-import os
-
-# Add parent directory to path to import config
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from typing import Optional
 
 from config import Config
 from pygame_ui.backgammon_board import BackgammonBoard
@@ -15,34 +14,53 @@ from pygame_ui.board_interaction import BoardInteraction
 from pygame_ui.button import Button
 
 
-def main():
-    """Main game function with game loop."""
+def main() -> None:
+    """
+    Main game function with game loop.
+    
+    This function initializes pygame, creates game components,
+    and runs the main game loop handling events, updates, and rendering.
+    
+    Returns:
+        None
+    """
     # Pygame setup
     pygame.init()
-    screen = pygame.display.set_mode((Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT))
+    screen: pygame.Surface = pygame.display.set_mode(
+        (Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT)
+    )
     pygame.display.set_caption("Backgammon Game")
-    clock = pygame.time.Clock()
+    clock: pygame.time.Clock = pygame.time.Clock()
     
     # Create game components
-    backgammon_board = BackgammonBoard()
-    board_interaction = BoardInteraction()
+    backgammon_board: BackgammonBoard = BackgammonBoard()
+    board_interaction: BoardInteraction = BoardInteraction()
     
     # Create UI buttons
-    roll_button = Button(50, 650, 150, 50, "Roll Dice", 
-                        color=(70, 130, 180), 
-                        hover_color=(100, 160, 210))
-    reset_button = Button(220, 650, 150, 50, "Reset", 
-                         color=(180, 70, 70), 
-                         hover_color=(210, 100, 100))
-    next_turn_button = Button(390, 650, 150, 50, "Next Turn", 
-                             color=(70, 180, 70), 
-                             hover_color=(100, 210, 100))
+    roll_button: Button = Button(
+        50, 650, 150, 50, "Roll Dice [Space]",
+        color=(70, 130, 180),
+        hover_color=(100, 160, 210)
+    )
+    reset_button: Button = Button(
+        220, 650, 150, 50, "Reset",
+        color=(180, 70, 70),
+        hover_color=(210, 100, 100)
+    )
+    next_turn_button: Button = Button(
+        390, 650, 150, 50, "Next Turn [N]",
+        color=(70, 180, 70),
+        hover_color=(100, 210, 100)
+    )
+    
+    # Game state variables
+    selected_point: Optional[int] = None  # Track which point is selected
+    dice_rolled: bool = False  # Track if dice have been rolled this turn
+    moves_made: int = 0  # Track number of moves made this turn
+    max_moves_this_turn: int = 0  # Track maximum moves for current turn
     
     # Game loop
-    running = True
-    selected_point = None  # Track which point is selected
-    dice_rolled = False  # Track if dice have been rolled this turn
-    moves_made = 0  # Track number of moves made this turn
+    running: bool = True
     
     while running:
         # Poll for events
@@ -62,6 +80,8 @@ def main():
                         dice = backgammon_board.roll_dice()
                         dice_rolled = True
                         moves_made = 0
+                        # Calculate max moves based on whether it's doubles
+                        max_moves_this_turn = 4 if len(dice) == 4 else 2
                         print(f"{backgammon_board.current_player} rolled: {dice}")
                     else:
                         print("Already rolled! Make your moves or press N for next turn")
@@ -71,6 +91,7 @@ def main():
                     backgammon_board.switch_player()
                     dice_rolled = False
                     moves_made = 0
+                    max_moves_this_turn = 0
                     selected_point = None
                     print(f"Turn ended. Now playing: {backgammon_board.current_player}")
                 
@@ -80,13 +101,14 @@ def main():
                     selected_point = None
                     dice_rolled = False
                     moves_made = 0
+                    max_moves_this_turn = 0
                     print("Board reset!")
             
             # Handle board interactions (clicks)
             interaction_result = board_interaction.handle_event(event)
             if interaction_result:
                 if interaction_result['type'] == 'point_click':
-                    point = interaction_result['point']
+                    point: int = interaction_result['point']
                     
                     # Must roll dice first
                     if not dice_rolled:
@@ -94,8 +116,11 @@ def main():
                         continue
                     
                     # Check if all moves used
-                    max_moves = 4 if backgammon_board.dice_values[0] == backgammon_board.dice_values[1] else 2
-                    if moves_made >= max_moves:
+                    if not backgammon_board.dice_values:
+                        print("All moves used! Press N to end turn")
+                        continue
+                    
+                    if moves_made >= max_moves_this_turn:
                         print("All moves used! Press N to end turn")
                         continue
                     
@@ -104,19 +129,19 @@ def main():
                     # Simple move logic: select first, then move
                     if selected_point is None:
                         # First click - select a point (must have current player's pieces)
-                        if backgammon_board.board.points[point] and \
-                           backgammon_board.board.points[point][0] == backgammon_board.current_player:
+                        if (backgammon_board.board.points[point] and
+                            backgammon_board.board.points[point][0] == backgammon_board.current_player):
                             selected_point = point
                             print(f"Selected point {point}")
                         else:
                             print(f"Point {point} has no {backgammon_board.current_player} pieces")
                     else:
                         # Second click - try to move
-                        distance = abs(point - selected_point)
+                        distance: int = abs(point - selected_point)
                         
                         # Check if distance matches one of the available dice
                         if distance in backgammon_board.dice_values:
-                            success = backgammon_board.move_checker(selected_point, point)
+                            success: bool = backgammon_board.move_checker(selected_point, point)
                             if success:
                                 print(f"Moved from {selected_point} to {point}")
                                 # Remove used die
@@ -139,6 +164,8 @@ def main():
                     dice = backgammon_board.roll_dice()
                     dice_rolled = True
                     moves_made = 0
+                    # Calculate max moves based on whether it's doubles
+                    max_moves_this_turn = 4 if len(dice) == 4 else 2
                     print(f"{backgammon_board.current_player} rolled: {dice}")
                 else:
                     print("Already rolled! Make your moves or press N for next turn")
@@ -148,12 +175,14 @@ def main():
                 selected_point = None
                 dice_rolled = False
                 moves_made = 0
+                max_moves_this_turn = 0
                 print("Board reset!")
             
             if next_turn_button.handle_event(event):
                 backgammon_board.switch_player()
                 dice_rolled = False
                 moves_made = 0
+                max_moves_this_turn = 0
                 selected_point = None
                 print(f"Turn ended. Now playing: {backgammon_board.current_player}")
         
@@ -172,26 +201,26 @@ def main():
         next_turn_button.draw(screen)
         
         # Draw current player indicator
-        font = pygame.font.Font(None, 36)
-        player_color = "White" if backgammon_board.current_player == "W" else "Black"
-        player_text = f"Current Player: {player_color}"
-        text_surface = font.render(player_text, True, (255, 255, 255))
+        font: pygame.font.Font = pygame.font.Font(None, 36)
+        player_color: str = "White" if backgammon_board.current_player == "W" else "Black"
+        player_text: str = f"Current Player: {player_color}"
+        text_surface: pygame.Surface = font.render(player_text, True, (255, 255, 255))
         screen.blit(text_surface, (600, 660))
         
         # Draw dice values if rolled
         if backgammon_board.dice_values:
-            dice_text = f"Dice: {backgammon_board.dice_values}"
-            dice_surface = font.render(dice_text, True, (255, 255, 255))
+            dice_text: str = f"Dice: {backgammon_board.dice_values}"
+            dice_surface: pygame.Surface = font.render(dice_text, True, (255, 255, 255))
             screen.blit(dice_surface, (600, 700))
         else:
             if dice_rolled:
-                all_used = font.render("All dice used!", True, (255, 255, 0))
+                all_used: pygame.Surface = font.render("All dice used!", True, (255, 255, 0))
                 screen.blit(all_used, (600, 700))
         
         # Draw selected point indicator
         if selected_point is not None:
-            selected_text = f"Selected: Point {selected_point}"
-            selected_surface = font.render(selected_text, True, (255, 255, 0))
+            selected_text: str = f"Selected: Point {selected_point}"
+            selected_surface: pygame.Surface = font.render(selected_text, True, (255, 255, 0))
             screen.blit(selected_surface, (900, 660))
         
         # flip() the display to put your work on screen
