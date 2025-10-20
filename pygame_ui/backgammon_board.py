@@ -41,8 +41,8 @@ class BackgammonBoard:
         # Draw checkers based on board state
         self.checker_renderer.draw(surface, self.board)
         
-        # Draw dice if rolled
-        if self.dice_values:
+        # Draw dice if rolled (and there are dice values available)
+        if self.dice_values and len(self.dice_values) > 0:
             self.dice_renderer.draw(surface, self.dice_values)
     
     def update(self):
@@ -61,7 +61,15 @@ class BackgammonBoard:
     def roll_dice(self):
         """Roll dice for current player."""
         import random
-        self.dice_values = [random.randint(1, 6), random.randint(1, 6)]
+        die1 = random.randint(1, 6)
+        die2 = random.randint(1, 6)
+        
+        # If doubles, player gets 4 moves of that number
+        if die1 == die2:
+            self.dice_values = [die1, die1, die1, die1]
+        else:
+            self.dice_values = [die1, die2]
+        
         return self.dice_values
     
     def move_checker(self, from_point, to_point):
