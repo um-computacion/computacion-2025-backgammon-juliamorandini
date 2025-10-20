@@ -191,11 +191,12 @@ def main() -> None:
             
             # Handle button clicks
             if roll_button.handle_event(event):
+                print(f"DEBUG: Roll button click detected at {pygame.mouse.get_pos()}")
                 if not dice_rolled:
+                    print("DEBUG: Rolling dice...")
                     dice = backgammon_board.roll_dice()
                     dice_rolled = True
                     moves_made = 0
-                    # Calculate max moves based on whether it's doubles
                     max_moves_this_turn = 4 if len(dice) == 4 else 2
                     print(f"{backgammon_board.current_player} rolled: {dice}")
                 else:
