@@ -1,23 +1,27 @@
-************* Module core
+************* Module computacion-2025-backgammon-juliamorandini.core
 core/__init__.py:7:0: C0304: Final newline missing (missing-final-newline)
 core/__init__.py:1:0: C0114: Missing module docstring (missing-module-docstring)
-************* Module core.Dice
+************* Module computacion-2025-backgammon-juliamorandini.core.Dice
 core/Dice.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 core/Dice.py:1:0: C0103: Module name "Dice" doesn't conform to snake_case naming style (invalid-name)
-************* Module core.BackgammonGame
+************* Module computacion-2025-backgammon-juliamorandini.core.BackgammonGame
 core/BackgammonGame.py:1:0: C0103: Module name "BackgammonGame" doesn't conform to snake_case naming style (invalid-name)
-************* Module core.board
+core/BackgammonGame.py:3:0: E0401: Unable to import 'core.board' (import-error)
+core/BackgammonGame.py:4:0: E0401: Unable to import 'core.player' (import-error)
+core/BackgammonGame.py:5:0: E0401: Unable to import 'core.Dice' (import-error)
+************* Module computacion-2025-backgammon-juliamorandini.core.board
 core/board.py:139:0: C0303: Trailing whitespace (trailing-whitespace)
 core/board.py:12:8: C0104: Disallowed name "bar" (disallowed-name)
-************* Module core.player
+************* Module computacion-2025-backgammon-juliamorandini.core.player
 core/player.py:1:0: C0114: Missing module docstring (missing-module-docstring)
 core/player.py:1:0: R0902: Too many instance attributes (9/7) (too-many-instance-attributes)
-************* Module core.Checker
+************* Module computacion-2025-backgammon-juliamorandini.core.Checker
 core/Checker.py:100:0: C0325: Unnecessary parens after 'not' keyword (superfluous-parens)
 core/Checker.py:1:0: C0103: Module name "Checker" doesn't conform to snake_case naming style (invalid-name)
 core/Checker.py:3:0: W0611: Unused Optional imported from typing (unused-import)
-************* Module test.test_cli
+************* Module computacion-2025-backgammon-juliamorandini.test.test_cli
 test/test_cli.py:77:0: C0303: Trailing whitespace (trailing-whitespace)
+test/test_cli.py:6:0: E0401: Unable to import 'cli.CLI' (import-error)
 test/test_cli.py:29:40: W0613: Unused argument 'mock_input' (unused-argument)
 test/test_cli.py:35:42: W0613: Unused argument 'mock_input' (unused-argument)
 test/test_cli.py:59:49: W0613: Unused argument 'mock_input' (unused-argument)
@@ -25,21 +29,27 @@ test/test_cli.py:70:49: W0613: Unused argument 'mock_input' (unused-argument)
 test/test_cli.py:80:52: W0613: Unused argument 'mock_input' (unused-argument)
 test/test_cli.py:90:49: W0613: Unused argument 'mock_input' (unused-argument)
 test/test_cli.py:101:49: W0613: Unused argument 'mock_input' (unused-argument)
-************* Module test.test_player
+************* Module computacion-2025-backgammon-juliamorandini.test.test_checker
+test/test_checker.py:4:0: E0401: Unable to import 'core.Checker' (import-error)
+************* Module computacion-2025-backgammon-juliamorandini.test.test_player
 test/test_player.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+test/test_player.py:2:0: E0401: Unable to import 'core.player' (import-error)
 test/test_player.py:5:0: C0115: Missing class docstring (missing-class-docstring)
 test/test_player.py:90:0: W0105: String statement has no effect (pointless-string-statement)
-************* Module test.test_dice
+************* Module computacion-2025-backgammon-juliamorandini.test.test_dice
 test/test_dice.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+test/test_dice.py:3:0: E0401: Unable to import 'core.Dice' (import-error)
 test/test_dice.py:35:4: C0116: Missing function or method docstring (missing-function-docstring)
 test/test_dice.py:55:4: C0116: Missing function or method docstring (missing-function-docstring)
 test/test_dice.py:67:4: C0116: Missing function or method docstring (missing-function-docstring)
 test/test_dice.py:6:0: R0904: Too many public methods (22/20) (too-many-public-methods)
-************* Module test.test_Game
+************* Module computacion-2025-backgammon-juliamorandini.test.test_Game
 test/test_Game.py:1:0: C0103: Module name "test_Game" doesn't conform to snake_case naming style (invalid-name)
+test/test_Game.py:4:0: E0401: Unable to import 'core.BackgammonGame' (import-error)
 test/test_Game.py:82:0: W0105: String statement has no effect (pointless-string-statement)
-************* Module test.test_board
+************* Module computacion-2025-backgammon-juliamorandini.test.test_board
 test/test_board.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+test/test_board.py:2:0: E0401: Unable to import 'core.board' (import-error)
 test/test_board.py:5:0: C0115: Missing class docstring (missing-class-docstring)
 test/test_board.py:12:4: C0116: Missing function or method docstring (missing-function-docstring)
 test/test_board.py:37:4: C0116: Missing function or method docstring (missing-function-docstring)
@@ -51,5 +61,5 @@ test/test_board.py:102:4: C0116: Missing function or method docstring (missing-f
 test/test_board.py:152:4: C0116: Missing function or method docstring (missing-function-docstring)
 
 -----------------------------------
-Your code has been rated at 9.39/10
+Your code has been rated at 8.71/10
 
