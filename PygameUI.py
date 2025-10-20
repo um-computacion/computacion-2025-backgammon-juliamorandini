@@ -26,6 +26,7 @@ def main():
     # Create game components
     backgammon_board = BackgammonBoard()
     board_interaction = BoardInteraction()
+    notification = Notification()
     
     # Create UI buttons
     roll_button = Button(50, 650, 150, 50, "Roll Dice", 
@@ -43,6 +44,7 @@ def main():
     selected_point = None  # Track which point is selected
     dice_rolled = False  # Track if dice have been rolled this turn
     moves_made = 0  # Track number of moves made this turn
+    max_moves_this_turn = 2  # Track max moves for this turn (2 or 4 for doubles)
     
     while running:
         # Poll for events
@@ -62,6 +64,13 @@ def main():
                         dice = backgammon_board.roll_dice()
                         dice_rolled = True
                         moves_made = 0
+                        # Set max moves based on if it's doubles
+                        max_moves_this_turn = len(dice)  # Will be 4 for doubles, 2 otherwise
+                        print(f"{backgammon_board.current_player} rolled: {dice}")
+                    else:
+                        print("Already rolled! Make your moves or press N for next turn")()
+                        dice_rolled = True
+                        moves_made = 0
                         print(f"{backgammon_board.current_player} rolled: {dice}")
                     else:
                         print("Already rolled! Make your moves or press N for next turn")
@@ -71,6 +80,7 @@ def main():
                     backgammon_board.switch_player()
                     dice_rolled = False
                     moves_made = 0
+                    max_moves_this_turn = 2
                     selected_point = None
                     print(f"Turn ended. Now playing: {backgammon_board.current_player}")
                 
@@ -80,6 +90,7 @@ def main():
                     selected_point = None
                     dice_rolled = False
                     moves_made = 0
+                    max_moves_this_turn = 2
                     print("Board reset!")
             
             # Handle board interactions (clicks)
@@ -90,12 +101,13 @@ def main():
                     
                     # Must roll dice first
                     if not dice_rolled:
+                        notification.add_message("Roll dice first!", "warning")
                         print("Roll dice first! (Press SPACE or click Roll Dice)")
                         continue
                     
                     # Check if all moves used
-                    max_moves = 4 if backgammon_board.dice_values[0] == backgammon_board.dice_values[1] else 2
-                    if moves_made >= max_moves:
+                    if moves_made >= max_moves_this_turn:
+                        notification.add_message("All moves used! Press N", "warning")
                         print("All moves used! Press N to end turn")
                         continue
                     
@@ -107,28 +119,46 @@ def main():
                         if backgammon_board.board.points[point] and \
                            backgammon_board.board.points[point][0] == backgammon_board.current_player:
                             selected_point = point
+                            notification.add_message(f"Selected point {point}", "info")
                             print(f"Selected point {point}")
                         else:
+                            player_name = "White" if backgammon_board.current_player == "W" else "Black"
+                            notification.add_message(f"No {player_name} pieces here!", "error")
                             print(f"Point {point} has no {backgammon_board.current_player} pieces")
                     else:
                         # Second click - try to move
                         distance = abs(point - selected_point)
                         
+                        # Validate point is in range (0-23)
+                        if not (0 <= point <= 23):
+                            notification.add_message("Out of range!", "error")
+                            print(f"Point {point} is out of range!")
+                            selected_point = None
+                            continue
+                        
                         # Check if distance matches one of the available dice
                         if distance in backgammon_board.dice_values:
-                            success = backgammon_board.move_checker(selected_point, point)
-                            if success:
-                                print(f"Moved from {selected_point} to {point}")
-                                # Remove used die
-                                backgammon_board.dice_values.remove(distance)
-                                moves_made += 1
-                                
-                                # Check if all moves used
-                                if not backgammon_board.dice_values:
-                                    print("All dice used! Press N to end turn")
-                            else:
-                                print(f"Invalid move from {selected_point} to {point}")
+                            try:
+                                success = backgammon_board.move_checker(selected_point, point)
+                                if success:
+                                    notification.add_message(f"Moved: {selected_point} → {point}", "success")
+                                    print(f"Moved from {selected_point} to {point}")
+                                    # Remove used die
+                                    backgammon_board.dice_values.remove(distance)
+                                    moves_made += 1
+                                    
+                                    # Check if all moves used
+                                    if not backgammon_board.dice_values:
+                                        notification.add_message("All dice used!", "info")
+                                        print("All dice used! Press N to end turn")
+                                else:
+                                    notification.add_message("Invalid move!", "error")
+                                    print(f"Invalid move from {selected_point} to {point}")
+                            except Exception as e:
+                                notification.add_message(f"Error: {str(e)}", "error")
+                                print(f"Error moving: {e}")
                         else:
+                            notification.add_message(f"Need dice: {distance}, have: {backgammon_board.dice_values}", "error")
                             print(f"Distance {distance} doesn't match dice: {backgammon_board.dice_values}")
                         
                         selected_point = None
@@ -139,8 +169,14 @@ def main():
                     dice = backgammon_board.roll_dice()
                     dice_rolled = True
                     moves_made = 0
+                    max_moves_this_turn = len(dice)  # Will be 4 for doubles, 2 otherwise
+                    player_name = "White" if backgammon_board.current_player == "W" else "Black"
+                    # Show just the first two values for display
+                    if len(dice) >= 2:
+                        notification.add_message(f"{player_name} rolled: {dice[0]}, {dice[1]}", "success")
                     print(f"{backgammon_board.current_player} rolled: {dice}")
                 else:
+                    notification.add_message("Already rolled!", "warning")
                     print("Already rolled! Make your moves or press N for next turn")
             
             if reset_button.handle_event(event):
@@ -148,13 +184,18 @@ def main():
                 selected_point = None
                 dice_rolled = False
                 moves_made = 0
+                max_moves_this_turn = 2
+                notification.add_message("Board reset!", "info")
                 print("Board reset!")
             
             if next_turn_button.handle_event(event):
                 backgammon_board.switch_player()
                 dice_rolled = False
                 moves_made = 0
+                max_moves_this_turn = 2
                 selected_point = None
+                player_name = "White" if backgammon_board.current_player == "W" else "Black"
+                notification.add_message(f"{player_name}'s turn", "info")
                 print(f"Turn ended. Now playing: {backgammon_board.current_player}")
         
         # Update game state
@@ -165,6 +206,9 @@ def main():
         
         # RENDER YOUR GAME HERE
         backgammon_board.render(screen)
+        
+        # Draw notifications on top of everything
+        notification.draw(screen)
         
         # Draw UI buttons
         roll_button.draw(screen)
