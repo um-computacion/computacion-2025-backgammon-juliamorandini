@@ -14,6 +14,29 @@ from pygame_ui.board_interaction import BoardInteraction
 from pygame_ui.button import Button
 
 
+def is_valid_direction(from_point: int, to_point: int, player: str) -> bool:
+    """
+    Check if the move is in the correct direction for the player.
+    
+    White moves counter-clockwise (from higher numbers to lower: 23 -> 0)
+    Black moves clockwise (from lower numbers to higher: 0 -> 23)
+    
+    Args:
+        from_point: Starting point (0-23)
+        to_point: Destination point (0-23)
+        player: 'W' for White or 'B' for Black
+        
+    Returns:
+        True if move is in correct direction, False otherwise
+    """
+    if player == "W":
+        # White moves counter-clockwise: from high to low (23 -> 0)
+        return to_point < from_point
+    else:  # player == "B"
+        # Black moves clockwise: from low to high (0 -> 23)
+        return to_point > from_point
+
+
 def main() -> None:
     """
     Main game function with game loop.
@@ -38,7 +61,7 @@ def main() -> None:
     
     # Create UI buttons
     roll_button: Button = Button(
-        50, 650, 150, 50, "Roll Dice [Space]",
+        50, 650, 150, 50, "Roll Dice",
         color=(70, 130, 180),
         hover_color=(100, 160, 210)
     )
@@ -48,7 +71,7 @@ def main() -> None:
         hover_color=(210, 100, 100)
     )
     next_turn_button: Button = Button(
-        390, 650, 150, 50, "Next Turn [N]",
+        390, 650, 150, 50, "Next Turn",
         color=(70, 180, 70),
         hover_color=(100, 210, 100)
     )
@@ -139,6 +162,14 @@ def main() -> None:
                         # Second click - try to move
                         distance: int = abs(point - selected_point)
                         
+                        # Check if move is in correct direction
+                        if not is_valid_direction(selected_point, point, backgammon_board.current_player):
+                            player_name: str = "White" if backgammon_board.current_player == "W" else "Black"
+                            direction: str = "counter-clockwise (towards 0)" if backgammon_board.current_player == "W" else "clockwise (towards 23)"
+                            print(f"Invalid direction! {player_name} must move {direction}")
+                            selected_point = None
+                            continue
+                        
                         # Check if distance matches one of the available dice
                         if distance in backgammon_board.dice_values:
                             success: bool = backgammon_board.move_checker(selected_point, point)
@@ -200,28 +231,28 @@ def main() -> None:
         reset_button.draw(screen)
         next_turn_button.draw(screen)
         
-        # Draw current player indicator
+        # Draw current player indicator (moved right to avoid collision)
         font: pygame.font.Font = pygame.font.Font(None, 36)
         player_color: str = "White" if backgammon_board.current_player == "W" else "Black"
         player_text: str = f"Current Player: {player_color}"
         text_surface: pygame.Surface = font.render(player_text, True, (255, 255, 255))
-        screen.blit(text_surface, (600, 660))
+        screen.blit(text_surface, (750, 660))
         
-        # Draw dice values if rolled
+        # Draw dice values if rolled (moved right to align with player indicator)
         if backgammon_board.dice_values:
             dice_text: str = f"Dice: {backgammon_board.dice_values}"
             dice_surface: pygame.Surface = font.render(dice_text, True, (255, 255, 255))
-            screen.blit(dice_surface, (600, 700))
+            screen.blit(dice_surface, (750, 700))
         else:
             if dice_rolled:
                 all_used: pygame.Surface = font.render("All dice used!", True, (255, 255, 0))
-                screen.blit(all_used, (600, 700))
+                screen.blit(all_used, (750, 700))
         
-        # Draw selected point indicator
+        # Draw selected point indicator (moved right)
         if selected_point is not None:
             selected_text: str = f"Selected: Point {selected_point}"
             selected_surface: pygame.Surface = font.render(selected_text, True, (255, 255, 0))
-            screen.blit(selected_surface, (900, 660))
+            screen.blit(selected_surface, (1000, 660))
         
         # flip() the display to put your work on screen
         pygame.display.flip()
