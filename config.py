@@ -4,7 +4,10 @@ Centralizes all color schemes, dimensions, and layout settings.
 """
 
 class Config:
-    """Configuration class containing all game constants."""
+    """Game configuration settings."""
+    
+    # Add debug flag
+    DEBUG = True
     
     # Screen dimensions
     SCREEN_WIDTH = 1200
