@@ -127,7 +127,37 @@ def main() -> None:
                     max_moves_this_turn = 0
                     print("Board reset!")
             
-            # Handle board interactions (clicks)
+            # Handle button clicks FIRST
+            if roll_button.handle_event(event):
+                if not dice_rolled:
+                    dice = backgammon_board.roll_dice()
+                    dice_rolled = True
+                    moves_made = 0
+                    max_moves_this_turn = 4 if len(dice) == 4 else 2
+                    print(f"{backgammon_board.current_player} rolled: {dice}")
+                else:
+                    print("Already rolled! Make your moves or press N for next turn")
+                continue  # Skip board interaction if button was clicked
+            
+            if reset_button.handle_event(event):
+                backgammon_board.reset()
+                selected_point = None
+                dice_rolled = False
+                moves_made = 0
+                max_moves_this_turn = 0
+                print("Board reset!")
+                continue  # Skip board interaction if button was clicked
+            
+            if next_turn_button.handle_event(event):
+                backgammon_board.switch_player()
+                dice_rolled = False
+                moves_made = 0
+                max_moves_this_turn = 0
+                selected_point = None
+                print(f"Turn ended. Now playing: {backgammon_board.current_player}")
+                continue  # Skip board interaction if button was clicked
+            
+            # Only then handle board interactions
             interaction_result = board_interaction.handle_event(event)
             if interaction_result:
                 if interaction_result['type'] == 'point_click':
@@ -191,12 +221,11 @@ def main() -> None:
             
             # Handle button clicks
             if roll_button.handle_event(event):
-                print(f"DEBUG: Roll button click detected at {pygame.mouse.get_pos()}")
                 if not dice_rolled:
-                    print("DEBUG: Rolling dice...")
                     dice = backgammon_board.roll_dice()
                     dice_rolled = True
                     moves_made = 0
+                    # Calculate max moves based on whether it's doubles
                     max_moves_this_turn = 4 if len(dice) == 4 else 2
                     print(f"{backgammon_board.current_player} rolled: {dice}")
                 else:

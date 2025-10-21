@@ -53,12 +53,15 @@ class BoardInteraction:
             return None
         
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:  # Left click
-                return self._handle_click(event.pos)
-        
+            mouse_pos = pygame.mouse.get_pos()
+            # Only handle clicks if they're in the board area AND not in the button area
+            if mouse_pos[1] < 600:  # Don't handle clicks in button area
+                point = self.get_clicked_point(mouse_pos)
+                if point is not None:
+                    return {'type': 'point_click', 'point': point}
         return None
     
-    def _handle_click(self, pos: Tuple[int, int]) -> Dict[str, Any]:
+    def get_clicked_point(self, pos: Tuple[int, int]) -> Optional[int]:
         """
         Process a click at the given position.
         
