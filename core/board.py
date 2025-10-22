@@ -136,7 +136,7 @@ class Board:
             return False
 
         start = 18 if color == "W" else 0
-        
+
         # Check no pieces outside home board
         for i in range(0, start):
             if any(c == color for c in self.points[i]):
@@ -152,31 +152,31 @@ class Board:
         return all(
             not point or all(c == point[0] for c in point) for point in self.points
         )
-    
+
     def move_checker_from_bar(self, to_point: int, color: str) -> bool:
         """Move checker from bar to home board.
-        
+
         Args:
             to_point: Target point (must be 0-5 for Black, 18-23 for White)
             color: Color of moving piece ('W' or 'B')
-        
+
         Returns:
             bool: True if move was successful
         """
         # Check if player has pieces on bar
         if self.bar[color] == 0:
             return False
-        
+
         # White enters at points 18-23, Black enters at points 0-5
         if color == "W" and not (18 <= to_point <= 23):
             return False
         if color == "B" and not (0 <= to_point <= 5):
             return False
-        
+
         # Check if point is available
         if not self.can_enter_from_bar(color, to_point):
             return False
-        
+
         # Handle hitting opponent's blot
         if (
             self.points[to_point]
@@ -186,7 +186,7 @@ class Board:
             hit_color = self.points[to_point][0]
             self.bar[hit_color] += 1
             self.points[to_point] = []
-        
+
         # Move checker from bar
         self.bar[color] -= 1
         self.points[to_point].append(color)

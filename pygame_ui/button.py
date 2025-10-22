@@ -34,7 +34,7 @@ class Button:
         # Get screen-space mouse position
         mouse_pos = pygame.mouse.get_pos()
         self.is_hovered = self.rect.collidepoint(mouse_pos)
-        
+
         # Draw button
         current_color = self.hover_color if self.is_hovered else self.color
         pygame.draw.rect(surface, current_color, self.rect)
