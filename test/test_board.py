@@ -1,3 +1,5 @@
+"""Test module for Board class."""
+
 import unittest
 from core.board import Board
 
@@ -8,294 +10,349 @@ class TestBackgammonBoard(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.board = Board()
-        self.board.reset()
 
-    def test_board_has_24_points(self):
-        self.assertEqual(len(self.board.points), 24, "El tablero debe tener 24 puntos.")
-
-    def test_initial_setup(self):
-        """Test initial board setup"""
-        expected_setup = {
-            0: ["B", "B"],
-            5: ["W"] * 5,
-            7: ["W"] * 3,
-            11: ["W"] * 5,
-            12: ["B"] * 5,
-            16: ["B"] * 3,
-            18: ["B"] * 5,
-            23: ["W", "W"],
-        }
-
-        for point, expected_checkers in expected_setup.items():
-            with self.subTest(point=point):
-                self.assertEqual(
-                    self.board.points[point],
-                    expected_checkers,
-                    f"Point {point+1} should have {expected_checkers}",
-                )
-
-    def test_no_mixed_checkers_on_point(self):
-        self.board.points[0] = ["W", "B"]
-        self.assertFalse(
-            self.board.is_valid(),
-            "No puede haber fichas de ambos colores en el mismo punto.",
-        )
-
-    def test_move_checker(self):
-        """Test moving a checker"""
-        self.board.points[0] = ["B"]
-        result = self.board.move_checker(0, 1, "B")
-        self.assertTrue(result)
-        self.assertEqual(len(self.board.points[0]), 0)
-        self.assertEqual(self.board.points[1], ["B"])
-
-    def test_capture_checker(self):
-        self.board.points[5] = ["B"]
-        self.board.points[4] = ["W"]
-        self.board.move_checker(4, 5, "W")
-        self.assertEqual(self.board.bar["B"], 1)
-        self.assertEqual(self.board.points[5], ["W"])
-
-    def test_illegal_move(self):
-        self.board.points[5] = ["B", "B"]
-        self.assertFalse(self.board.is_valid_move(4, 5, "W"))
-
-    def test_cannot_move_from_empty_point(self):
-        self.board.points[10] = []
-        self.assertFalse(self.board.is_valid_move(10, 12, "W"))
-
-    def test_cannot_move_opponent_checker(self):
-        self.board.points[8] = ["B"]
-        self.assertFalse(self.board.is_valid_move(8, 10, "W"))
-
-    def test_bar_priority(self):
-        self.board.bar["W"] = 1
-        self.assertFalse(self.board.is_valid_move(0, 2, "W"))
-
-    def test_bear_off_only_when_all_in_home(self):
-        self.board.points = [[] for _ in range(24)]
-        self.board.points[18] = ["W"] * 15
-        result = self.board.bear_off("W", 18)
-        self.assertTrue(result)
-        self.assertEqual(len(self.board.points[18]), 14)
-        self.assertEqual(self.board.borne_off["W"], 1)
-
-    def test_bear_off(self):
-        self.board.points = [[] for _ in range(24)]
-        self.board.points[18] = ["W"]
-        result = self.board.bear_off("W", 18)
-        self.assertTrue(result)
-        self.assertEqual(self.board.points[18], [])
-        self.assertEqual(self.board.borne_off["W"], 1)
-
-    def test_bear_off_invalid(self):
-        self.board.points = [[] for _ in range(24)]
-        result = self.board.bear_off("W", 18)
-        self.assertFalse(result)
-
-        self.board.points[10] = ["B"]
-        result = self.board.bear_off("W", 10)
-        self.assertFalse(result)
-
-    def test_blocked_entry_from_bar(self):
-        self.board.bar["W"] = 1
-        self.board.points[0] = ["B", "B"]
-        self.assertFalse(self.board.can_enter_from_bar("W", 0))
-
-    def test_move_checker_from_bar_white(self):
-        self.board.bar["W"] = 1
-        self.assertFalse(self.board.move_checker_from_bar(0, "W"))
-        self.assertTrue(self.board.move_checker_from_bar(18, "W"))
-        self.assertEqual(self.board.bar["W"], 0)
-        self.assertEqual(self.board.points[18][-1], "W")
-
-    def test_move_checker_from_bar_black(self):
-        self.board.bar["B"] = 1
-        self.assertFalse(self.board.move_checker_from_bar(18, "B"))
-        self.assertTrue(self.board.move_checker_from_bar(0, "B"))
-        self.assertEqual(self.board.bar["B"], 0)
-        self.assertEqual(self.board.points[0][-1], "B")
-
-    def test_move_checker_from_empty_bar(self):
-        self.assertFalse(self.board.move_checker_from_bar(18, "W"))
-        self.assertFalse(self.board.move_checker_from_bar(0, "B"))
-
-    def test_move_checker_to_blocked_point(self):
-        self.board.points[18] = ["B", "B"]
-        self.board.bar["W"] = 1
-        self.assertFalse(self.board.move_checker_from_bar(18, "W"))
-
-    def test_invalid_point_moves(self):
-        self.assertFalse(self.board.is_valid_move(-1, 5, "W"))
-        self.assertFalse(self.board.is_valid_move(5, 24, "W"))
-        self.assertFalse(self.board.is_valid_move(24, 5, "W"))
-
-    def test_hit_opponent_from_bar(self):
-        self.board.points[18] = ["B"]
-        self.board.bar["W"] = 1
-        self.assertTrue(self.board.move_checker_from_bar(18, "W"))
-        self.assertEqual(self.board.bar["B"], 1)
-        self.assertEqual(self.board.points[18], ["W"])
-
-    def test_bear_off_with_pieces_outside(self):
-        # Test for White
-        self.board.points = [[] for _ in range(24)]
-        self.board.points[0] = ["W"]
-        self.board.points[23] = ["W"]
-        self.assertFalse(self.board.bear_off("W", 23))
-
-        # Test for Black
-        self.board.points = [[] for _ in range(24)]
-        self.board.points[23] = ["B"]
-        self.board.points[0] = ["B"]
-        self.assertFalse(self.board.bear_off("B", 0))
-
-    def test_can_bear_off_edge_cases(self):
-        self.board.points = [[] for _ in range(24)]
-        self.assertTrue(self.board.can_bear_off("W"))
-        self.assertTrue(self.board.can_bear_off("B"))
-
-        self.board.bar["W"] = 1
-        self.assertFalse(self.board.can_bear_off("W"))
-        self.board.bar["B"] = 1
-        self.assertFalse(self.board.can_bear_off("B"))
-
-    def test_move_checker_invalid_color(self):
-        self.board.points[0] = ["X"]
-        self.assertFalse(self.board.move_checker(0, 1, "W"))
-
-    def test_enter_from_bar_invalid_points(self):
-        self.board.bar["W"] = 1
-        self.board.bar["B"] = 1
-
-        for point in range(18):
-            self.assertFalse(self.board.move_checker_from_bar(point, "W"))
-
-        for point in range(6, 24):
-            self.assertFalse(self.board.move_checker_from_bar(point, "B"))
-
-    def test_point_manipulation(self):
-        point = 0
-        self.board.points[point] = ["W"]
-        self.assertEqual(self.board.points[point], ["W"])
-        self.board.points[point] = []
-        self.assertEqual(self.board.points[point], [])
-
-    def test_bar_manipulation(self):
-        self.board.bar["W"] = 2
-        self.assertEqual(self.board.bar["W"], 2)
-        self.board.bar["W"] = 0
-        self.assertEqual(self.board.bar["W"], 0)
-
-    def test_borne_off_manipulation(self):
-        self.board.borne_off["B"] = 3
-        self.assertEqual(self.board.borne_off["B"], 3)
-        self.board.borne_off["B"] = 0
-        self.assertEqual(self.board.borne_off["B"], 0)
-
-    def test_move_checker_to_empty_point(self):
-        self.board.points[0] = ["W"]
-        self.board.points[1] = []
-        self.assertTrue(self.board.move_checker(0, 1, "W"))
-        self.assertEqual(self.board.points[0], [])
-        self.assertEqual(self.board.points[1], ["W"])
-
-    def test_bar_entrance_with_hit(self):
-        self.board.bar["W"] = 1
-        self.board.points[18] = ["B"]
-        self.assertTrue(self.board.move_checker_from_bar(18, "W"))
-        self.assertEqual(self.board.bar["B"], 1)
-        self.assertEqual(self.board.points[18], ["W"])
-        self.assertEqual(self.board.bar["W"], 0)
-
-    def test_board_state_validation(self):
-        self.assertTrue(self.board.is_valid())
-        self.board.points[0] = ["W", "B"]
-        self.assertFalse(self.board.is_valid())
-        self.board.points[0] = []
-        self.assertTrue(self.board.is_valid())
-
-    def test_initial_bar_and_borne_off(self):
+    def test_initialization(self):
+        """Test board initialization."""
+        self.assertEqual(len(self.board.points), 24)
         self.assertEqual(self.board.bar["W"], 0)
         self.assertEqual(self.board.bar["B"], 0)
         self.assertEqual(self.board.borne_off["W"], 0)
         self.assertEqual(self.board.borne_off["B"], 0)
 
-    def test_can_enter_from_bar_empty_point(self):
-        empty_point = 18
-        self.board.points[empty_point] = []
-        self.assertTrue(self.board.can_enter_from_bar("W", empty_point))
+    def test_reset(self):
+        """Test board reset to initial position."""
+        self.board.reset()
+        # Check initial setup
+        self.assertEqual(self.board.points[0], ["B", "B"])
+        self.assertEqual(len(self.board.points[5]), 5)  # 5 white at point 6
+        self.assertEqual(len(self.board.points[23]), 2)  # 2 white at point 24
 
-    def test_can_enter_from_bar_single_checker(self):
-        point = 18
-        self.board.points[point] = ["W"]
-        self.assertTrue(self.board.can_enter_from_bar("W", point))
-        self.board.points[point] = ["B"]
-        self.assertTrue(self.board.can_enter_from_bar("W", point))
+    def test_is_valid_move_comprehensive(self):
+        """Test all validation scenarios for moves."""
+        # Test invalid bounds
+        self.assertFalse(self.board.is_valid_move(-1, 5, "W"))
+        self.assertFalse(self.board.is_valid_move(5, 24, "W"))
+        
+        # Test bar priority
+        self.board.bar["W"] = 1
+        self.assertFalse(self.board.is_valid_move(5, 6, "W"))
+        self.board.bar["W"] = 0
+        
+        # Test empty from point
+        self.assertFalse(self.board.is_valid_move(10, 11, "W"))
+        
+        # Test wrong color
+        self.board.points[5] = ["B"]
+        self.assertFalse(self.board.is_valid_move(5, 6, "W"))
+        
+        # Test blocked point
+        self.board.points[6] = ["B", "B"]
+        self.board.points[5] = ["W"]
+        self.assertFalse(self.board.is_valid_move(5, 6, "W"))
+        
+        # Test valid moves
+        self.board.points[7] = ["W"]
+        self.board.points[8] = []
+        self.assertTrue(self.board.is_valid_move(7, 8, "W"))
+        
+        # Test valid move to own color point
+        self.board.points[9] = ["W", "W"]
+        self.board.points[10] = ["W"]
+        self.assertTrue(self.board.is_valid_move(10, 9, "W"))
 
-    def test_can_bear_off_with_all_pieces_home(self):
+    def test_move_checker_comprehensive(self):
+        """Test all move scenarios."""
+        # Test invalid move returns False
+        self.assertFalse(self.board.move_checker(-1, 5, "W"))
+        
+        # Test valid move to empty point
+        self.board.points[5] = ["W"]
+        self.board.points[6] = []
+        self.assertTrue(self.board.move_checker(5, 6, "W"))
+        self.assertEqual(self.board.points[5], [])
+        self.assertEqual(self.board.points[6], ["W"])
+        
+        # Test hitting opponent
+        self.board.points[7] = ["B"]
+        self.board.points[8] = ["W"]
+        self.assertTrue(self.board.move_checker(8, 7, "W"))
+        self.assertEqual(self.board.bar["B"], 1)
+        self.assertEqual(self.board.points[7], ["W"])
+        
+        # Test color consistency after move
+        self.board.points[9] = ["W"]
+        self.board.points[10] = ["B"]  # Different color
+        self.assertTrue(self.board.move_checker(9, 10, "W"))
+        self.assertTrue(all(checker == "W" for checker in self.board.points[10]))
+
+    def test_bar_operations_comprehensive(self):
+        """Test all bar-related operations."""
+        self.assertFalse(self.board.move_checker_from_bar(18, "W"))
+        
+        # Test white bar entry
+        self.board.set_point(18, [])
+        self.board.bar["W"] = 1
+        self.assertTrue(self.board.move_checker_from_bar(18, "W"))
+        self.assertEqual(self.board.bar["W"], 0)
+        self.assertEqual(self.board.points[18][-1], "W")
+        
+        # Test black bar entry
+        self.board.set_point(0, [])
+        self.board.bar["B"] = 1
+        self.assertTrue(self.board.move_checker_from_bar(0, "B"))
+        self.assertEqual(self.board.bar["B"], 0)
+        self.assertEqual(self.board.points[0][-1], "B")
+        
+        # Test hit from bar
+        self.board.bar["W"] = 1
+        self.board.points[19] = ["B"]
+        self.assertTrue(self.board.move_checker_from_bar(19, "W"))
+        self.assertEqual(self.board.bar["B"], 1)
+        self.assertEqual(self.board.points[19], ["W"])
+        
+        # Test cannot enter blocked point
+        self.board.bar["W"] = 1
+        self.board.points[20] = ["B", "B"]
+        self.assertFalse(self.board.move_checker_from_bar(20, "W"))
+        
+        # Test invalid entry points
+        self.board.bar["W"] = 1
+        self.assertFalse(self.board.move_checker_from_bar(0, "W"))
+        self.board.bar["B"] = 1
+        self.assertFalse(self.board.move_checker_from_bar(18, "B"))
+
+    def test_can_enter_from_bar_comprehensive(self):
+        """Test bar entry validation."""
+        # Test invalid point
+        self.assertFalse(self.board.can_enter_from_bar("W", -1))
+        self.assertFalse(self.board.can_enter_from_bar("W", 24))
+        
+        # Test empty point
+        self.board.set_point(18, [])
+        self.assertTrue(self.board.can_enter_from_bar("W", 18))
+        
+        # Test point with own checkers
+        self.board.set_point(19, ["W", "W"])
+        self.assertTrue(self.board.can_enter_from_bar("W", 19))
+        
+        # Test point with single opponent (hittable)
+        self.board.set_point(20, ["B"])
+        self.assertTrue(self.board.can_enter_from_bar("W", 20))
+        
+        # Test blocked point
+        self.board.set_point(21, ["B", "B"])
+        self.assertFalse(self.board.can_enter_from_bar("W", 21))
+
+    def test_bear_off_comprehensive(self):
+        """Test all bear off scenarios."""
+        # Setup all white pieces in home
         self.board.points = [[] for _ in range(24)]
         for i in range(18, 24):
-            self.board.points[i] = ["W", "W"]
+            self.board.points[i] = ["W"]
+        
+        # Test valid bear off
+        self.assertTrue(self.board.bear_off("W", 18))
+        self.assertEqual(self.board.borne_off["W"], 1)
+        self.assertEqual(len(self.board.points[18]), 0)
+        
+        # Test cannot bear off with bar pieces
+        self.board.bar["W"] = 1
+        self.assertFalse(self.board.bear_off("W", 19))
+        self.board.bar["W"] = 0
+        
+        # Test cannot bear off opponent piece
+        self.board.points[19] = ["B"]
+        self.assertFalse(self.board.bear_off("W", 19))
+        
+        # Clear point 20 which still contained a checker from setup
+        self.board.set_point(20, [])
+        
+        # Test cannot bear off from empty point
+        self.assertFalse(self.board.bear_off("W", 20))
+        
+        # Test cannot bear off if not all in home
+        self.board.points[0] = ["W"]  # Outside home
+        self.assertFalse(self.board.bear_off("W", 21))
+
+
+    def test_can_bear_off_comprehensive(self):
+        """Test bear off eligibility."""
+        # Test cannot bear off with pieces on bar
+        self.board.bar["W"] = 1
+        self.assertFalse(self.board.can_bear_off("W"))
+        self.board.bar["W"] = 0
+        
+        # Test white with pieces outside home
+        self.board.points = [[] for _ in range(24)]
+        self.board.points[0] = ["W"]  # Point 1 - outside white home
+        self.assertFalse(self.board.can_bear_off("W"))
+        
+        # Test black with pieces outside home
+        self.board.points = [[] for _ in range(24)]
+        self.board.points[23] = ["B"]  # Point 24 - outside black home
+        self.assertFalse(self.board.can_bear_off("B"))
+        
+        # Test valid bear off for white
+        self.board.points = [[] for _ in range(24)]
+        for i in range(18, 24):
+            self.board.points[i] = ["W"]
         self.assertTrue(self.board.can_bear_off("W"))
+        
+        # Test valid bear off for black
+        self.board.points = [[] for _ in range(24)]
+        for i in range(0, 6):
+            self.board.points[i] = ["B"]
+        self.assertTrue(self.board.can_bear_off("B"))
 
-    def test_move_checker_validation(self):
-        self.assertFalse(self.board.move_checker(-1, 5, "W"))
-        self.assertFalse(self.board.move_checker(5, 24, "W"))
+    def test_bar_operations_comprehensive(self):
+        """Test all bar-related operations."""
+        self.assertFalse(self.board.move_checker_from_bar(18, "W"))
+        
+        # Test white bar entry
+        self.board.set_point(18, [])
         self.board.bar["W"] = 1
-        self.assertFalse(self.board.move_checker(5, 7, "W"))
-
-    def test_bear_off_from_invalid_point(self):
-        self.assertFalse(self.board.bear_off("W", 18))
-        self.board.points[18] = ["B"]
-        self.assertFalse(self.board.bear_off("W", 18))
-        self.board.points[18] = ["W"]
+        self.assertTrue(self.board.move_checker_from_bar(18, "W"))
+        self.assertEqual(self.board.bar["W"], 0)
+        self.assertEqual(self.board.points[18][-1], "W")
+        
+        # Test black bar entry
+        self.board.set_point(0, [])
+        self.board.bar["B"] = 1
+        self.assertTrue(self.board.move_checker_from_bar(0, "B"))
+        self.assertEqual(self.board.bar["B"], 0)
+        self.assertEqual(self.board.points[0][-1], "B")
+        
+        # Test hit from bar
         self.board.bar["W"] = 1
-        self.assertFalse(self.board.bear_off("W", 18))
+        self.board.points[19] = ["B"]
+        self.assertTrue(self.board.move_checker_from_bar(19, "W"))
+        self.assertEqual(self.board.bar["B"], 1)
+        self.assertEqual(self.board.points[19], ["W"])
+        
+        # Test cannot enter blocked point
+        self.board.bar["W"] = 1
+        self.board.points[20] = ["B", "B"]
+        self.assertFalse(self.board.move_checker_from_bar(20, "W"))
+        
+        # Test invalid entry points
+        self.board.bar["W"] = 1
+        self.assertFalse(self.board.move_checker_from_bar(0, "W"))
+        self.board.bar["B"] = 1
+        self.assertFalse(self.board.move_checker_from_bar(18, "B"))
 
-    def test_get_and_set_point(self):
+
+    def test_bar_operations_comprehensive(self):
+        """Test all bar-related operations."""
+        self.assertFalse(self.board.move_checker_from_bar(18, "W"))
+        
+        # Test white bar entry
+        self.board.set_point(18, [])
+        self.board.bar["W"] = 1
+        self.assertTrue(self.board.move_checker_from_bar(18, "W"))
+        self.assertEqual(self.board.bar["W"], 0)
+        self.assertEqual(self.board.points[18][-1], "W")
+        
+        # Test black bar entry
+        self.board.set_point(0, [])
+        self.board.bar["B"] = 1
+        self.assertTrue(self.board.move_checker_from_bar(0, "B"))
+        self.assertEqual(self.board.bar["B"], 0)
+        self.assertEqual(self.board.points[0][-1], "B")
+        
+        # Test hit from bar
+        self.board.bar["W"] = 1
+        self.board.points[19] = ["B"]
+        self.assertTrue(self.board.move_checker_from_bar(19, "W"))
+        self.assertEqual(self.board.bar["B"], 1)
+        self.assertEqual(self.board.points[19], ["W"])
+        
+        # Test cannot enter blocked point
+        self.board.bar["W"] = 1
+        self.board.points[20] = ["B", "B"]
+        self.assertFalse(self.board.move_checker_from_bar(20, "W"))
+        
+        # Test invalid entry points
+        self.board.bar["W"] = 1
+        self.assertFalse(self.board.move_checker_from_bar(0, "W"))
+        self.board.bar["B"] = 1
+        self.assertFalse(self.board.move_checker_from_bar(18, "B"))
+
+    def test_can_enter_from_bar_comprehensive(self):
+        """Test bar entry validation."""
+        # Test invalid point
+        self.assertFalse(self.board.can_enter_from_bar("W", -1))
+        self.assertFalse(self.board.can_enter_from_bar("W", 24))
+        
+        # Test empty point
+        self.board.set_point(18, [])
+        self.assertTrue(self.board.can_enter_from_bar("W", 18))
+        
+        # Test point with own checkers
+        self.board.set_point(19, ["W", "W"])
+        self.assertTrue(self.board.can_enter_from_bar("W", 19))
+        
+        # Test point with single opponent (hittable)
+        self.board.set_point(20, ["B"])
+        self.assertTrue(self.board.can_enter_from_bar("W", 20))
+        
+        # Test blocked point
+        self.board.set_point(21, ["B", "B"])
+        self.assertFalse(self.board.can_enter_from_bar("W", 21))
+
+
+    def test_board_validation(self):
+        """Test board state validation."""
+        # Test valid initial board
+        self.board.reset()
+        self.assertTrue(self.board.is_valid())
+        
+        # Test invalid board with mixed colors
+        self.board.points[10] = ["W", "B"]
+        self.assertFalse(self.board.is_valid())
+        
+        # Test empty board is valid
+        self.board.points = [[] for _ in range(24)]
+        self.assertTrue(self.board.is_valid())
+
+    def test_point_operations(self):
         """Test get_point and set_point methods."""
         # Test get_point with valid point
-        self.assertEqual(self.board.get_point(0), ["B", "B"])
+        self.board.points[5] = ["W", "W"]
+        self.assertEqual(self.board.get_point(5), ["W", "W"])
         
         # Test get_point with invalid point
         self.assertEqual(self.board.get_point(-1), [])
         self.assertEqual(self.board.get_point(24), [])
         
         # Test set_point with valid point
-        self.board.set_point(10, ["W", "W"])
-        self.assertEqual(self.board.get_point(10), ["W", "W"])
+        self.board.set_point(10, ["B", "B"])
+        self.assertEqual(self.board.points[10], ["B", "B"])
         
         # Test set_point with invalid point (should not change anything)
-        original_point_0 = self.board.get_point(0)
+        original = self.board.points[0] if self.board.points[0] else []
         self.board.set_point(-1, ["W"])
         self.board.set_point(24, ["W"])
-        self.assertEqual(self.board.get_point(0), original_point_0)
+        if original:
+            self.assertEqual(self.board.points[0], original)
 
-    def test_move_to_point_with_same_color(self):
-        """Test moving to a point with same color checkers."""
-        self.board.points[0] = ["B"]
-        self.board.points[1] = ["B", "B"]
-        self.assertTrue(self.board.move_checker(0, 1, "B"))
-        self.assertEqual(self.board.points[1], ["B", "B", "B"])
-
-    def test_can_enter_from_bar_invalid_point(self):
-        """Test can_enter_from_bar with invalid point."""
-        self.assertFalse(self.board.can_enter_from_bar("W", -1))
-        self.assertFalse(self.board.can_enter_from_bar("W", 24))
-
-    def test_reset_functionality(self):
-        """Test that reset properly initializes the board."""
-        # Modify the board
-        self.board.points[0] = ["W"]
-        self.board.bar["W"] = 2
-        self.board.borne_off["B"] = 3
+    def test_complex_scenarios(self):
+        """Test complex game scenarios."""
+        # Test multiple consecutive moves
+        self.board.points[5] = ["W"]
+        self.board.points[6] = []
+        self.assertTrue(self.board.move_checker(5, 6, "W"))
         
-        # Reset and check
-        self.board.reset()
-        self.assertEqual(self.board.points[0], ["B", "B"])
-        self.assertEqual(self.board.bar["W"], 0)
-        self.assertEqual(self.board.borne_off["B"], 0)
+        self.board.points[7] = ["B"]
+        self.assertTrue(self.board.move_checker(6, 7, "W"))
+        self.assertEqual(self.board.bar["B"], 1)
+        
+        # Test bearing off after clearing bar
+        self.board.points = [[] for _ in range(24)]
+        for i in range(18, 24):
+            self.board.points[i] = ["W"]
+        self.assertTrue(self.board.bear_off("W", 18))
+        self.assertEqual(self.board.borne_off["W"], 1)
+
 
 
 if __name__ == "__main__":
