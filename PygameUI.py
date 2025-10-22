@@ -59,17 +59,17 @@ def main() -> None:
     backgammon_board: BackgammonBoard = BackgammonBoard()
     
     roll_button: Button = Button(
-        50, 735, 150, 50, "Roll Dice",
+        50, 730, 150, 50, "Roll Dice",
         color=(70, 130, 180),
         hover_color=(100, 160, 210)
     )
     reset_button: Button = Button(
-        220, 735, 150, 50, "Reset",
+        220, 730, 150, 50, "Reset",
         color=(180, 70, 70),
         hover_color=(210, 100, 100)
     )
     next_turn_button: Button = Button(
-        390, 735, 150, 50, "Next Turn",
+        390, 730, 150, 50, "Next Turn",
         color=(70, 180, 70),
         hover_color=(100, 210, 100)
     )
@@ -78,7 +78,6 @@ def main() -> None:
     dice_rolled: bool = False
     moves_made: int = 0
     max_moves_this_turn: int = 0
-    checker_positions: List[CheckerPos] = []
     
     board_interaction = BoardInteraction()
     
@@ -193,7 +192,7 @@ def main() -> None:
         
         screen.fill(Config.DARK_BROWN)
         
-        checker_positions = backgammon_board.render(screen)
+        backgammon_board.render(screen)  # Just render, don't collect positions
         
         roll_button.draw(screen)
         reset_button.draw(screen)
@@ -213,28 +212,6 @@ def main() -> None:
             if dice_rolled:
                 all_used: pygame.Surface = font.render("All dice used!", True, (255, 255, 0))
                 screen.blit(all_used, (750, 700))
-        
-        # Draw selected point highlight and info
-        if selected_point is not None:
-            point_coords = get_point_center_coords(selected_point)
-            # Draw yellow highlight circle
-            pygame.draw.circle(screen, (255, 255, 0), point_coords, 20, 3)
-            
-            # Draw selection info
-            font = pygame.font.Font(None, 36)
-            info_text = [
-                f"Selected: Point {selected_point}",
-                f"Click destination point to move",
-                f"or click again to deselect"
-            ]
-            
-            for i, text in enumerate(info_text):
-                text_surface = font.render(text, True, (255, 255, 255))
-                text_rect = text_surface.get_rect(topleft=(550, 620 + i*30))
-                # Draw text background
-                bg_rect = text_rect.inflate(20, 10)
-                pygame.draw.rect(screen, (0, 0, 0), bg_rect)
-                screen.blit(text_surface, text_rect)
 
         pygame.display.flip()
         

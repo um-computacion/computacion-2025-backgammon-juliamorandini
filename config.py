@@ -59,7 +59,7 @@ class Config:
     
     # Checker dimensions
     CHECKER_RADIUS = 25
-    CHECKER_SPACING = 8  # Vertical spacing between stacked checkers
+    CHECKER_SPACING = 15  # Vertical spacing between stacked checkers
     
     # Dice dimensions
     DICE_SIZE = 40
