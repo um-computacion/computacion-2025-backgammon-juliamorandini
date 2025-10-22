@@ -78,30 +78,3 @@ class TestBackgammonGame(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-"""Este conjunto de tests verifica las siguientes reglas del Backgammon:
-
-Configuración inicial correcta del tablero
-Validación de movimientos permitidos
-Captura de fichas solitarias (blots)
-Reglas de salida de fichas (bearing off)
-Manejo de dados dobles
-Bloqueo de posiciones
-Detección de ganador
-Movimientos válidos según los dados
-Movimiento obligatorio desde la barra
-Para implementar estos tests, necesitarías una clase Game con los siguientes métodos:
-
-get_board()
-make_move()
-set_piece()
-get_bar_pieces()
-bear_off()
-set_dice()
-get_available_moves()
-check_winner()
-get_valid_moves()
-add_to_bar()
-must_move_from_bar()
-setup_bearing_off_scenario()
-setup_winning_scenario()"""
