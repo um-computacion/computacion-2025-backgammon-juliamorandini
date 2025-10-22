@@ -162,18 +162,21 @@ def main() -> None:
                     else:
                         # Making a move
                         if clicked_point == selected_point:
-                            # Deselect if clicking same point
                             selected_point = None
                             print("Point deselected")
                             continue
                             
                         distance = abs(clicked_point - selected_point)
+                        
+                        # Check if distance matches an available dice value
                         if distance in backgammon_board.dice_values:
                             if is_valid_direction(selected_point, clicked_point, backgammon_board.current_player):
                                 if backgammon_board.move_checker(selected_point, clicked_point):
                                     print(f"Moved from {selected_point} to {clicked_point}")
                                     backgammon_board.dice_values.remove(distance)
                                     moves_made += 1
+                                    
+                                    # Auto-end turn if all dice used or no more moves possible
                                     if moves_made >= max_moves_this_turn or not backgammon_board.dice_values:
                                         print("Turn complete!")
                                         backgammon_board.switch_player()
@@ -186,6 +189,7 @@ def main() -> None:
                                 print(f"Wrong direction for {backgammon_board.current_player}")
                         else:
                             print(f"No dice value matches distance {distance}")
+                        
                         selected_point = None
 
         backgammon_board.update()
