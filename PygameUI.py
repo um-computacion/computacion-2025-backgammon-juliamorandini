@@ -8,44 +8,29 @@ from pygame_ui.board_interaction import BoardInteraction
 
 CheckerPos = Tuple[int, int, int, int, str]
 
-def get_point_center_coords(point_index: int) -> Tuple[int, int]:
-    """Get screen coordinates for the center of a point.
-    
-    Args:
-        point_index: Point number (0-23)
-        
-    Returns:
-        Tuple[int, int]: (x, y) screen coordinates
-    """
-    # Calculate section widths
-    left_section_width = Config.BAR_X - (Config.BOARD_X + Config.BORDER_THICKNESS)
-    right_section_width = (Config.BOARD_X + Config.BOARD_WIDTH - Config.BORDER_THICKNESS) - (Config.BAR_X + Config.BAR_WIDTH)
-    
-    point_width = left_section_width // 6  # Same width for both sections
-    
-    # Determine x coordinate
-    if point_index <= 5:  # Bottom right
-        x = (Config.BAR_X + Config.BAR_WIDTH) + (point_index * point_width) + (point_width // 2)
-    elif point_index <= 11:  # Bottom left
-        x = (Config.BOARD_X + Config.BORDER_THICKNESS) + ((11 - point_index) * point_width) + (point_width // 2)
-    elif point_index <= 17:  # Top left
-        x = (Config.BOARD_X + Config.BORDER_THICKNESS) + ((point_index - 12) * point_width) + (point_width // 2)
-    else:  # Top right (18-23)
-        x = (Config.BAR_X + Config.BAR_WIDTH) + ((point_index - 18) * point_width) + (point_width // 2)
-    
-    # Determine y coordinate
-    if point_index >= 12:  # Top half
-        y = Config.BOARD_Y + Config.BORDER_THICKNESS + Config.POINT_HEIGHT
-    else:  # Bottom half
-        y = Config.BOARD_Y + Config.BOARD_HEIGHT - Config.BORDER_THICKNESS - Config.POINT_HEIGHT
-    
-    return int(x), int(y)
-
 def is_valid_direction(from_point: int, to_point: int, player: str) -> bool:
     if player == "W":
         return to_point < from_point
     else:
         return to_point > from_point
+
+
+def get_entry_point_for_dice(dice_value: int, player: str) -> int:
+    """Get the entry point corresponding to a dice value.
+    
+    Args:
+        dice_value: The dice value (1-6)
+        player: 'W' for White or 'B' for Black
+        
+    Returns:
+        The entry point (0-23)
+    """
+    if player == "W":
+        # White enters at 24 - dice_value (1→23, 2→22, ..., 6→18)
+        return 24 - dice_value
+    else:
+        # Black enters at dice_value - 1 (1→0, 2→1, ..., 6→5)
+        return dice_value - 1
 
 
 def main() -> None:
@@ -144,13 +129,83 @@ def main() -> None:
                 print(f"Turn ended. Now playing: {backgammon_board.current_player}")
             
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                clicked_point = board_interaction.get_clicked_point(event.pos)
+                mouse_pos = event.pos
                 
-                if clicked_point is not None:
-                    if not dice_rolled:
-                        print("Roll dice first!")
-                        continue
+                if not dice_rolled:
+                    print("Roll dice first!")
+                    continue
 
+                # CHECK IF PLAYER HAS PIECES ON BAR
+                if backgammon_board.board.bar[backgammon_board.current_player] > 0:
+                    # PLAYER MUST ENTER FROM BAR
+                    bar_x = Config.BAR_X
+                    bar_y_top = Config.BOARD_Y + Config.BORDER_THICKNESS
+                    bar_y_bottom = Config.BOARD_Y + Config.BOARD_HEIGHT - Config.BORDER_THICKNESS
+                    bar_width = Config.BAR_WIDTH
+                    
+                    # Check if clicking on bar area
+                    if bar_x <= mouse_pos[0] <= bar_x + bar_width and bar_y_top <= mouse_pos[1] <= bar_y_bottom:
+                        # Clicked on bar - select it
+                        selected_point = "BAR"
+                        bar_pieces = backgammon_board.board.bar[backgammon_board.current_player]
+                        print(f"Selected checker from bar! ({bar_pieces} pieces on bar)")
+                        print(f"Valid entry points with current dice:")
+                        for dice_val in backgammon_board.dice_values:
+                            entry_pt = get_entry_point_for_dice(dice_val, backgammon_board.current_player)
+                            print(f"  Dice {dice_val} → Point {entry_pt}")
+                        continue
+                    
+                    # Not clicking bar, must click valid entry point if bar is selected
+                    if selected_point == "BAR":
+                        clicked_point = board_interaction.get_clicked_point(mouse_pos)
+                        
+                        if clicked_point is not None:
+                            # Get valid entry points for this player's dice
+                            valid_entry_points = {}  # dice_value -> point
+                            for dice_val in backgammon_board.dice_values:
+                                entry_pt = get_entry_point_for_dice(dice_val, backgammon_board.current_player)
+                                valid_entry_points[dice_val] = entry_pt
+                            
+                            # Check if clicked point matches any valid entry point
+                            matching_dice = None
+                            for dice_val, entry_pt in valid_entry_points.items():
+                                if entry_pt == clicked_point:
+                                    matching_dice = dice_val
+                                    break
+                            
+                            if matching_dice is None:
+                                print(f"Cannot enter at point {clicked_point}. Valid entry points: {list(valid_entry_points.values())}")
+                                selected_point = None
+                                continue
+                            
+                            # Try to enter from bar
+                            if backgammon_board.board.move_checker_from_bar(clicked_point, backgammon_board.current_player):
+                                print(f"✓ Entered from bar at point {clicked_point} using dice {matching_dice}")
+                                backgammon_board.dice_values.remove(matching_dice)
+                                moves_made += 1
+                                
+                                # Check if turn is complete
+                                if moves_made >= max_moves_this_turn or not backgammon_board.dice_values:
+                                    print("Turn complete!")
+                                    backgammon_board.switch_player()
+                                    dice_rolled = False
+                                    moves_made = 0
+                                    max_moves_this_turn = 0
+                            else:
+                                print(f"Cannot enter at point {clicked_point} (point blocked)")
+                            
+                            selected_point = None
+                        continue
+                    else:
+                        print("Click the BAR first to select a checker!")
+                        continue
+                
+                # NORMAL MOVE (not from bar)
+                clicked_point = board_interaction.get_clicked_point(mouse_pos)
+                if clicked_point is None:
+                    continue
+                    
+                    # NORMAL MOVE (not from bar)
                     if selected_point is None:
                         # Selecting a point
                         point_pieces = backgammon_board.board.points[clicked_point]
@@ -162,21 +217,18 @@ def main() -> None:
                     else:
                         # Making a move
                         if clicked_point == selected_point:
+                            # Deselect if clicking same point
                             selected_point = None
                             print("Point deselected")
                             continue
                             
                         distance = abs(clicked_point - selected_point)
-                        
-                        # Check if distance matches an available dice value
                         if distance in backgammon_board.dice_values:
                             if is_valid_direction(selected_point, clicked_point, backgammon_board.current_player):
                                 if backgammon_board.move_checker(selected_point, clicked_point):
                                     print(f"Moved from {selected_point} to {clicked_point}")
                                     backgammon_board.dice_values.remove(distance)
                                     moves_made += 1
-                                    
-                                    # Auto-end turn if all dice used or no more moves possible
                                     if moves_made >= max_moves_this_turn or not backgammon_board.dice_values:
                                         print("Turn complete!")
                                         backgammon_board.switch_player()
@@ -189,14 +241,13 @@ def main() -> None:
                                 print(f"Wrong direction for {backgammon_board.current_player}")
                         else:
                             print(f"No dice value matches distance {distance}")
-                        
                         selected_point = None
 
         backgammon_board.update()
         
         screen.fill(Config.DARK_BROWN)
         
-        backgammon_board.render(screen)  # Just render, don't collect positions
+        backgammon_board.render(screen)
         
         roll_button.draw(screen)
         reset_button.draw(screen)
@@ -207,6 +258,13 @@ def main() -> None:
         player_text: str = f"Current Player: {player_color}"
         text_surface: pygame.Surface = font.render(player_text, True, (255, 255, 255))
         screen.blit(text_surface, (750, 660))
+        
+        # Display bar pieces if any
+        bar_pieces = backgammon_board.board.bar[backgammon_board.current_player]
+        if bar_pieces > 0:
+            bar_text: str = f"On Bar: {bar_pieces}"
+            bar_surface: pygame.Surface = font.render(bar_text, True, (255, 100, 100))
+            screen.blit(bar_surface, (750, 620))
         
         if backgammon_board.dice_values:
             dice_text: str = f"Dice: {backgammon_board.dice_values}"
