@@ -1,5 +1,5 @@
 """
-Unit tests for main.py
+Unit tests for main.py using unittest framework
 
 Tests cover:
 - Direction validation for both players
@@ -8,16 +8,18 @@ Tests cover:
 - Move logic
 
 Run tests with:
-    pytest test_main.py -v
+    python -m unittest test_main.py -v
+    or
+    python test_main.py
 """
-import unitest
+import unittest
 from unittest.mock import Mock, patch, MagicMock
 import pygame
 
 from PygameUI import is_valid_direction
 
 
-class TestIsValidDirection:
+class TestIsValidDirection(unittest.TestCase):
     """Test suite for move direction validation."""
     
     def test_white_moves_counter_clockwise_valid(self) -> None:
@@ -35,7 +37,7 @@ class TestIsValidDirection:
         result: bool = is_valid_direction(from_point, to_point, player)
         
         # Assert
-        assert result is True, "White should move from high to low"
+        self.assertTrue(result, "White should move from high to low")
     
     def test_white_moves_counter_clockwise_invalid(self) -> None:
         """
@@ -52,7 +54,7 @@ class TestIsValidDirection:
         result: bool = is_valid_direction(from_point, to_point, player)
         
         # Assert
-        assert result is False, "White cannot move from low to high"
+        self.assertFalse(result, "White cannot move from low to high")
     
     def test_black_moves_clockwise_valid(self) -> None:
         """
@@ -69,7 +71,7 @@ class TestIsValidDirection:
         result: bool = is_valid_direction(from_point, to_point, player)
         
         # Assert
-        assert result is True, "Black should move from low to high"
+        self.assertTrue(result, "Black should move from low to high")
     
     def test_black_moves_clockwise_invalid(self) -> None:
         """
@@ -86,7 +88,7 @@ class TestIsValidDirection:
         result: bool = is_valid_direction(from_point, to_point, player)
         
         # Assert
-        assert result is False, "Black cannot move from high to low"
+        self.assertFalse(result, "Black cannot move from high to low")
     
     def test_white_edge_case_from_23_to_0(self) -> None:
         """
@@ -103,7 +105,7 @@ class TestIsValidDirection:
         result: bool = is_valid_direction(from_point, to_point, player)
         
         # Assert
-        assert result is True, "White can move from 23 to 0"
+        self.assertTrue(result, "White can move from 23 to 0")
     
     def test_black_edge_case_from_0_to_23(self) -> None:
         """
@@ -120,7 +122,7 @@ class TestIsValidDirection:
         result: bool = is_valid_direction(from_point, to_point, player)
         
         # Assert
-        assert result is True, "Black can move from 0 to 23"
+        self.assertTrue(result, "Black can move from 0 to 23")
     
     def test_same_point_white(self) -> None:
         """
@@ -137,7 +139,7 @@ class TestIsValidDirection:
         result: bool = is_valid_direction(from_point, to_point, player)
         
         # Assert
-        assert result is False, "Cannot move to same point"
+        self.assertFalse(result, "Cannot move to same point")
     
     def test_same_point_black(self) -> None:
         """
@@ -154,10 +156,10 @@ class TestIsValidDirection:
         result: bool = is_valid_direction(from_point, to_point, player)
         
         # Assert
-        assert result is False, "Cannot move to same point"
+        self.assertFalse(result, "Cannot move to same point")
 
 
-class TestGameInitialization:
+class TestGameInitialization(unittest.TestCase):
     """Test suite for game initialization."""
     
     @patch('main.pygame.init')
@@ -192,11 +194,11 @@ class TestGameInitialization:
         # Assert
         # Since we can't easily test main() without it running forever,
         # we verify our mocks are set up correctly
-        assert mock_init is not None
-        assert mock_set_mode is not None
+        self.assertIsNotNone(mock_init)
+        self.assertIsNotNone(mock_set_mode)
 
 
-class TestGameStateLogic:
+class TestGameStateLogic(unittest.TestCase):
     """Test suite for game state management logic."""
     
     def test_initial_dice_not_rolled(self) -> None:
@@ -209,7 +211,7 @@ class TestGameStateLogic:
         dice_rolled: bool = False
         
         # Assert
-        assert dice_rolled is False, "Dice should not be rolled initially"
+        self.assertFalse(dice_rolled, "Dice should not be rolled initially")
     
     def test_initial_moves_made_zero(self) -> None:
         """
@@ -221,7 +223,7 @@ class TestGameStateLogic:
         moves_made: int = 0
         
         # Assert
-        assert moves_made == 0, "No moves should be made initially"
+        self.assertEqual(moves_made, 0, "No moves should be made initially")
     
     def test_initial_selected_point_none(self) -> None:
         """
@@ -233,7 +235,7 @@ class TestGameStateLogic:
         selected_point: None = None
         
         # Assert
-        assert selected_point is None, "No point should be selected initially"
+        self.assertIsNone(selected_point, "No point should be selected initially")
     
     def test_max_moves_for_doubles(self) -> None:
         """
@@ -248,7 +250,7 @@ class TestGameStateLogic:
         max_moves_this_turn: int = 4 if len(dice) == 4 else 2
         
         # Assert
-        assert max_moves_this_turn == 4, "Doubles should allow 4 moves"
+        self.assertEqual(max_moves_this_turn, 4, "Doubles should allow 4 moves")
     
     def test_max_moves_for_non_doubles(self) -> None:
         """
@@ -263,10 +265,10 @@ class TestGameStateLogic:
         max_moves_this_turn: int = 4 if len(dice) == 4 else 2
         
         # Assert
-        assert max_moves_this_turn == 2, "Non-doubles should allow 2 moves"
+        self.assertEqual(max_moves_this_turn, 2, "Non-doubles should allow 2 moves")
 
 
-class TestMoveDistanceLogic:
+class TestMoveDistanceLogic(unittest.TestCase):
     """Test suite for move distance calculations."""
     
     def test_distance_calculation_forward(self) -> None:
@@ -283,7 +285,7 @@ class TestMoveDistanceLogic:
         distance: int = abs(to_point - from_point)
         
         # Assert
-        assert distance == 5, "Distance should be 5"
+        self.assertEqual(distance, 5, "Distance should be 5")
     
     def test_distance_calculation_backward(self) -> None:
         """
@@ -299,7 +301,7 @@ class TestMoveDistanceLogic:
         distance: int = abs(to_point - from_point)
         
         # Assert
-        assert distance == 5, "Distance should be 5"
+        self.assertEqual(distance, 5, "Distance should be 5")
     
     def test_distance_matches_dice_value(self) -> None:
         """
@@ -315,7 +317,7 @@ class TestMoveDistanceLogic:
         is_valid: bool = distance in dice_values
         
         # Assert
-        assert is_valid is True, "Distance 5 should match dice"
+        self.assertTrue(is_valid, "Distance 5 should match dice")
     
     def test_distance_does_not_match_dice_value(self) -> None:
         """
@@ -331,10 +333,10 @@ class TestMoveDistanceLogic:
         is_valid: bool = distance in dice_values
         
         # Assert
-        assert is_valid is False, "Distance 3 should not match dice"
+        self.assertFalse(is_valid, "Distance 3 should not match dice")
 
 
-class TestPlayerSwitching:
+class TestPlayerSwitching(unittest.TestCase):
     """Test suite for player switching logic."""
     
     def test_player_representation_white(self) -> None:
@@ -350,7 +352,7 @@ class TestPlayerSwitching:
         player_color: str = "White" if current_player == "W" else "Black"
         
         # Assert
-        assert player_color == "White", "Should display as White"
+        self.assertEqual(player_color, "White", "Should display as White")
     
     def test_player_representation_black(self) -> None:
         """
@@ -365,10 +367,10 @@ class TestPlayerSwitching:
         player_color: str = "White" if current_player == "W" else "Black"
         
         # Assert
-        assert player_color == "Black", "Should display as Black"
+        self.assertEqual(player_color, "Black", "Should display as Black")
 
 
-class TestDiceUsage:
+class TestDiceUsage(unittest.TestCase):
     """Test suite for dice usage logic."""
     
     def test_remove_used_die_value(self) -> None:
@@ -385,8 +387,8 @@ class TestDiceUsage:
         dice_values.remove(distance)
         
         # Assert
-        assert 5 not in dice_values, "Used die should be removed"
-        assert dice_values == [2], "Only unused dice should remain"
+        self.assertNotIn(5, dice_values, "Used die should be removed")
+        self.assertEqual(dice_values, [2], "Only unused dice should remain")
     
     def test_all_dice_used(self) -> None:
         """
@@ -401,7 +403,7 @@ class TestDiceUsage:
         all_used: bool = not dice_values
         
         # Assert
-        assert all_used is True, "All dice should be used"
+        self.assertTrue(all_used, "All dice should be used")
     
     def test_dice_still_available(self) -> None:
         """
@@ -416,10 +418,10 @@ class TestDiceUsage:
         all_used: bool = not dice_values
         
         # Assert
-        assert all_used is False, "Dice should still be available"
+        self.assertFalse(all_used, "Dice should still be available")
 
 
-class TestButtonConfiguration:
+class TestButtonConfiguration(unittest.TestCase):
     """Test suite for button configuration."""
     
     def test_roll_button_position(self) -> None:
@@ -435,10 +437,10 @@ class TestButtonConfiguration:
         height: int = 50
         
         # Assert
-        assert x == 50, "Roll button x should be 50"
-        assert y == 650, "Roll button y should be 650"
-        assert width == 150, "Roll button width should be 150"
-        assert height == 50, "Roll button height should be 50"
+        self.assertEqual(x, 50, "Roll button x should be 50")
+        self.assertEqual(y, 650, "Roll button y should be 650")
+        self.assertEqual(width, 150, "Roll button width should be 150")
+        self.assertEqual(height, 50, "Roll button height should be 50")
     
     def test_reset_button_position(self) -> None:
         """
@@ -453,10 +455,10 @@ class TestButtonConfiguration:
         height: int = 50
         
         # Assert
-        assert x == 220, "Reset button x should be 220"
-        assert y == 650, "Reset button y should be 650"
-        assert width == 150, "Reset button width should be 150"
-        assert height == 50, "Reset button height should be 50"
+        self.assertEqual(x, 220, "Reset button x should be 220")
+        self.assertEqual(y, 650, "Reset button y should be 650")
+        self.assertEqual(width, 150, "Reset button width should be 150")
+        self.assertEqual(height, 50, "Reset button height should be 50")
     
     def test_next_turn_button_position(self) -> None:
         """
@@ -471,11 +473,11 @@ class TestButtonConfiguration:
         height: int = 50
         
         # Assert
-        assert x == 390, "Next turn button x should be 390"
-        assert y == 650, "Next turn button y should be 650"
-        assert width == 150, "Next turn button width should be 150"
-        assert height == 50, "Next turn button height should be 50"
+        self.assertEqual(x, 390, "Next turn button x should be 390")
+        self.assertEqual(y, 650, "Next turn button y should be 650")
+        self.assertEqual(width, 150, "Next turn button width should be 150")
+        self.assertEqual(height, 50, "Next turn button height should be 50")
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+    unittest.main()
