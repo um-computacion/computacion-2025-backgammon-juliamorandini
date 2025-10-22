@@ -60,6 +60,7 @@ def main() -> None:
     )
     
     selected_point: Optional[int] = None
+    bar_selected: bool = False
     dice_rolled: bool = False
     moves_made: int = 0
     max_moves_this_turn: int = 0
@@ -92,11 +93,13 @@ def main() -> None:
                     moves_made = 0
                     max_moves_this_turn = 0
                     selected_point = None
+                    bar_selected = False
                     print(f"Turn ended. Now playing: {backgammon_board.current_player}")
                 
                 elif event.key == pygame.K_r:
                     backgammon_board.reset()
                     selected_point = None
+                    bar_selected = False
                     dice_rolled = False
                     moves_made = 0
                     max_moves_this_turn = 0
@@ -115,6 +118,7 @@ def main() -> None:
             elif reset_button.handle_event(event):
                 backgammon_board.reset()
                 selected_point = None
+                bar_selected = False
                 dice_rolled = False
                 moves_made = 0
                 max_moves_this_turn = 0
@@ -126,88 +130,86 @@ def main() -> None:
                 moves_made = 0
                 max_moves_this_turn = 0
                 selected_point = None
+                bar_selected = False
                 print(f"Turn ended. Now playing: {backgammon_board.current_player}")
             
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = event.pos
-                
                 if not dice_rolled:
                     print("Roll dice first!")
                     continue
 
+                mouse_pos = event.pos
+                
                 # CHECK IF PLAYER HAS PIECES ON BAR
-                if backgammon_board.board.bar[backgammon_board.current_player] > 0:
-                    # PLAYER MUST ENTER FROM BAR
+                has_bar_pieces = backgammon_board.board.bar[backgammon_board.current_player] > 0
+                
+                if has_bar_pieces:
+                    # Check if clicking on bar area
                     bar_x = Config.BAR_X
                     bar_y_top = Config.BOARD_Y + Config.BORDER_THICKNESS
                     bar_y_bottom = Config.BOARD_Y + Config.BOARD_HEIGHT - Config.BORDER_THICKNESS
                     bar_width = Config.BAR_WIDTH
                     
-                    # Check if clicking on bar area
                     if bar_x <= mouse_pos[0] <= bar_x + bar_width and bar_y_top <= mouse_pos[1] <= bar_y_bottom:
-                        # Clicked on bar - select it
-                        selected_point = "BAR"
+                        # Clicked on bar
+                        bar_selected = True
                         bar_pieces = backgammon_board.board.bar[backgammon_board.current_player]
-                        print(f"Selected checker from bar! ({bar_pieces} pieces on bar)")
+                        print(f"\n✓ Selected checker from bar! ({bar_pieces} pieces on bar)")
                         print(f"Valid entry points with current dice:")
                         for dice_val in backgammon_board.dice_values:
                             entry_pt = get_entry_point_for_dice(dice_val, backgammon_board.current_player)
                             print(f"  Dice {dice_val} → Point {entry_pt}")
                         continue
                     
-                    # Not clicking bar, must click valid entry point if bar is selected
-                    if selected_point == "BAR":
-                        clicked_point = board_interaction.get_clicked_point(mouse_pos)
-                        
-                        if clicked_point is not None:
-                            # Get valid entry points for this player's dice
-                            valid_entry_points = {}  # dice_value -> point
-                            for dice_val in backgammon_board.dice_values:
-                                entry_pt = get_entry_point_for_dice(dice_val, backgammon_board.current_player)
-                                valid_entry_points[dice_val] = entry_pt
-                            
-                            # Check if clicked point matches any valid entry point
-                            matching_dice = None
-                            for dice_val, entry_pt in valid_entry_points.items():
-                                if entry_pt == clicked_point:
-                                    matching_dice = dice_val
-                                    break
-                            
-                            if matching_dice is None:
-                                print(f"Cannot enter at point {clicked_point}. Valid entry points: {list(valid_entry_points.values())}")
-                                selected_point = None
-                                continue
-                            
-                            # Try to enter from bar
-                            if backgammon_board.board.move_checker_from_bar(clicked_point, backgammon_board.current_player):
-                                print(f"✓ Entered from bar at point {clicked_point} using dice {matching_dice}")
-                                backgammon_board.dice_values.remove(matching_dice)
-                                moves_made += 1
-                                
-                                # Check if turn is complete
-                                if moves_made >= max_moves_this_turn or not backgammon_board.dice_values:
-                                    print("Turn complete!")
-                                    backgammon_board.switch_player()
-                                    dice_rolled = False
-                                    moves_made = 0
-                                    max_moves_this_turn = 0
-                            else:
-                                print(f"Cannot enter at point {clicked_point} (point blocked)")
-                            
-                            selected_point = None
-                        continue
-                    else:
-                        print("Click the BAR first to select a checker!")
-                        continue
-                
-                # NORMAL MOVE (not from bar)
-                clicked_point = board_interaction.get_clicked_point(mouse_pos)
-                if clicked_point is None:
-                    continue
+                    # Clicked on board
+                    clicked_point = board_interaction.get_clicked_point(mouse_pos)
                     
-                    # NORMAL MOVE (not from bar)
+                    if clicked_point is not None:
+                        if not bar_selected:
+                            print("Click the BAR first to select a checker!")
+                            continue
+                        
+                        # Get valid entry points
+                        valid_entry_points = {}
+                        for dice_val in backgammon_board.dice_values:
+                            entry_pt = get_entry_point_for_dice(dice_val, backgammon_board.current_player)
+                            valid_entry_points[dice_val] = entry_pt
+                        
+                        # Check if clicked point is valid
+                        matching_dice = None
+                        for dice_val, entry_pt in valid_entry_points.items():
+                            if entry_pt == clicked_point:
+                                matching_dice = dice_val
+                                break
+                        
+                        if matching_dice is None:
+                            print(f"Cannot enter at point {clicked_point}. Valid: {list(valid_entry_points.values())}")
+                            continue
+                        
+                        # Enter from bar
+                        if backgammon_board.board.move_checker_from_bar(clicked_point, backgammon_board.current_player):
+                            print(f"✓ Entered from bar at point {clicked_point} using dice {matching_dice}")
+                            backgammon_board.dice_values.remove(matching_dice)
+                            moves_made += 1
+                            bar_selected = False
+                            
+                            if moves_made >= max_moves_this_turn or not backgammon_board.dice_values:
+                                print("✓ Turn complete!")
+                                backgammon_board.switch_player()
+                                dice_rolled = False
+                                moves_made = 0
+                                max_moves_this_turn = 0
+                                bar_selected = False
+                        else:
+                            print(f"Cannot enter at point {clicked_point} (blocked)")
+                    continue
+                
+                # NORMAL MOVE (no pieces on bar)
+                clicked_point = board_interaction.get_clicked_point(mouse_pos)
+                
+                if clicked_point is not None:
                     if selected_point is None:
-                        # Selecting a point
+                        # Select a point
                         point_pieces = backgammon_board.board.points[clicked_point]
                         if point_pieces and point_pieces[0] == backgammon_board.current_player:
                             selected_point = clicked_point
@@ -215,9 +217,8 @@ def main() -> None:
                         else:
                             print(f"No {backgammon_board.current_player} pieces at point {clicked_point}")
                     else:
-                        # Making a move
+                        # Move to destination
                         if clicked_point == selected_point:
-                            # Deselect if clicking same point
                             selected_point = None
                             print("Point deselected")
                             continue
