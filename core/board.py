@@ -1,6 +1,9 @@
 from typing import List, Dict
 
 
+from typing import List, Dict
+
+
 class Board:
     """Backgammon board representation."""
 
