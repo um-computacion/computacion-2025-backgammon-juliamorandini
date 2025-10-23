@@ -1,9 +1,6 @@
 from typing import List, Dict
 
 
-from typing import List, Dict
-
-
 class Board:
     """Backgammon board representation."""
 
@@ -84,6 +81,8 @@ class Board:
         self.points[to_point].append(checker)
 
         if len(self.points[to_point]) > 1:
+            # Re-ensure all elements are the same color string for consistency
+            # (Though popping and appending maintains color if is_valid is true)
             self.points[to_point] = [self.points[to_point][0]] * len(
                 self.points[to_point]
             )
@@ -180,6 +179,7 @@ class Board:
         if self.bar[color] == 0:
             return False
 
+        # Check if the target point is in the correct home board range
         if color == "W" and not (18 <= to_point <= 23):
             return False
         if color == "B" and not (0 <= to_point <= 5):
@@ -188,6 +188,7 @@ class Board:
         if not self.can_enter_from_bar(color, to_point):
             return False
 
+        # Hit logic (only hits if it's a single opponent piece)
         if (
             self.points[to_point]
             and len(self.points[to_point]) == 1
