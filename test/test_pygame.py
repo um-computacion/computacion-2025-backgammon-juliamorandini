@@ -15,7 +15,7 @@ import pygame
 
 # We import from PygameUI_refactored (assuming you rename it to PygameUI.py)
 # If you keep the name "PygameUI_refactored.py", change this import
-from PygameUI_refactored import Game, is_valid_direction, get_entry_point_for_dice
+from PygameUI import Game, is_valid_direction, get_entry_point_for_dice
 
 from config import Config
 from pygame_ui.button import Button
@@ -63,10 +63,12 @@ class TestGameLogic(unittest.TestCase):
     This class tests the actual game logic that was previously in main().
     """
 
-    @patch('pygame.display.set_mode', Mock())
-    @patch('pygame.display.set_caption', Mock())
-    @patch('pygame.font.Font', Mock(return_value=Mock(render=Mock(return_value=Mock()))))
-    @patch('pygame.quit', Mock())
+    @patch("pygame.display.set_mode", Mock())
+    @patch("pygame.display.set_caption", Mock())
+    @patch(
+        "pygame.font.Font", Mock(return_value=Mock(render=Mock(return_value=Mock())))
+    )
+    @patch("pygame.quit", Mock())
     def setUp(self):
         """Set up a new Game instance for each test."""
         # We must init pygame to be able to create pygame.event.Event
@@ -125,7 +127,9 @@ class TestGameLogic(unittest.TestCase):
         self.assertFalse(self.game.dice_rolled)
 
         # Mock the roll_dice method to return a known value
-        with patch.object(self.game.backgammon_board, 'roll_dice', return_value=[3, 4]) as mock_roll:
+        with patch.object(
+            self.game.backgammon_board, "roll_dice", return_value=[3, 4]
+        ) as mock_roll:
             self.game.handle_keydown(pygame.K_SPACE)
 
         mock_roll.assert_called_once()
@@ -135,7 +139,9 @@ class TestGameLogic(unittest.TestCase):
 
     def test_handle_keydown_k_space_roll_dice_doubles(self):
         """Test that 'SPACE' correctly identifies doubles."""
-        with patch.object(self.game.backgammon_board, 'roll_dice', return_value=[6, 6, 6, 6]) as mock_roll:
+        with patch.object(
+            self.game.backgammon_board, "roll_dice", return_value=[6, 6, 6, 6]
+        ) as mock_roll:
             self.game.handle_keydown(pygame.K_SPACE)
 
         mock_roll.assert_called_once()
@@ -146,101 +152,105 @@ class TestGameLogic(unittest.TestCase):
         """Test that 'SPACE' does not roll dice if already rolled."""
         self.game.dice_rolled = True  # Set state to already rolled
 
-        with patch.object(self.game.backgammon_board, 'roll_dice') as mock_roll:
+        with patch.object(self.game.backgammon_board, "roll_dice") as mock_roll:
             self.game.handle_keydown(pygame.K_SPACE)
 
         # Assert that roll_dice was NOT called
         mock_roll.assert_not_called()
-        self.assertTrue(self.game.dice_rolled) # State remains unchanged
+        self.assertTrue(self.game.dice_rolled)  # State remains unchanged
 
     def test_button_click_roll_dice(self):
         """Test that clicking the Roll Dice button calls do_roll_dice."""
         # Create a mock event positioned at the button's center
         event = pygame.event.Event(
             pygame.MOUSEBUTTONDOWN,
-            {'pos': self.game.roll_button.rect.center, 'button': 1}
+            {"pos": self.game.roll_button.rect.center, "button": 1},
         )
 
         # Patch the actual action method to verify it's called
-        with patch.object(self.game, 'do_roll_dice') as mock_do_roll:
+        with patch.object(self.game, "do_roll_dice") as mock_do_roll:
             self.game.handle_event(event)
-        
+
         mock_do_roll.assert_called_once()
 
     def test_button_click_reset(self):
         """Test that clicking the Reset button calls do_reset."""
         event = pygame.event.Event(
             pygame.MOUSEBUTTONDOWN,
-            {'pos': self.game.reset_button.rect.center, 'button': 1}
+            {"pos": self.game.reset_button.rect.center, "button": 1},
         )
-        with patch.object(self.game, 'do_reset') as mock_do_reset:
+        with patch.object(self.game, "do_reset") as mock_do_reset:
             self.game.handle_event(event)
-        
+
         mock_do_reset.assert_called_once()
 
     def test_button_click_next_turn(self):
         """Test that clicking the Next Turn button calls do_next_turn."""
         event = pygame.event.Event(
             pygame.MOUSEBUTTONDOWN,
-            {'pos': self.game.next_turn_button.rect.center, 'button': 1}
+            {"pos": self.game.next_turn_button.rect.center, "button": 1},
         )
-        with patch.object(self.game, 'do_next_turn') as mock_do_next:
+        with patch.object(self.game, "do_next_turn") as mock_do_next:
             self.game.handle_event(event)
-        
+
         mock_do_next.assert_called_once()
 
     def test_mouse_click_board_before_roll_is_ignored(self):
         """Test that clicking the board before rolling dice does nothing."""
         self.game.dice_rolled = False  # Ensure dice are not rolled
-        
+
         # Click somewhere on the board (not on a button)
         event = pygame.event.Event(
-            pygame.MOUSEBUTTONDOWN,
-            {'pos': (300, 300), 'button': 1}
+            pygame.MOUSEBUTTONDOWN, {"pos": (300, 300), "button": 1}
         )
-        
+
         # We patch the move handlers to ensure they are NOT called
-        with patch.object(self.game, 'handle_normal_move') as mock_normal_move, \
-             patch.object(self.game, 'handle_bar_move') as mock_bar_move:
-            
+        with patch.object(
+            self.game, "handle_normal_move"
+        ) as mock_normal_move, patch.object(
+            self.game, "handle_bar_move"
+        ) as mock_bar_move:
+
             self.game.handle_event(event)
-        
+
         mock_normal_move.assert_not_called()
         mock_bar_move.assert_not_called()
 
     def test_mouse_click_board_after_roll_is_handled(self):
         """Test that clicking the board after rolling dice calls the move handler."""
         self.game.dice_rolled = True  # Dice are rolled
-        
+
         # Player has no pieces on the bar
-        self.game.backgammon_board.board.bar[self.game.backgammon_board.current_player] = 0
-        
+        self.game.backgammon_board.board.bar[
+            self.game.backgammon_board.current_player
+        ] = 0
+
         event = pygame.event.Event(
-            pygame.MOUSEBUTTONDOWN,
-            {'pos': (300, 300), 'button': 1}
+            pygame.MOUSEBUTTONDOWN, {"pos": (300, 300), "button": 1}
         )
-        
-        with patch.object(self.game, 'handle_normal_move') as mock_normal_move:
+
+        with patch.object(self.game, "handle_normal_move") as mock_normal_move:
             self.game.handle_event(event)
-        
+
         # It should call the normal move handler
         mock_normal_move.assert_called_once_with((300, 300))
 
     def test_mouse_click_with_bar_pieces_calls_bar_handler(self):
         """Test that clicking after rolling with bar pieces calls the bar handler."""
         self.game.dice_rolled = True  # Dice are rolled
-        
+
         # Player HAS pieces on the bar
-        self.game.backgammon_board.board.bar[self.game.backgammon_board.current_player] = 1
-        
+        self.game.backgammon_board.board.bar[
+            self.game.backgammon_board.current_player
+        ] = 1
+
         event = pygame.event.Event(
-            pygame.MOUSEBUTTONDOWN,
-            {'pos': (300, 300), 'button': 1}
+            pygame.MOUSEBUTTONDOWN, {"pos": (300, 300), "button": 1}
         )
-        
-        with patch.object(self.game, 'handle_bar_move') as mock_bar_move:
+
+        with patch.object(self.game, "handle_bar_move") as mock_bar_move:
             self.game.handle_event(event)
-        
+
         # It should call the bar move handler
         mock_bar_move.assert_called_once_with((300, 300))
 

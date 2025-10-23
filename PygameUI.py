@@ -10,6 +10,7 @@ CheckerPos = Tuple[int, int, int, int, str]
 
 
 def is_valid_direction(from_point: int, to_point: int, player: str) -> bool:
+    """Checks if the move direction is valid for the player."""
     if player == "W":
         return to_point < from_point
     else:
@@ -34,337 +35,413 @@ def get_entry_point_for_dice(dice_value: int, player: str) -> int:
         return dice_value - 1
 
 
-def main() -> None:
-    pygame.init()
-    screen: pygame.Surface = pygame.display.set_mode(
-        (Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT)
-    )
-    pygame.display.set_caption("Backgammon Game")
-    clock: pygame.time.Clock = pygame.time.Clock()
+class Game:
+    """
+    Encapsulates the main game logic, state, and rendering.
+    """
 
-    backgammon_board: BackgammonBoard = BackgammonBoard()
+    def __init__(self):
+        """Initializes the game, Pygame, and all game state variables."""
+        pygame.init()
+        self.screen: pygame.Surface = pygame.display.set_mode(
+            (Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT)
+        )
+        pygame.display.set_caption("Backgammon Game")
+        self.clock: pygame.time.Clock = pygame.time.Clock()
 
-    roll_button: Button = Button(
-        50, 730, 150, 50, "Roll Dice", color=(70, 130, 180), hover_color=(100, 160, 210)
-    )
-    reset_button: Button = Button(
-        220, 730, 150, 50, "Reset", color=(180, 70, 70), hover_color=(210, 100, 100)
-    )
-    next_turn_button: Button = Button(
-        390, 730, 150, 50, "Next Turn", color=(70, 180, 70), hover_color=(100, 210, 100)
-    )
+        self.backgammon_board: BackgammonBoard = BackgammonBoard()
+        self.board_interaction = BoardInteraction()
 
-    selected_point: Optional[int] = None
-    bar_selected: bool = False
-    dice_rolled: bool = False
-    moves_made: int = 0
-    max_moves_this_turn: int = 0
+        # --- UI Elements ---
+        self.roll_button: Button = Button(
+            50, 730, 150, 50, "Roll Dice", color=(70, 130, 180), hover_color=(100, 160, 210)
+        )
+        self.reset_button: Button = Button(
+            220, 730, 150, 50, "Reset", color=(180, 70, 70), hover_color=(210, 100, 100)
+        )
+        self.next_turn_button: Button = Button(
+            390, 730, 150, 50, "Next Turn", color=(70, 180, 70), hover_color=(100, 210, 100)
+        )
+        self.font: pygame.font.Font = pygame.font.Font(None, 36)
 
-    board_interaction = BoardInteraction()
+        # --- Game State Variables ---
+        self.selected_point: Optional[int] = None
+        self.bar_selected: bool = False
+        self.dice_rolled: bool = False
+        self.moves_made: int = 0
+        self.max_moves_this_turn: int = 0
+        self.running: bool = True
 
-    running: bool = True
+    def run(self):
+        """Starts and runs the main game loop."""
+        while self.running:
+            # --- Event Handling ---
+            for event in pygame.event.get():
+                self.handle_event(event)
 
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    running = False
+            # --- Game Logic Update ---
+            self.update()
 
-                elif event.key == pygame.K_SPACE:
-                    if not dice_rolled:
-                        dice = backgammon_board.roll_dice()
-                        dice_rolled = True
-                        moves_made = 0
-                        max_moves_this_turn = 4 if len(dice) == 4 else 2
-                        print(f"{backgammon_board.current_player} rolled: {dice}")
-                    else:
-                        print(
-                            "Already rolled! Make your moves or press N for next turn"
-                        )
+            # --- Rendering ---
+            self.render()
 
-                elif event.key == pygame.K_n:
-                    backgammon_board.switch_player()
-                    dice_rolled = False
-                    moves_made = 0
-                    max_moves_this_turn = 0
-                    selected_point = None
-                    bar_selected = False
-                    print(f"Turn ended. Now playing: {backgammon_board.current_player}")
+            self.clock.tick(60)
 
-                elif event.key == pygame.K_r:
-                    backgammon_board.reset()
-                    selected_point = None
-                    bar_selected = False
-                    dice_rolled = False
-                    moves_made = 0
-                    max_moves_this_turn = 0
-                    print("Board reset!")
+        pygame.quit()
 
-            elif roll_button.handle_event(event):
-                if not dice_rolled:
-                    dice = backgammon_board.roll_dice()
-                    dice_rolled = True
-                    moves_made = 0
-                    max_moves_this_turn = 4 if len(dice) == 4 else 2
-                    print(f"{backgammon_board.current_player} rolled: {dice}")
-                else:
-                    print("Already rolled! Make your moves or press N for next turn")
+    def handle_event(self, event: pygame.event.Event):
+        """Handles a single Pygame event."""
+        if event.type == pygame.QUIT:
+            self.running = False
+            return
 
-            elif reset_button.handle_event(event):
-                backgammon_board.reset()
-                selected_point = None
-                bar_selected = False
-                dice_rolled = False
-                moves_made = 0
-                max_moves_this_turn = 0
-                print("Board reset!")
+        if event.type == pygame.KEYDOWN:
+            self.handle_keydown(event.key)
+            return
 
-            elif next_turn_button.handle_event(event):
-                backgammon_board.switch_player()
-                dice_rolled = False
-                moves_made = 0
-                max_moves_this_turn = 0
-                selected_point = None
-                bar_selected = False
-                print(f"Turn ended. Now playing: {backgammon_board.current_player}")
+        # --- Button Events ---
+        if self.roll_button.handle_event(event):
+            self.do_roll_dice()
+            return
 
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if not dice_rolled:
-                    print("Roll dice first!")
-                    continue
+        if self.reset_button.handle_event(event):
+            self.do_reset()
+            return
 
-                mouse_pos = event.pos
+        if self.next_turn_button.handle_event(event):
+            self.do_next_turn()
+            return
 
-                # CHECK IF PLAYER HAS PIECES ON BAR
-                has_bar_pieces = (
-                    backgammon_board.board.bar[backgammon_board.current_player] > 0
+        # --- Mouse Click on Board ---
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            self.handle_mouse_click(event.pos)
+            return
+
+    def handle_keydown(self, key: int):
+        """Handles keyboard press events."""
+        if key == pygame.K_ESCAPE:
+            self.running = False
+        elif key == pygame.K_SPACE:
+            self.do_roll_dice()
+        elif key == pygame.K_n:
+            self.do_next_turn()
+        elif key == pygame.K_r:
+            self.do_reset()
+
+    def do_roll_dice(self):
+        """Action for rolling the dice."""
+        if not self.dice_rolled:
+            dice = self.backgammon_board.roll_dice()
+            self.dice_rolled = True
+            self.moves_made = 0
+            self.max_moves_this_turn = 4 if len(dice) == 4 else 2
+            print(f"{self.backgammon_board.current_player} rolled: {dice}")
+        else:
+            print("Already rolled! Make your moves or press N for next turn")
+
+    def do_reset(self):
+        """Action for resetting the game."""
+        self.backgammon_board.reset()
+        self.selected_point = None
+        self.bar_selected = False
+        self.dice_rolled = False
+        self.moves_made = 0
+        self.max_moves_this_turn = 0
+        print("Board reset!")
+
+    def do_next_turn(self):
+        """Action for switching to the next turn."""
+        self.backgammon_board.switch_player()
+        self.dice_rolled = False
+        self.moves_made = 0
+        self.max_moves_this_turn = 0
+        self.selected_point = None
+        self.bar_selected = False
+        print(f"Turn ended. Now playing: {self.backgammon_board.current_player}")
+
+    def handle_mouse_click(self, mouse_pos: Tuple[int, int]):
+        """Handles logic for all mouse clicks on the board/bar."""
+        if not self.dice_rolled:
+            print("Roll dice first!")
+            return
+
+        # CHECK IF PLAYER HAS PIECES ON BAR
+        has_bar_pieces = (
+            self.backgammon_board.board.bar[self.backgammon_board.current_player] > 0
+        )
+
+        if has_bar_pieces:
+            self.handle_bar_move(mouse_pos)
+        else:
+            self.handle_normal_move(mouse_pos)
+
+    def handle_bar_move(self, mouse_pos: Tuple[int, int]):
+        """Handles a move attempt when the player has pieces on the bar."""
+        # Check if clicking on bar area
+        bar_x = Config.BAR_X
+        bar_y_top = Config.BOARD_Y + Config.BORDER_THICKNESS
+        bar_y_bottom = (
+            Config.BOARD_Y + Config.BOARD_HEIGHT - Config.BORDER_THICKNESS
+        )
+        bar_width = Config.BAR_WIDTH
+
+        if (
+            bar_x <= mouse_pos[0] <= bar_x + bar_width
+            and bar_y_top <= mouse_pos[1] <= bar_y_bottom
+        ):
+            # Clicked on bar
+            self.bar_selected = True
+            bar_pieces = self.backgammon_board.board.bar[
+                self.backgammon_board.current_player
+            ]
+            print(f"\n✓ Selected checker from bar! ({bar_pieces} pieces on bar)")
+            print(f"Valid entry points with current dice:")
+            for dice_val in self.backgammon_board.dice_values:
+                entry_pt = get_entry_point_for_dice(
+                    dice_val, self.backgammon_board.current_player
                 )
+                print(f"  Dice {dice_val} → Point {entry_pt}")
+            return
 
-                if has_bar_pieces:
-                    # Check if clicking on bar area
-                    bar_x = Config.BAR_X
-                    bar_y_top = Config.BOARD_Y + Config.BORDER_THICKNESS
-                    bar_y_bottom = (
-                        Config.BOARD_Y + Config.BOARD_HEIGHT - Config.BORDER_THICKNESS
-                    )
-                    bar_width = Config.BAR_WIDTH
+        # Clicked on board (attempting to enter)
+        clicked_point = self.board_interaction.get_clicked_point(mouse_pos)
 
-                    if (
-                        bar_x <= mouse_pos[0] <= bar_x + bar_width
-                        and bar_y_top <= mouse_pos[1] <= bar_y_bottom
-                    ):
-                        # Clicked on bar
-                        bar_selected = True
-                        bar_pieces = backgammon_board.board.bar[
-                            backgammon_board.current_player
-                        ]
-                        print(
-                            f"\n✓ Selected checker from bar! ({bar_pieces} pieces on bar)"
-                        )
-                        print(f"Valid entry points with current dice:")
-                        for dice_val in backgammon_board.dice_values:
-                            entry_pt = get_entry_point_for_dice(
-                                dice_val, backgammon_board.current_player
-                            )
-                            print(f"  Dice {dice_val} → Point {entry_pt}")
-                        continue
+        if clicked_point is not None:
+            if not self.bar_selected:
+                print("Click the BAR first to select a checker!")
+                return
 
-                    # Clicked on board
-                    clicked_point = board_interaction.get_clicked_point(mouse_pos)
+            # Get valid entry points
+            valid_entry_points = {}
+            for dice_val in self.backgammon_board.dice_values:
+                entry_pt = get_entry_point_for_dice(
+                    dice_val, self.backgammon_board.current_player
+                )
+                valid_entry_points[dice_val] = entry_pt
 
-                    if clicked_point is not None:
-                        if not bar_selected:
-                            print("Click the BAR first to select a checker!")
-                            continue
+            # Check if clicked point is valid
+            matching_dice = None
+            for dice_val, entry_pt in valid_entry_points.items():
+                if entry_pt == clicked_point:
+                    matching_dice = dice_val
+                    break
 
-                        # Get valid entry points
-                        valid_entry_points = {}
-                        for dice_val in backgammon_board.dice_values:
-                            entry_pt = get_entry_point_for_dice(
-                                dice_val, backgammon_board.current_player
-                            )
-                            valid_entry_points[dice_val] = entry_pt
+            if matching_dice is None:
+                print(
+                    f"Cannot enter at point {clicked_point}. Valid: {list(valid_entry_points.values())}"
+                )
+                return
 
-                        # Check if clicked point is valid
-                        matching_dice = None
-                        for dice_val, entry_pt in valid_entry_points.items():
-                            if entry_pt == clicked_point:
-                                matching_dice = dice_val
-                                break
+            # Attempt to enter from bar
+            if self.backgammon_board.board.move_checker_from_bar(
+                clicked_point, self.backgammon_board.current_player
+            ):
+                print(
+                    f"Entered from bar at point {clicked_point} using dice {matching_dice}"
+                )
+                self.backgammon_board.dice_values.remove(matching_dice)
+                self.moves_made += 1
+                self.bar_selected = False
 
-                        if matching_dice is None:
-                            print(
-                                f"Cannot enter at point {clicked_point}. Valid: {list(valid_entry_points.values())}"
-                            )
-                            continue
+                if (
+                    self.moves_made >= self.max_moves_this_turn
+                    or not self.backgammon_board.dice_values
+                ):
+                    print("✓ Turn complete!")
+                    self.do_next_turn()
+            else:
+                print(f"Cannot enter at point {clicked_point} (blocked)")
 
-                        # Enter from bar
-                        if backgammon_board.board.move_checker_from_bar(
-                            clicked_point, backgammon_board.current_player
-                        ):
-                            print(
-                                f"Entered from bar at point {clicked_point} using dice {matching_dice}"
-                            )
-                            backgammon_board.dice_values.remove(matching_dice)
-                            moves_made += 1
-                            bar_selected = False
+    def handle_normal_move(self, mouse_pos: Tuple[int, int]):
+        """Handles a move attempt when the player has no pieces on the bar."""
+        clicked_point = self.board_interaction.get_clicked_point(mouse_pos)
 
-                            if (
-                                moves_made >= max_moves_this_turn
-                                or not backgammon_board.dice_values
-                            ):
-                                print("✓ Turn complete!")
-                                backgammon_board.switch_player()
-                                dice_rolled = False
-                                moves_made = 0
-                                max_moves_this_turn = 0
-                                bar_selected = False
-                        else:
-                            print(f"Cannot enter at point {clicked_point} (blocked)")
-                    continue
+        if clicked_point is None:
+            return
 
-                # NORMAL MOVE (no pieces on bar)
-                clicked_point = board_interaction.get_clicked_point(mouse_pos)
+        if self.selected_point is None:
+            # --- Select a point ---
+            point_pieces = self.backgammon_board.board.points[clicked_point]
+            if (
+                point_pieces
+                and point_pieces[0] == self.backgammon_board.current_player
+            ):
+                self.selected_point = clicked_point
+                print(f"Selected point {clicked_point}")
+            else:
+                print(
+                    f"No {self.backgammon_board.current_player} pieces at point {clicked_point}"
+                )
+        else:
+            # --- Move to destination ---
+            if clicked_point == self.selected_point:
+                self.selected_point = None
+                print("Point deselected")
+                return
 
-                if clicked_point is not None:
-                    if selected_point is None:
-                        # Select a point
-                        point_pieces = backgammon_board.board.points[clicked_point]
-                        if (
-                            point_pieces
-                            and point_pieces[0] == backgammon_board.current_player
-                        ):
-                            selected_point = clicked_point
-                            print(f"Selected point {clicked_point}")
-                        else:
-                            print(
-                                f"No {backgammon_board.current_player} pieces at point {clicked_point}"
-                            )
+            # --- Check for Bearing Off ---
+            # Note: This bear-off logic is simplified. A real check
+            # (backgammon_board.board.can_bear_off) should be used.
+            player = self.backgammon_board.current_player
+            is_bearing_off = self.backgammon_board.board.can_bear_off(player)
+            
+            # Simple check if click is "off board" in the right direction
+            is_bear_off_click = False
+            if player == "W" and clicked_point < 0: # White bears off past 0
+                is_bear_off_click = True
+                # Calculate effective distance for bear off
+                distance = self.selected_point + 1 
+            elif player == "B" and clicked_point > 23: # Black bears off past 23
+                is_bear_off_click = True
+                # Calculate effective distance for bear off
+                distance = 24 - self.selected_point
+            else:
+                distance = abs(clicked_point - self.selected_point)
+
+            if is_bearing_off and is_bear_off_click:
+                # --- Handle Bear Off Attempt ---
+                
+                # Check if exact dice value exists
+                if distance in self.backgammon_board.dice_values:
+                    if self.backgammon_board.board.bear_off(player, self.selected_point):
+                        print(f"Bore off from point {self.selected_point}!")
+                        self.backgammon_board.dice_values.remove(distance)
+                        self.moves_made += 1
                     else:
-                        # Move to destination
-                        if clicked_point == selected_point:
-                            selected_point = None
-                            print("Point deselected")
-                            continue
+                        print("Cannot bear off from that point (logic error)!")
+                
+                # Check if a higher dice value can be used (if no exact match and this is the furthest checker)
+                elif all(d > distance for d in self.backgammon_board.dice_values):
+                     # Check if this is the furthest checker
+                    is_furthest = True
+                    if player == 'W':
+                        for p in range(self.selected_point + 1, 6):
+                            if self.backgammon_board.board.points[p] and self.backgammon_board.board.points[p][0] == 'W':
+                                is_furthest = False
+                                break
+                    else: # Player 'B'
+                         for p in range(self.selected_point - 1, 17, -1):
+                            if self.backgammon_board.board.points[p] and self.backgammon_board.board.points[p][0] == 'B':
+                                is_furthest = False
+                                break
+                    
+                    if is_furthest:
+                         if self.backgammon_board.board.bear_off(player, self.selected_point):
+                            print(f"Bore off from point {self.selected_point} (using higher dice)!")
+                            # Use the smallest dice that is larger than the distance
+                            used_dice = min(d for d in self.backgammon_board.dice_values if d > distance)
+                            self.backgammon_board.dice_values.remove(used_dice)
+                            self.moves_made += 1
+                         else:
+                            print("Cannot bear off from that point (logic error)!")
+                    else:
+                        print(f"No dice value matches for bearing off (must move furthest checker first)")
 
-                        # CHECK FOR BEAR OFF
-                        player = backgammon_board.current_player
-                        home_start = 18 if player == "W" else 0
-                        home_end = 24 if player == "W" else 6
+                else:
+                    print(f"No dice value matches for bearing off ({distance})")
 
-                        # Can bear off if: selected_point is in home, clicked_point is off board, all pieces in home
-                        if (
-                            home_start <= selected_point < home_end
-                            and clicked_point >= 24
-                        ):
-                            # Bearing off
-                            distance = (
-                                clicked_point - selected_point
-                                if player == "W"
-                                else selected_point - clicked_point
-                            )
-                            if distance in backgammon_board.dice_values:
-                                if backgammon_board.board.bear_off(
-                                    player, selected_point
-                                ):
-                                    print(f"Bore off from point {selected_point}!")
-                                    backgammon_board.dice_values.remove(distance)
-                                    moves_made += 1
-                                    if (
-                                        moves_made >= max_moves_this_turn
-                                        or not backgammon_board.dice_values
-                                    ):
-                                        print(
-                                            f"Turn complete! Borne off: {backgammon_board.board.borne_off[player]}"
-                                        )
-                                        backgammon_board.switch_player()
-                                        dice_rolled = False
-                                        moves_made = 0
-                                        max_moves_this_turn = 0
-                                else:
-                                    print("Cannot bear off from that point!")
-                            else:
-                                print(f"No dice value matches for bearing off")
-                        else:
-                            # Regular move
-                            distance = abs(clicked_point - selected_point)
-                            if distance in backgammon_board.dice_values:
-                                if is_valid_direction(
-                                    selected_point,
-                                    clicked_point,
-                                    backgammon_board.current_player,
-                                ):
-                                    if backgammon_board.move_checker(
-                                        selected_point, clicked_point
-                                    ):
-                                        print(
-                                            f"Moved from {selected_point} to {clicked_point}"
-                                        )
-                                        backgammon_board.dice_values.remove(distance)
-                                        moves_made += 1
-                                        if (
-                                            moves_made >= max_moves_this_turn
-                                            or not backgammon_board.dice_values
-                                        ):
-                                            print("Turn complete!")
-                                            backgammon_board.switch_player()
-                                            dice_rolled = False
-                                            moves_made = 0
-                                            max_moves_this_turn = 0
-                                    else:
-                                        print(f"Invalid move!")
-                                else:
-                                    print(
-                                        f"Wrong direction for {backgammon_board.current_player}"
-                                    )
-                            else:
-                                print(f"No dice value matches distance {distance}")
+            # --- Handle Regular Move ---
+            elif distance in self.backgammon_board.dice_values:
+                if is_valid_direction(
+                    self.selected_point,
+                    clicked_point,
+                    self.backgammon_board.current_player,
+                ):
+                    if self.backgammon_board.move_checker(
+                        self.selected_point, clicked_point
+                    ):
+                        print(
+                            f"Moved from {self.selected_point} to {clicked_point}"
+                        )
+                        self.backgammon_board.dice_values.remove(distance)
+                        self.moves_made += 1
+                    else:
+                        print(f"Invalid move!")
+                else:
+                    print(
+                        f"Wrong direction for {self.backgammon_board.current_player}"
+                    )
+            else:
+                print(f"No dice value matches distance {distance}")
 
-                        selected_point = None
+            # --- Reset selection and check for turn end ---
+            self.selected_point = None
+            if (
+                self.moves_made >= self.max_moves_this_turn
+                or not self.backgammon_board.dice_values
+            ):
+                # Check for win condition
+                if self.backgammon_board.board.borne_off[player] == 15:
+                    print(f"🎉 PLAYER {player} WINS! 🎉")
+                    self.do_reset() # Reset board after win
+                else:
+                    print("Turn complete!")
+                    self.do_next_turn()
 
-        backgammon_board.update()
 
-        screen.fill(Config.DARK_BROWN)
+    def update(self):
+        """Updates game state logic (e.g., animations)."""
+        self.backgammon_board.update()
 
-        backgammon_board.render(screen)
+    def render(self):
+        """Draws the entire game screen."""
+        self.screen.fill(Config.DARK_BROWN)
 
-        roll_button.draw(screen)
-        reset_button.draw(screen)
-        next_turn_button.draw(screen)
+        # Draw board and pieces
+        self.backgammon_board.render(self.screen)
 
-        font: pygame.font.Font = pygame.font.Font(None, 36)
+        # Draw buttons
+        self.roll_button.draw(self.screen)
+        self.reset_button.draw(self.screen)
+        self.next_turn_button.draw(self.screen)
+
+        # --- Draw Text Info ---
         player_color: str = (
-            "White" if backgammon_board.current_player == "W" else "Black"
+            "White" if self.backgammon_board.current_player == "W" else "Black"
         )
         player_text: str = f"Current Player: {player_color}"
-        text_surface: pygame.Surface = font.render(player_text, True, (255, 255, 255))
-        screen.blit(text_surface, (750, 660))
+        text_surface: pygame.Surface = self.font.render(player_text, True, (255, 255, 255))
+        self.screen.blit(text_surface, (750, 660))
 
         # Display bar pieces if any
-        bar_pieces = backgammon_board.board.bar[backgammon_board.current_player]
+        bar_pieces = self.backgammon_board.board.bar[self.backgammon_board.current_player]
         if bar_pieces > 0:
             bar_text: str = f"On Bar: {bar_pieces}"
-            bar_surface: pygame.Surface = font.render(bar_text, True, (255, 100, 100))
-            screen.blit(bar_surface, (750, 620))
+            bar_surface: pygame.Surface = self.font.render(bar_text, True, (255, 100, 100))
+            self.screen.blit(bar_surface, (750, 620))
+        
+        # Display borne-off pieces
+        borne_off_w = self.backgammon_board.board.borne_off["W"]
+        borne_off_b = self.backgammon_board.board.borne_off["B"]
+        borne_off_text_w: str = f"White Off: {borne_off_w}"
+        borne_off_text_b: str = f"Black Off: {borne_off_b}"
+        borne_off_surf_w: pygame.Surface = self.font.render(borne_off_text_w, True, (200, 200, 200))
+        borne_off_surf_b: pygame.Surface = self.font.render(borne_off_text_b, True, (200, 200, 200))
+        self.screen.blit(borne_off_surf_w, (750, 50))
+        self.screen.blit(borne_off_surf_b, (750, 90))
 
-        if backgammon_board.dice_values:
-            dice_text: str = f"Dice: {backgammon_board.dice_values}"
-            dice_surface: pygame.Surface = font.render(dice_text, True, (255, 255, 255))
-            screen.blit(dice_surface, (750, 700))
+
+        # Display dice info
+        if self.backgammon_board.dice_values:
+            dice_text: str = f"Dice: {self.backgammon_board.dice_values}"
+            dice_surface: pygame.Surface = self.font.render(dice_text, True, (255, 255, 255))
+            self.screen.blit(dice_surface, (750, 700))
         else:
-            if dice_rolled:
-                all_used: pygame.Surface = font.render(
+            if self.dice_rolled:
+                all_used: pygame.Surface = self.font.render(
                     "All dice used!", True, (255, 255, 0)
                 )
-                screen.blit(all_used, (750, 700))
+                self.screen.blit(all_used, (750, 700))
 
         pygame.display.flip()
 
-        clock.tick(60)
 
-    pygame.quit()
+def main() -> None:
+    """
+    Main function to create and run the game.
+    """
+    game = Game()
+    game.run()
 
 
 if __name__ == "__main__":
