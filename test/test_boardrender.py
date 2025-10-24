@@ -3,49 +3,15 @@ Módulo de pruebas exhaustivo para la clase BoardRenderer.
 (Versión actualizada para reflejar la eliminación del panel derecho)
 """
 
+# pylint: disable=no-member, protected-access
+# E1101: 'pygame' members (init, quit, etc.) are loaded dynamically.
+# W0212: Tests need to access protected members to verify internal state.
+
 import unittest
 from unittest.mock import patch
 import pygame
 
-# Disable specific pylint warnings for pygame
-# pylint: disable=no-member
-
-# --- Clases bajo prueba ---
-try:
-    from pygame_ui.board_renderer import BoardRenderer
-except ImportError:
-    print("ADVERTENCIA: No se pudo importar BoardRenderer. Usando versión simulada.")
-
-    class BoardRenderer:
-        def __init__(self):
-            pass
-
-        def draw(self, s):
-            pass
-
-        def _draw_border(self, s):
-            pass
-
-        def _draw_board_background(self, s):
-            pass
-
-        def _draw_points(self, s):
-            pass
-
-        def _draw_single_point(self, s, i):
-            pass
-
-        def _draw_bar(self, s):
-            pass
-
-        # _draw_right_panel ya no existe
-        # _draw_stripes ya no existe
-
-
-# --- Clase Base de Pruebas ---
-
-# pylint: disable=protected-access
-# Justification: Tests need to access protected members to verify internal state
+from pygame_ui.board_renderer import BoardRenderer
 
 
 class BoardRendererTestBase(unittest.TestCase):
@@ -74,16 +40,12 @@ class BoardRendererTestBase(unittest.TestCase):
         mock_config.POINT_HEIGHT = 200
         mock_config.HINGE_WIDTH = 30
         mock_config.HINGE_HEIGHT = 15
-        # mock_config.RIGHT_PANEL_X = 750 # Ya no es necesario
-        # mock_config.RIGHT_PANEL_WIDTH = 50 # Ya no es necesario
         mock_config.DARK_BROWN = (10, 10, 10)
         mock_config.WOOD_BROWN = (20, 20, 20)
         mock_config.LIGHT_TAN = (30, 30, 30)
         mock_config.DARK_POINT = (40, 40, 40)
         mock_config.GREEN_BAR = (50, 50, 50)
         mock_config.BRASS = (60, 60, 60)
-        # mock_config.STRIPE_GREEN = (70, 70, 70) # Ya no es necesario
-        # mock_config.STRIPE_YELLOW = (80, 80, 80) # Ya no es necesario
 
         self.mock_config = mock_config
         pygame.init()
@@ -100,22 +62,23 @@ class BoardRendererTestBase(unittest.TestCase):
 
 
 class TestBoardRendererInitialization(BoardRendererTestBase):
-    # (Esta clase no necesita cambios)
+    """Prueba los cálculos de inicialización de BoardRenderer."""
+
     def test_initialization_creates_inner_boundaries(self):
-        """Test that the board renderer correctly calculates inner boundaries upon initialization."""
+        """Prueba que los límites internos se calculan correctamente."""
         self.assertEqual(self.renderer._inner_left, 15)
         self.assertEqual(self.renderer._inner_right, 805)
         self.assertEqual(self.renderer._inner_top, 15)
         self.assertEqual(self.renderer._inner_bottom, 605)
 
     def test_initialization_calculates_point_width(self):
-        """Test that the point width is correctly calculated based on the board dimensions."""
+        """Prueba que el ancho del punto se calcula correctamente."""
         # Calculate expected point width based on bar position
         expected_point_width = (400 - 15) // 6
         self.assertEqual(self.renderer._point_width, expected_point_width)
 
     def test_private_attributes_exist(self):
-        """Verify that all required private attributes are initialized."""
+        """Verifica que todos los atributos privados requeridos existan."""
         self.assertTrue(hasattr(self.renderer, "_inner_left"))
         self.assertTrue(hasattr(self.renderer, "_inner_right"))
         self.assertTrue(hasattr(self.renderer, "_inner_top"))
@@ -124,7 +87,8 @@ class TestBoardRendererInitialization(BoardRendererTestBase):
 
 
 class TestBoardRendererDraw(BoardRendererTestBase):
-    # (Esta clase necesita cambios)
+    """Prueba el método principal 'draw' de BoardRenderer."""
+
     @patch.object(BoardRenderer, "_draw_border")
     @patch.object(BoardRenderer, "_draw_board_background")
     @patch.object(BoardRenderer, "_draw_points")
@@ -133,7 +97,7 @@ class TestBoardRendererDraw(BoardRendererTestBase):
     def test_draw_calls_all_methods_in_order(
         self, mock_bar, mock_points, mock_bg, mock_border
     ):
-        """Test that the draw method calls all required rendering methods in the correct order."""
+        """Prueba que 'draw' llama a todos sus submétodos en orden."""
         self.renderer.draw(self.surface)
         mock_border.assert_called_once_with(self.surface)
         mock_bg.assert_called_once_with(self.surface)
@@ -143,10 +107,11 @@ class TestBoardRendererDraw(BoardRendererTestBase):
 
 
 class TestDrawBorder(BoardRendererTestBase):
-    # (Esta clase no necesita cambios)
+    """Prueba el método '_draw_border'."""
+
     @patch("pygame.draw.rect")
     def test_draw_border_creates_correct_rect(self, mock_draw_rect):
-        """Test that the border is drawn with correct dimensions and color."""
+        """Prueba que el borde se dibuja con las dimensiones correctas."""
         self.renderer._draw_border(self.surface)
         mock_draw_rect.assert_called_once()
         surface_arg, color, rect = mock_draw_rect.call_args[0]
@@ -156,9 +121,11 @@ class TestDrawBorder(BoardRendererTestBase):
 
 
 class TestDrawBoardBackground(BoardRendererTestBase):
-    # (Esta clase no necesita cambios)
+    """Prueba el método '_draw_board_background'."""
+
     @patch("pygame.draw.rect")
     def test_draw_board_background_creates_correct_rect(self, mock_draw_rect):
+        """Prueba que el fondo del tablero se dibuja correctamente."""
         self.renderer._draw_board_background(self.surface)
         mock_draw_rect.assert_called_once()
         surface_arg, color, rect = mock_draw_rect.call_args[0]
@@ -168,20 +135,22 @@ class TestDrawBoardBackground(BoardRendererTestBase):
 
 
 class TestDrawPoints(BoardRendererTestBase):
-    # (Esta clase no necesita cambios)
+    """Prueba el método '_draw_points'."""
+
     @patch.object(BoardRenderer, "_draw_single_point")
     def test_draw_points_calls_draw_single_point_24_times(self, mock_draw_single):
-        """Test that drawing points calls draw_single_point for all 24 points on the board."""
+        """Prueba que se llama a _draw_single_point 24 veces."""
         self.renderer._draw_points(self.surface)
         self.assertEqual(mock_draw_single.call_count, 24)
         mock_draw_single.assert_any_call(self.surface, 23)
 
 
 class TestDrawSinglePoint(BoardRendererTestBase):
-    # (Esta clase no necesita cambios)
+    """Prueba el método '_draw_single_point'."""
+
     @patch("pygame.draw.polygon")
     def test_draw_single_point_quadrants(self, mock_draw_polygon):
-        """Test that points can be drawn in all four quadrants of the board."""
+        """Prueba que los puntos se dibujan en los cuatro cuadrantes."""
         self.renderer._draw_single_point(self.surface, 2)
         mock_draw_polygon.assert_called()
         mock_draw_polygon.reset_mock()
@@ -196,7 +165,7 @@ class TestDrawSinglePoint(BoardRendererTestBase):
 
     @patch("pygame.draw.polygon")
     def test_draw_single_point_uses_alternating_colors(self, mock_draw_polygon):
-        """Test that points are drawn with alternating colors in the correct pattern."""
+        """Prueba que los puntos usan colores alternados."""
         self.renderer._draw_single_point(self.surface, 0)
         self.assertEqual(mock_draw_polygon.call_args[0][1], self.mock_config.LIGHT_TAN)
         self.renderer._draw_single_point(self.surface, 6)
@@ -208,7 +177,7 @@ class TestDrawSinglePoint(BoardRendererTestBase):
 
     @patch("pygame.draw.polygon")
     def test_draw_single_point_triangle_shape_bottom(self, mock_draw_polygon):
-        """Test that bottom triangular points have correct vertical positioning."""
+        """Prueba la forma de los triángulos inferiores."""
         self.renderer._draw_single_point(self.surface, 5)
         points = mock_draw_polygon.call_args[0][2]
         self.assertEqual(
@@ -217,7 +186,7 @@ class TestDrawSinglePoint(BoardRendererTestBase):
 
     @patch("pygame.draw.polygon")
     def test_draw_single_point_triangle_shape_top(self, mock_draw_polygon):
-        """Test that top triangular points have correct vertical positioning."""
+        """Prueba la forma de los triángulos superiores."""
         self.renderer._draw_single_point(self.surface, 15)
         points = mock_draw_polygon.call_args[0][2]
         self.assertEqual(
@@ -226,11 +195,13 @@ class TestDrawSinglePoint(BoardRendererTestBase):
 
 
 class TestDrawBar(BoardRendererTestBase):
-    # (Esta clase no necesita cambios)
+    """Prueba el método '_draw_bar'."""
+
+
     @patch("pygame.draw.rect")
     @patch("pygame.draw.line")
     def test_draw_bar_creates_all_components(self, mock_line, mock_rect):
-        """Test that the center bar is drawn with all its components and correct colors."""
+        """Prueba que la barra central se dibuja con todos sus componentes."""
         self.renderer._draw_bar(self.surface)
         self.assertEqual(mock_rect.call_args_list[0][0][1], self.mock_config.GREEN_BAR)
         self.assertEqual(mock_line.call_count, 8)
