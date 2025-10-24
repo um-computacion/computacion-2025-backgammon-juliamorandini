@@ -23,7 +23,7 @@ class BoardRenderer:
         self._draw_board_background(surface)
         self._draw_points(surface)
         self._draw_bar(surface)
-       # self._draw_right_panel(surface)
+        # self._draw_right_panel(surface) # <--- ¡AQUÍ ESTÁ LA CORRECCIÓN! (Línea comentada)
 
     def _draw_border(self, surface: pygame.Surface) -> None:
         outer_rect = pygame.Rect(
@@ -114,28 +114,3 @@ class BoardRenderer:
         )
         pygame.draw.rect(surface, Config.BRASS, bottom_hinge)
         pygame.draw.rect(surface, (140, 100, 0), bottom_hinge, 2)
-
-
-    def _draw_stripes(
-        self, surface: pygame.Surface, x: int, y: int, width: int, height: int
-    ) -> None:
-        stripe_width = 15
-
-        clip_rect = pygame.Rect(x, y, width, height)
-        surface.set_clip(clip_rect)
-
-        pygame.draw.rect(surface, Config.STRIPE_GREEN, clip_rect)
-
-        max_coverage = width + height
-
-        for i in range(-height, max_coverage, stripe_width * 2):
-            p1 = (x + i, y)
-            p2 = (x + i + stripe_width, y)
-            p3 = (x + i + stripe_width + height, y + height)
-            p4 = (x + i + height, y + height)
-
-            points = [p1, p2, p3, p4]
-
-            pygame.draw.polygon(surface, Config.STRIPE_YELLOW, points)
-
-        surface.set_clip(None)

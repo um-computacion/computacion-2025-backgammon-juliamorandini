@@ -1,6 +1,6 @@
 """
 Módulo de pruebas exhaustivo para la clase BoardRenderer.
-(Corrección para el error 'set_clip' read-only)
+(Versión actualizada para reflejar la eliminación del panel derecho)
 """
 
 import unittest
@@ -20,8 +20,8 @@ except ImportError:
         def _draw_points(self, s): pass
         def _draw_single_point(self, s, i): pass
         def _draw_bar(self, s): pass
-        def _draw_right_panel(self, s): pass
-        def _draw_stripes(self, s, x, y, w, h): pass
+        # _draw_right_panel ya no existe
+        # _draw_stripes ya no existe
 
 # --- Clase Base de Pruebas ---
 
@@ -51,22 +51,21 @@ class BoardRendererTestBase(unittest.TestCase):
         mock_config.POINT_HEIGHT = 200
         mock_config.HINGE_WIDTH = 30
         mock_config.HINGE_HEIGHT = 15
-        mock_config.RIGHT_PANEL_X = 750
-        mock_config.RIGHT_PANEL_WIDTH = 50
+        # mock_config.RIGHT_PANEL_X = 750 # Ya no es necesario
+        # mock_config.RIGHT_PANEL_WIDTH = 50 # Ya no es necesario
         mock_config.DARK_BROWN = (10, 10, 10)
         mock_config.WOOD_BROWN = (20, 20, 20)
         mock_config.LIGHT_TAN = (30, 30, 30)
         mock_config.DARK_POINT = (40, 40, 40)
         mock_config.GREEN_BAR = (50, 50, 50)
         mock_config.BRASS = (60, 60, 60)
-        mock_config.STRIPE_GREEN = (70, 70, 70)
-        mock_config.STRIPE_YELLOW = (80, 80, 80)
+        # mock_config.STRIPE_GREEN = (70, 70, 70) # Ya no es necesario
+        # mock_config.STRIPE_YELLOW = (80, 80, 80) # Ya no es necesario
         
         self.mock_config = mock_config
         pygame.init()
         self.renderer = BoardRenderer()
         
-        # La base crea una superficie REAL para las pruebas de integración
         self.surface = pygame.Surface((1000, 800))
 
     def tearDown(self):
@@ -98,21 +97,21 @@ class TestBoardRendererInitialization(BoardRendererTestBase):
 
 
 class TestBoardRendererDraw(BoardRendererTestBase):
-    # (Esta clase no necesita cambios)
+    # (Esta clase necesita cambios)
     @patch.object(BoardRenderer, "_draw_border")
     @patch.object(BoardRenderer, "_draw_board_background")
     @patch.object(BoardRenderer, "_draw_points")
     @patch.object(BoardRenderer, "_draw_bar")
-    @patch.object(BoardRenderer, "_draw_right_panel")
+    # Eliminado el mock para _draw_right_panel
     def test_draw_calls_all_methods_in_order(
-        self, mock_right_panel, mock_bar, mock_points, mock_bg, mock_border
+        self, mock_bar, mock_points, mock_bg, mock_border
     ):
         self.renderer.draw(self.surface)
         mock_border.assert_called_once_with(self.surface)
         mock_bg.assert_called_once_with(self.surface)
         mock_points.assert_called_once_with(self.surface)
         mock_bar.assert_called_once_with(self.surface)
-        mock_right_panel.assert_called_once_with(self.surface)
+        # Eliminada la aserción para mock_right_panel
 
 
 class TestDrawBorder(BoardRendererTestBase):
@@ -198,62 +197,6 @@ class TestDrawBar(BoardRendererTestBase):
         self.assertEqual(mock_rect.call_args_list[3][0][1], self.mock_config.BRASS)
 
 
-class TestDrawRightPanel(BoardRendererTestBase):
-    # (Esta clase no necesita cambios)
-    @patch.object(BoardRenderer, "_draw_stripes")
-    @patch("pygame.draw.rect")
-    def test_draw_right_panel_creates_three_sections(self, mock_rect, mock_stripes):
-        self.renderer._draw_right_panel(self.surface)
-        self.assertEqual(mock_stripes.call_count, 2)
-        mock_rect.assert_called_once()
-        self.assertEqual(mock_rect.call_args[0][1], self.mock_config.WOOD_BROWN)
-        self.assertEqual(mock_stripes.call_args_list[0][0][1], self.mock_config.RIGHT_PANEL_X)
-
-
-# --- INICIO DE LA CORRECCIÓN ---
-
-class TestDrawStripes(BoardRendererTestBase):
-    """Prueba el método _draw_stripes."""
-
-    def setUp(self):
-        """Sobrescribe el setUp para usar una superficie Mock."""
-        # Llama al setUp de la clase base (para config, pygame.init, etc.)
-        super().setUp()
-        # Sobrescribe self.surface con un Mock para esta clase de prueba
-        # Esto nos permite verificar las llamadas a 'set_clip' sin error
-        self.surface = Mock(spec=pygame.Surface)
-
-    @patch("pygame.draw.polygon")
-    @patch("pygame.draw.rect")
-    def test_draw_stripes_workflow(self, mock_rect, mock_polygon):
-        """Prueba el flujo completo de _draw_stripes."""
-        x, y, width, height = 100, 100, 200, 300
-        
-        # Llama al método con la superficie Mock
-        self.renderer._draw_stripes(self.surface, x, y, width, height)
-
-        # 1. Dibuja el fondo
-        mock_rect.assert_called_once()
-        self.assertEqual(mock_rect.call_args[0][1], self.mock_config.STRIPE_GREEN)
-
-        # 2. Dibuja múltiples polígonos
-        self.assertGreater(mock_polygon.call_count, 0)
-        
-        # 3. Todos los polígonos son amarillos
-        polygon_color = mock_polygon.call_args[0][1]
-        self.assertEqual(polygon_color, self.mock_config.STRIPE_YELLOW)
-        
-        # 4. Todos los polígonos tienen 4 puntos
-        polygon_points = mock_polygon.call_args[0][2]
-        self.assertEqual(len(polygon_points), 4)
-
-        # 5. Establece y reinicia el clip (ahora funciona porque self.surface es un Mock)
-        clip_calls = self.surface.set_clip.call_args_list
-        self.assertEqual(len(clip_calls), 2)
-        self.assertEqual(clip_calls[0][0][0], pygame.Rect(x, y, width, height)) # Establece
-        self.assertEqual(clip_calls[1][0][0], None) # Reinicia
-
-# --- FIN DE LA CORRECCIÓN ---
 
 
 class TestBoardRendererIntegration(BoardRendererTestBase):
@@ -283,7 +226,7 @@ class TestBoardRendererIntegration(BoardRendererTestBase):
             "_draw_board_background",
             "_draw_points",
             "_draw_bar",
-            "_draw_right_panel",
+            # "_draw_right_panel", # Eliminado de la lista
         ]
 
         for method_name in methods:
@@ -300,3 +243,4 @@ class TestBoardRendererIntegration(BoardRendererTestBase):
 
 if __name__ == "__main__":
     unittest.main()
+
