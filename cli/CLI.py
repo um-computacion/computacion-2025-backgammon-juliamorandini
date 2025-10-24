@@ -1,6 +1,6 @@
 """Command Line Interface module for Backgammon game."""
 
-from typing import Optional, Tuple, Dict, Any, Callable
+from typing import Optional, Tuple, Dict, Any
 from core.BackgammonGame import Game
 
 

@@ -1,8 +1,14 @@
+"""
+Tests for the Button class that handles clickable buttons in the game UI.
+"""
+
 import unittest
 import pygame
 from unittest.mock import patch, Mock
 
-# Import the class to test and the Config
+# Disable pylint warnings for pygame members
+# pylint: disable=no-member
+
 from pygame_ui.button import Button
 
 

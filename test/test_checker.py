@@ -1,11 +1,18 @@
-"""Test module for Checker class."""
+"""
+Unit tests for the Checker class that handles individual checker pieces in the backgammon game.
+
+This module contains comprehensive tests for verifying the behavior of checker pieces,
+including movement rules, board interactions, and state transitions.
+"""
 
 import unittest
 from core.Checker import Checker
 
-
 class TestChecker(unittest.TestCase):
+    """Test suite for the Checker class."""
+    
     def setUp(self):
+        """Set up test fixtures before each test method."""
         self.white_checker = Checker("white", 1)
         self.black_checker = Checker("black", 3)
         self.board = {
@@ -19,18 +26,23 @@ class TestChecker(unittest.TestCase):
     # --- Tests for can_move_to ---
 
     def test_move_to_empty_point(self):
+        """Test that a checker can move to an empty point."""
         self.assertTrue(self.white_checker.can_move_to(2, self.board))
 
     def test_move_to_own_point(self):
+        """Test that a checker can move to a point occupied by own color."""
         self.assertTrue(self.white_checker.can_move_to(5, self.board))
 
     def test_move_to_single_opponent_checker(self):
+        """Test that a checker can move to a point with single opponent checker."""
         self.assertTrue(self.white_checker.can_move_to(3, self.board))
 
     def test_move_to_blocked_point(self):
+        """Test that a checker cannot move to a blocked point (2+ opponent checkers)."""
         self.assertFalse(self.white_checker.can_move_to(4, self.board))
 
     def test_can_move_to_out_of_bounds(self):
+        """Test that a checker cannot move outside the valid point range (0-23)."""
         # Covers 'if not (0 <= point < 24):' branch in can_move_to
         self.assertFalse(self.white_checker.can_move_to(24, self.board))
         self.assertFalse(self.white_checker.can_move_to(-1, self.board))
@@ -38,6 +50,7 @@ class TestChecker(unittest.TestCase):
     # --- Tests for move_to / move ---
 
     def test_move_to_updates_position(self):
+        """Test that move_to correctly updates checker's position and status."""
         initial_pos = self.white_checker.position
         # Use move_to to cover its success path
         self.assertTrue(self.white_checker.move_to(23))
@@ -47,18 +60,21 @@ class TestChecker(unittest.TestCase):
         self.assertFalse(self.white_checker.is_borne_off)
 
     def test_move_to_out_of_bounds_fails(self):
+        """Test that moving to an invalid point fails and maintains original position."""
         # Covers the 'return False' branch in move_to
         initial_pos = self.white_checker.position
         self.assertFalse(self.white_checker.move_to(24))
         self.assertEqual(self.white_checker.position, initial_pos)
 
     def test_move_to_blocked_point_fails(self):
+        """Test that moving to a blocked point fails and maintains original position."""
         initial_pos = self.white_checker.position
         moved = self.white_checker.move(4, self.board)
         self.assertFalse(moved)
         self.assertEqual(self.white_checker.position, initial_pos)
 
     def test_move_success_removes_from_old_position(self):
+        """Test that successful move updates both old and new positions on board."""
         # Tests the board update logic within move (where old_position is an int)
         self.white_checker.move(2, self.board)
         self.assertEqual(self.white_checker.position, 2)

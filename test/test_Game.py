@@ -197,7 +197,7 @@ class TestGameEnhanced(unittest.TestCase):
     def test_add_multiple_to_bar(self):
         """Test adding multiple pieces to bar."""
         self.game.current_player = "white"
-        for i in range(3):
+        for _ in range(3):  # Using _ for unused loop variable
             self.game.add_to_bar()
         self.assertEqual(self.game.board.bar["W"], 3)
 

@@ -1,20 +1,19 @@
 """
-Pruebas unitarias para pygame_ui/backgammon_board.py
+Tests for the BackgammonBoard class that manages the game board's visual representation.
+
+This module contains unit tests for the pygame_ui/backgammon_board.py module.
+Tests cover initialization, rendering, and interaction with the game board.
 """
 
 import unittest
 import pygame
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, MagicMock
 
-# Importar la clase que queremos probar
+# Disable pylint warnings for pygame members
+# pylint: disable=no-member
+
+# Import the class to test
 from pygame_ui.backgammon_board import BackgammonBoard
-
-# Importar las clases que vamos a simular (para 'autospec')
-from core.board import Board as CoreBoard
-from core.Dice import Dice as CoreDice
-from pygame_ui.board_renderer import BoardRenderer
-from pygame_ui.checker_renderer import CheckerRenderer
-from pygame_ui.dice_renderer import DiceRenderer
 
 
 class TestBackgammonBoard(unittest.TestCase):
@@ -149,7 +148,7 @@ class TestBackgammonBoard(unittest.TestCase):
         # Simplemente llamamos al método para cubrirlo
         try:
             self.game_board.update()
-        except Exception as e:
+        except (pygame.error, ValueError, AttributeError) as e:
             self.fail(f"update() generó una excepción inesperada: {e}")
         # No se espera ninguna acción
 

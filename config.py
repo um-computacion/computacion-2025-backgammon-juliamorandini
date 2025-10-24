@@ -28,6 +28,9 @@ class Config:
     POINT_HEIGHT = 200
     POINTS_PER_QUADRANT = 6
     TOTAL_POINTS = 24
+    
+    # Checker dimensions
+    CHECKER_SIZE = 40  # Diameter of checker pieces
 
     # Bar dimensions
     BAR_WIDTH = 60

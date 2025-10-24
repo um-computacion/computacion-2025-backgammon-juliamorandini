@@ -1,5 +1,4 @@
 import pygame
-from typing import List, Tuple
 from config import Config
 
 

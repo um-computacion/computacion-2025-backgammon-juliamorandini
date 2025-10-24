@@ -5,6 +5,9 @@ from unittest.mock import patch
 from io import StringIO
 from cli.CLI import BackgammonCLI
 
+# pylint: disable=unused-argument
+# Justification: Mock arguments are required by patch decorator but not used in all tests
+
 
 class TestBackgammonCLI(unittest.TestCase):
     """Test cases for BackgammonCLI."""

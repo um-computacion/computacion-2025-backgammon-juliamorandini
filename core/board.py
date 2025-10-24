@@ -142,12 +142,11 @@ class Board:
         if self.bar[color] > 0:
             return False
 
+        # Define ranges based on color
         if color == "W":
-            home_range = range(18, 24)
-            outside_range = range(0, 18)
+            outside_range = range(0, 18)  # Points 0-17
         else:
-            home_range = range(0, 6)
-            outside_range = range(6, 24)
+            outside_range = range(6, 24)  # Points 6-23
 
         for i in outside_range:
             if any(checker == color for checker in self.points[i]):

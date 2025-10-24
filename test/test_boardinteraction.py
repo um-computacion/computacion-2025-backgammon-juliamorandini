@@ -1,8 +1,15 @@
+"""
+Tests for the BoardInteraction class that handles mouse and keyboard interactions
+with the backgammon board.
+"""
+
 import unittest
 import pygame
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 
-# Import the class to test and the Config
+# Disable pylint warnings for pygame members and protected access
+# pylint: disable=no-member,protected-access
+
 from pygame_ui.board_interaction import BoardInteraction
 from config import Config
 

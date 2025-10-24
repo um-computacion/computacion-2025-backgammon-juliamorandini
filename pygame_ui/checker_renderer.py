@@ -74,7 +74,8 @@ class CheckerRenderer:
         self, surface: pygame.Surface, borne_off_dict: Dict[str, int]
     ) -> None:
 
-        panel_center_x = Config.RIGHT_PANEL_X + Config.RIGHT_PANEL_WIDTH // 2
+        # Position borne off checkers at the right edge of the board
+        panel_center_x = Config.BOARD_WIDTH - Config.CHECKER_SIZE
 
         if borne_off_dict["W"] > 0:
             for i in range(min(borne_off_dict["W"], 15)):

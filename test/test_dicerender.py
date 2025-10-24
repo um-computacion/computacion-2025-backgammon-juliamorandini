@@ -1,8 +1,14 @@
+"""
+Tests for the DiceRenderer class that handles rendering of dice in the game UI.
+"""
+
 import unittest
-from unittest.mock import Mock, patch, call
+from unittest.mock import patch, Mock, call
 import pygame
 
-# Assuming dice_renderer is in pygame_ui folder
+# Disable pylint warnings for pygame members and protected access
+# pylint: disable=no-member,protected-access,unused-argument
+
 from pygame_ui.dice_renderer import DiceRenderer
 from config import Config
 

@@ -10,17 +10,16 @@ Tests cover:
 """
 
 import unittest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 import pygame
+
+# Disable specific pylint warnings for pygame
+# pylint: disable=no-member
 
 # We import from PygameUI_refactored (assuming you rename it to PygameUI.py)
 # If you keep the name "PygameUI_refactored.py", change this import
 from PygameUI import Game, is_valid_direction, get_entry_point_for_dice
-
-from config import Config
-from pygame_ui.button import Button
 from pygame_ui.backgammon_board import BackgammonBoard
-from pygame_ui.board_interaction import BoardInteraction
 
 
 class TestHelperFunctions(unittest.TestCase):

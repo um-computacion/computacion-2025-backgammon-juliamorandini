@@ -6,7 +6,10 @@ Pruebas unitarias para pygame_ui/checker_renderer.py
 import unittest
 import pygame
 from unittest.mock import Mock, patch, call
-from typing import List, Dict, Tuple
+from typing import List, Dict
+
+# Disable specific pylint warnings for pygame
+# pylint: disable=no-member
 
 # --- Dependencias simuladas ---
 
@@ -24,14 +27,16 @@ class Board:  #! CORRECCIÓN: Renombrado de 'test_Board' a 'Board'
         self.borne_off = {"W": 0, "B": 0}
 
 
-# --- Clase bajo prueba ---
+# --- Clases bajo prueba ---
+
+# pylint: disable=protected-access
+# Justification: Tests need to access protected members to verify internal state
 try:
     from pygame_ui.checker_renderer import CheckerRenderer
 except ImportError:
     print(
         "ADVERTENCIA: No se pudo importar CheckerRenderer. Usando versión local simulada."
     )
-    pass
 
 # --- Pruebas ---
 
