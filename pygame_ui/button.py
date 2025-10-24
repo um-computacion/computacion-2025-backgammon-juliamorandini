@@ -34,7 +34,7 @@ class Button:
         # Get screen-space mouse position
         mouse_pos = pygame.mouse.get_pos()
         self.is_hovered = self.rect.collidepoint(mouse_pos)
-        
+
         # Draw button
         current_color = self.hover_color if self.is_hovered else self.color
         pygame.draw.rect(surface, current_color, self.rect)
@@ -48,6 +48,6 @@ class Button:
     def handle_event(self, event: pygame.event.Event) -> bool:
         """Handle mouse events and return True if clicked."""
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            mouse_pos = pygame.mouse.get_pos()
-            return self.rect.collidepoint(mouse_pos)
+            # FIX: Use event.pos instead of pygame.mouse.get_pos()
+            return self.rect.collidepoint(event.pos)
         return False

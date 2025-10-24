@@ -22,22 +22,38 @@ class Game:
         """Get current board state as point counts."""
         board_state = []
         for point in self.board.points:
-            if not point:  # Empty point
+            if not point:
                 board_state.append(0)
             else:
                 count = len(point)
-                # Check what color occupies the point
-                if point[0] == "B":  # Black pieces
+                if point[0] == "B":
                     board_state.append(-count)
-                else:  # White pieces
+                else:
                     board_state.append(count)
         return board_state
 
     def make_move(self, from_point: int, to_point: int) -> bool:
         """Make a move if valid."""
-        return self.board.move_checker(
-            from_point, to_point, "W" if self.current_player == "white" else "B"
-        )
+        color = "W" if self.current_player == "white" else "B"
+
+        if self.board.bar[color] > 0:
+            return False
+
+        return self.board.move_checker(from_point, to_point, color)
+
+    def make_bar_move(self, to_point: int) -> bool:
+        """Move a checker from the bar to a valid entry point."""
+        color = "W" if self.current_player == "white" else "B"
+        return self.board.move_checker_from_bar(to_point, color)
+
+    def get_entry_point_for_dice(self, dice_value: int) -> int:
+        """Get the entry point corresponding to a dice value."""
+        color = "W" if self.current_player == "white" else "B"
+
+        if color == "W":
+            return 24 - dice_value
+        else:
+            return dice_value - 1
 
     def set_dice(self, values: list) -> None:
         """Set dice values for testing."""
@@ -54,9 +70,10 @@ class Game:
             color = "W" if self.current_player == "white" else "B"
         self.board.points[point] = [color] * abs(count)
 
-    def add_to_bar(self) -> None:
+    def add_to_bar(self, color: str = None) -> None:
         """Add current player's piece to bar."""
-        color = "W" if self.current_player == "white" else "B"
+        if color is None:
+            color = "W" if self.current_player == "white" else "B"
         self.board.bar[color] += 1
 
     def must_move_from_bar(self) -> bool:
@@ -77,7 +94,11 @@ class Game:
     def setup_bearing_off_scenario(self):
         """Setup board for bearing off test."""
         self.board.points = [[] for _ in range(24)]
-        self.set_piece(23, 1)  # Place piece at point 23 instead
+        color = "W" if self.current_player == "white" else "B"
+        if color == "W":
+            self.board.points[18] = [color] * 5
+        else:
+            self.board.points[0] = [color] * 5
 
     def setup_winning_scenario(self) -> None:
         """Setup board for win condition test."""
@@ -89,12 +110,20 @@ class Game:
         color = "W" if self.current_player == "white" else "B"
         return self.board.borne_off[color] == 15
 
-    def get_valid_moves(self) -> list:
-        """Get valid moves based on current dice values."""
-        dice_values = [self.dice.die1, self.dice.die2]
-        return [v for v in dice_values if v <= 6]
+    def switch_player(self) -> None:
+        """Switch to the other player."""
+        self.current_player = "black" if self.current_player == "white" else "white"
 
-    def get_opponent_bar_pieces(self) -> int:
-        """Get number of pieces on bar for opponent player."""
-        opponent_color = "B" if self.current_player == "white" else "W"
-        return self.board.bar[opponent_color]
+    def roll_dice(self) -> list:
+        """Roll the dice and return the values."""
+        self.dice.roll()
+        return self.get_available_moves()
+
+    def can_bear_off(self) -> bool:
+        """Check if current player can bear off."""
+        color = "W" if self.current_player == "white" else "B"
+        return self.board.can_bear_off(color)
+
+    def get_current_player_color(self) -> str:
+        """Get current player's color code."""
+        return "W" if self.current_player == "white" else "B"

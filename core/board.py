@@ -1,5 +1,3 @@
-"""Module containing the Board class for Backgammon game."""
-
 from typing import List, Dict
 
 
@@ -16,15 +14,14 @@ class Board:
     def reset(self) -> None:
         """Reset board to initial position."""
         self.points = [[] for _ in range(24)]
-        # Initial setup
-        self.points[0] = ["B", "B"]  # 2 black pieces at point 0
-        self.points[5] = ["W"] * 5  # 5 white pieces at point 5
-        self.points[7] = ["W"] * 3  # 3 white pieces at point 7
-        self.points[11] = ["W"] * 5  # 5 white pieces at point 11
-        self.points[12] = ["B"] * 5  # 5 black pieces at point 12
-        self.points[16] = ["B"] * 3  # 3 black pieces at point 16
-        self.points[18] = ["B"] * 5  # 5 black pieces at point 18
-        self.points[23] = ["W", "W"]  # 2 white pieces at point 23
+        self.points[0] = ["B", "B"]
+        self.points[5] = ["W"] * 5
+        self.points[7] = ["W"] * 3
+        self.points[11] = ["W"] * 5
+        self.points[12] = ["B"] * 5
+        self.points[16] = ["B"] * 3
+        self.points[18] = ["B"] * 5
+        self.points[23] = ["W", "W"]
         self.bar = {"W": 0, "B": 0}
         self.borne_off = {"W": 0, "B": 0}
 
@@ -71,7 +68,6 @@ class Board:
         if not self.is_valid_move(from_point, to_point, color):
             return False
 
-        # Handle hitting opponent's blot
         if (
             self.points[to_point]
             and len(self.points[to_point]) == 1
@@ -81,13 +77,17 @@ class Board:
             self.bar[hit_color] += 1
             self.points[to_point] = []
 
-        # Move checker
-        if self.points[from_point]:
-            checker = self.points[from_point].pop()
-            self.points[to_point].append(checker)
-            return True
+        checker = self.points[from_point].pop()
+        self.points[to_point].append(checker)
 
-        return False
+        if len(self.points[to_point]) > 1:
+            # Re-ensure all elements are the same color string for consistency
+            # (Though popping and appending maintains color if is_valid is true)
+            self.points[to_point] = [self.points[to_point][0]] * len(
+                self.points[to_point]
+            )
+
+        return True
 
     def bear_off(self, color: str, point: int) -> bool:
         """Remove piece from board.
@@ -101,8 +101,10 @@ class Board:
         """
         if not self.can_bear_off(color):
             return False
+
         if not self.points[point] or self.points[point][0] != color:
             return False
+
         self.points[point].pop()
         self.borne_off[color] += 1
         return True
@@ -117,10 +119,15 @@ class Board:
         Returns:
             bool: True if piece can enter
         """
+        if not 0 <= point < 24:
+            return False
+
         if not self.points[point]:
             return True
-        if len(self.points[point]) < 2:
+
+        if len(self.points[point]) == 1 and self.points[point][0] != color:
             return True
+
         return self.points[point][0] == color
 
     def can_bear_off(self, color: str) -> bool:
@@ -135,12 +142,16 @@ class Board:
         if self.bar[color] > 0:
             return False
 
-        start = 18 if color == "W" else 0
-        
-        # Check no pieces outside home board
-        for i in range(0, start):
-            if any(c == color for c in self.points[i]):
+        # Define ranges based on color
+        if color == "W":
+            outside_range = range(0, 18)  # Points 0-17
+        else:
+            outside_range = range(6, 24)  # Points 6-23
+
+        for i in outside_range:
+            if any(checker == color for checker in self.points[i]):
                 return False
+
         return True
 
     def is_valid(self) -> bool:
@@ -149,6 +160,66 @@ class Board:
         Returns:
             bool: True if no points have mixed colors
         """
-        return all(
-            not point or all(c == point[0] for c in point) for point in self.points
-        )
+        for point in self.points:
+            if point and not all(checker == point[0] for checker in point):
+                return False
+        return True
+
+    def move_checker_from_bar(self, to_point: int, color: str) -> bool:
+        """Move checker from bar to home board.
+
+        Args:
+            to_point: Target point (must be 0-5 for Black, 18-23 for White)
+            color: Color of moving piece ('W' or 'B')
+
+        Returns:
+            bool: True if move was successful
+        """
+        if self.bar[color] == 0:
+            return False
+
+        # Check if the target point is in the correct home board range
+        if color == "W" and not (18 <= to_point <= 23):
+            return False
+        if color == "B" and not (0 <= to_point <= 5):
+            return False
+
+        if not self.can_enter_from_bar(color, to_point):
+            return False
+
+        # Hit logic (only hits if it's a single opponent piece)
+        if (
+            self.points[to_point]
+            and len(self.points[to_point]) == 1
+            and self.points[to_point][0] != color
+        ):
+            hit_color = self.points[to_point][0]
+            self.bar[hit_color] += 1
+            self.points[to_point] = []
+
+        self.bar[color] -= 1
+        self.points[to_point].append(color)
+        return True
+
+    def get_point(self, point: int) -> List[str]:
+        """Get checkers at specific point.
+
+        Args:
+            point: Point index (0-23)
+
+        Returns:
+            List of checkers at the point
+        """
+        if 0 <= point < 24:
+            return self.points[point]
+        return []
+
+    def set_point(self, point: int, checkers: List[str]) -> None:
+        """Set checkers at specific point.
+
+        Args:
+            point: Point index (0-23)
+            checkers: List of checkers to set
+        """
+        if 0 <= point < 24:
+            self.points[point] = checkers
