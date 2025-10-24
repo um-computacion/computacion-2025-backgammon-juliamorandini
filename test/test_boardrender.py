@@ -4,39 +4,62 @@ Módulo de pruebas exhaustivo para la clase BoardRenderer.
 """
 
 import unittest
-from unittest.mock import Mock, patch, call
+from unittest.mock import patch
 import pygame
+
+# Disable specific pylint warnings for pygame
+# pylint: disable=no-member
 
 # --- Clases bajo prueba ---
 try:
     from pygame_ui.board_renderer import BoardRenderer
 except ImportError:
     print("ADVERTENCIA: No se pudo importar BoardRenderer. Usando versión simulada.")
+
     class BoardRenderer:
-        def __init__(self): pass
-        def draw(self, s): pass
-        def _draw_border(self, s): pass
-        def _draw_board_background(self, s): pass
-        def _draw_points(self, s): pass
-        def _draw_single_point(self, s, i): pass
-        def _draw_bar(self, s): pass
+        def __init__(self):
+            pass
+
+        def draw(self, s):
+            pass
+
+        def _draw_border(self, s):
+            pass
+
+        def _draw_board_background(self, s):
+            pass
+
+        def _draw_points(self, s):
+            pass
+
+        def _draw_single_point(self, s, i):
+            pass
+
+        def _draw_bar(self, s):
+            pass
+
         # _draw_right_panel ya no existe
         # _draw_stripes ya no existe
 
+
 # --- Clase Base de Pruebas ---
+
+# pylint: disable=protected-access
+# Justification: Tests need to access protected members to verify internal state
+
 
 class BoardRendererTestBase(unittest.TestCase):
     """
     Clase base para las pruebas de BoardRenderer.
-    
+
     Maneja el patching de 'Config' y la inicialización/cierre de pygame
     para todas las clases de prueba que hereden de ella.
     """
-    
+
     def setUp(self):
         """Configura el entorno de prueba antes de cada test."""
-        
-        self.patcher = patch('pygame_ui.board_renderer.Config')
+
+        self.patcher = patch("pygame_ui.board_renderer.Config")
         mock_config = self.patcher.start()
         self.addCleanup(self.patcher.stop)
 
@@ -61,11 +84,11 @@ class BoardRendererTestBase(unittest.TestCase):
         mock_config.BRASS = (60, 60, 60)
         # mock_config.STRIPE_GREEN = (70, 70, 70) # Ya no es necesario
         # mock_config.STRIPE_YELLOW = (80, 80, 80) # Ya no es necesario
-        
+
         self.mock_config = mock_config
         pygame.init()
         self.renderer = BoardRenderer()
-        
+
         self.surface = pygame.Surface((1000, 800))
 
     def tearDown(self):
@@ -74,6 +97,7 @@ class BoardRendererTestBase(unittest.TestCase):
 
 
 # --- Clases de Prueba ---
+
 
 class TestBoardRendererInitialization(BoardRendererTestBase):
     # (Esta clase no necesita cambios)
@@ -84,8 +108,8 @@ class TestBoardRendererInitialization(BoardRendererTestBase):
         self.assertEqual(self.renderer._inner_bottom, 605)
 
     def test_initialization_calculates_point_width(self):
-        left_section_width = 400 - 15
-        expected_point_width = 385 // 6
+        # Calculate expected point width based on bar position
+        expected_point_width = (400 - 15) // 6
         self.assertEqual(self.renderer._point_width, expected_point_width)
 
     def test_private_attributes_exist(self):
@@ -125,6 +149,7 @@ class TestDrawBorder(BoardRendererTestBase):
         self.assertEqual(color, self.mock_config.DARK_BROWN)
         self.assertEqual(rect.width, self.mock_config.BOARD_WIDTH)
 
+
 class TestDrawBoardBackground(BoardRendererTestBase):
     # (Esta clase no necesita cambios)
     @patch("pygame.draw.rect")
@@ -136,6 +161,7 @@ class TestDrawBoardBackground(BoardRendererTestBase):
         self.assertEqual(color, self.mock_config.WOOD_BROWN)
         self.assertEqual(rect.x, self.renderer._inner_left)
 
+
 class TestDrawPoints(BoardRendererTestBase):
     # (Esta clase no necesita cambios)
     @patch.object(BoardRenderer, "_draw_single_point")
@@ -143,6 +169,7 @@ class TestDrawPoints(BoardRendererTestBase):
         self.renderer._draw_points(self.surface)
         self.assertEqual(mock_draw_single.call_count, 24)
         mock_draw_single.assert_any_call(self.surface, 23)
+
 
 class TestDrawSinglePoint(BoardRendererTestBase):
     # (Esta clase no necesita cambios)
@@ -175,13 +202,17 @@ class TestDrawSinglePoint(BoardRendererTestBase):
     def test_draw_single_point_triangle_shape_bottom(self, mock_draw_polygon):
         self.renderer._draw_single_point(self.surface, 5)
         points = mock_draw_polygon.call_args[0][2]
-        self.assertEqual(points[2][1], self.renderer._inner_bottom - self.mock_config.POINT_HEIGHT)
+        self.assertEqual(
+            points[2][1], self.renderer._inner_bottom - self.mock_config.POINT_HEIGHT
+        )
 
     @patch("pygame.draw.polygon")
     def test_draw_single_point_triangle_shape_top(self, mock_draw_polygon):
         self.renderer._draw_single_point(self.surface, 15)
         points = mock_draw_polygon.call_args[0][2]
-        self.assertEqual(points[2][1], self.renderer._inner_top + self.mock_config.POINT_HEIGHT)
+        self.assertEqual(
+            points[2][1], self.renderer._inner_top + self.mock_config.POINT_HEIGHT
+        )
 
 
 class TestDrawBar(BoardRendererTestBase):
@@ -197,8 +228,6 @@ class TestDrawBar(BoardRendererTestBase):
         self.assertEqual(mock_rect.call_args_list[3][0][1], self.mock_config.BRASS)
 
 
-
-
 class TestBoardRendererIntegration(BoardRendererTestBase):
     """
     Pruebas de integración que ejecutan el código sin mocks internos.
@@ -212,12 +241,8 @@ class TestBoardRendererIntegration(BoardRendererTestBase):
         """
         try:
             self.renderer.draw(self.surface)
-            success = True
-        except Exception as e:
-            print(f"Error en full_render: {e}")
-            success = False
-
-        self.assertTrue(success, "La renderización completa no debe lanzar errores")
+        except (pygame.error, ValueError, AttributeError) as e:
+            self.fail(f"La renderización falló con error: {e}")
 
     def test_all_drawing_methods_callable(self):
         """Prueba que todos los métodos de dibujo se pueden llamar."""
@@ -234,13 +259,9 @@ class TestBoardRendererIntegration(BoardRendererTestBase):
                 method = getattr(self.renderer, method_name)
                 try:
                     method(self.surface)
-                    success = True
-                except Exception as e:
-                    print(f"Error llamando a {method_name}: {e}")
-                    success = False
-                self.assertTrue(success, f"{method_name} debe ser ejecutable")
+                except (pygame.error, ValueError, AttributeError) as e:
+                    self.fail(f"Error llamando a {method_name}: {e}")
 
 
 if __name__ == "__main__":
     unittest.main()
-

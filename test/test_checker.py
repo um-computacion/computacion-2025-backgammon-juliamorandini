@@ -51,7 +51,7 @@ class TestChecker(unittest.TestCase):
         initial_pos = self.white_checker.position
         self.assertFalse(self.white_checker.move_to(24))
         self.assertEqual(self.white_checker.position, initial_pos)
-        
+
     def test_move_to_blocked_point_fails(self):
         initial_pos = self.white_checker.position
         moved = self.white_checker.move(4, self.board)
@@ -66,19 +66,19 @@ class TestChecker(unittest.TestCase):
         self.assertEqual(self.board[1], [])
         # Check that checker was added to new position (point 2)
         self.assertEqual(self.board[2][0], self.white_checker)
-        
+
     def test_move_comprehensive(self):
         """Test comprehensive move scenarios."""
         # Test moving from bar
         self.white_checker.send_to_bar()
         self.assertTrue(self.white_checker.move(1, self.board))
         self.assertEqual(self.white_checker.position, 1)
-        
+
         # Test moving to occupied point
         self.white_checker.position = 2
         self.board[3] = [self.black_checker]
         self.assertTrue(self.white_checker.move(3, self.board))
-        
+
         # Test moving to blocked point
         self.board[4] = [Checker("black", 4), Checker("black", 4)]
         self.assertFalse(self.white_checker.move(4, self.board))
@@ -98,16 +98,16 @@ class TestChecker(unittest.TestCase):
         # Initial state
         self.assertFalse(self.white_checker.is_on_bar)
         self.assertFalse(self.white_checker.is_borne_off)
-        
+
         # Send to bar
         self.white_checker.send_to_bar()
         self.assertTrue(self.white_checker.is_on_bar)
         self.assertFalse(self.white_checker.is_borne_off)
-        
+
         # Move from bar
         self.white_checker.move(1, self.board)
         self.assertFalse(self.white_checker.is_on_bar)
-        
+
         # Bear off
         self.white_checker.bear_off()
         self.assertTrue(self.white_checker.is_borne_off)
@@ -122,7 +122,7 @@ class TestChecker(unittest.TestCase):
     def test_invalid_color(self):
         with self.assertRaises(ValueError):
             Checker("red", 1)
-            
+
     # --- Bar and Bear Off Tests ---
 
     def test_send_to_bar(self):

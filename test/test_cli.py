@@ -74,7 +74,7 @@ class TestBackgammonCLI(unittest.TestCase):
         self.assertIn("Welcome to Backgammon!", output)
         self.assertIn("Invalid move!", output)  # Changed this line
         self.assertIn("Thanks for playing!", output)
-        
+
     @patch("builtins.input", side_effect=["invalid", "quit"])
     @patch("sys.stdout", new_callable=StringIO)
     def test_run_invalid_command(self, mock_stdout, mock_input):

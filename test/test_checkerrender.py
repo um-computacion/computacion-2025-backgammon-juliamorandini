@@ -10,8 +10,10 @@ from typing import List, Dict, Tuple
 
 # --- Dependencias simuladas ---
 
-class Board: #! CORRECCIÓN: Renombrado de 'test_Board' a 'Board'
+
+class Board:  #! CORRECCIÓN: Renombrado de 'test_Board' a 'Board'
     """Clase 'Board' simulada para pruebas."""
+
     points: List[List[str]]
     bar: Dict[str, int]
     borne_off: Dict[str, int]
@@ -21,14 +23,18 @@ class Board: #! CORRECCIÓN: Renombrado de 'test_Board' a 'Board'
         self.bar = {"W": 0, "B": 0}
         self.borne_off = {"W": 0, "B": 0}
 
+
 # --- Clase bajo prueba ---
 try:
     from pygame_ui.checker_renderer import CheckerRenderer
 except ImportError:
-    print("ADVERTENCIA: No se pudo importar CheckerRenderer. Usando versión local simulada.")
-    pass 
+    print(
+        "ADVERTENCIA: No se pudo importar CheckerRenderer. Usando versión local simulada."
+    )
+    pass
 
 # --- Pruebas ---
+
 
 #! 1. ELIMINAR EL DECORADOR @patch DE LA CLASE
 class TestCheckerRenderer(unittest.TestCase):
@@ -37,11 +43,11 @@ class TestCheckerRenderer(unittest.TestCase):
     #! 2. CAMBIAR LA FIRMA DE 'setUp'
     def setUp(self) -> None:
         """Configura el entorno de prueba antes de cada test."""
-        
+
         #! 3. INICIAR EL PATCH MANUALMENTE
-        self.patcher = patch('pygame_ui.checker_renderer.Config')
+        self.patcher = patch("pygame_ui.checker_renderer.Config")
         mock_config = self.patcher.start()
-        
+
         # Esto asegura que self.patcher.stop() se llame automáticamente
         # después de cada prueba, incluso si falla.
         self.addCleanup(self.patcher.stop)
@@ -65,13 +71,13 @@ class TestCheckerRenderer(unittest.TestCase):
 
         pygame.init()
         self.surface = pygame.Surface((1000, 800))
-        
+
         # Ahora, cuando se llame a CheckerRenderer(), usará el mock_config
         # que acabamos de configurar.
-        self.renderer = CheckerRenderer() 
-        
+        self.renderer = CheckerRenderer()
+
         # Usa la clase 'Board' corregida para el 'spec'
-        self.mock_board = Mock(spec=Board) 
+        self.mock_board = Mock(spec=Board)
         self.mock_board.points = [[] for _ in range(24)]
         self.mock_board.bar = {"W": 0, "B": 0}
         self.mock_board.borne_off = {"W": 0, "B": 0}
@@ -109,19 +115,19 @@ class TestCheckerRenderer(unittest.TestCase):
         self.renderer._draw_single_checker(self.surface, 100, 150, "W")
 
         self.assertEqual(mock_draw_circle.call_count, 3)
-        
+
         mock_draw_circle.assert_any_call(
-            self.surface, 
-            self.mock_config.WHITE_CHECKER, 
-            (100, 150), 
-            self.mock_config.CHECKER_RADIUS
+            self.surface,
+            self.mock_config.WHITE_CHECKER,
+            (100, 150),
+            self.mock_config.CHECKER_RADIUS,
         )
         mock_draw_circle.assert_any_call(
-            self.surface, 
-            self.mock_config.CHECKER_OUTLINE, 
-            (100, 150), 
-            self.mock_config.CHECKER_RADIUS, 
-            2
+            self.surface,
+            self.mock_config.CHECKER_OUTLINE,
+            (100, 150),
+            self.mock_config.CHECKER_RADIUS,
+            2,
         )
         mock_draw_circle.assert_any_call(
             self.surface,
@@ -136,19 +142,19 @@ class TestCheckerRenderer(unittest.TestCase):
         self.renderer._draw_single_checker(self.surface, 200, 250, "B")
 
         self.assertEqual(mock_draw_circle.call_count, 3)
-        
+
         mock_draw_circle.assert_any_call(
-            self.surface, 
-            self.mock_config.BLACK_CHECKER, 
-            (200, 250), 
-            self.mock_config.CHECKER_RADIUS
+            self.surface,
+            self.mock_config.BLACK_CHECKER,
+            (200, 250),
+            self.mock_config.CHECKER_RADIUS,
         )
         mock_draw_circle.assert_any_call(
-            self.surface, 
-            self.mock_config.CHECKER_OUTLINE, 
-            (200, 250), 
-            self.mock_config.CHECKER_RADIUS, 
-            2
+            self.surface,
+            self.mock_config.CHECKER_OUTLINE,
+            (200, 250),
+            self.mock_config.CHECKER_RADIUS,
+            2,
         )
         mock_draw_circle.assert_any_call(
             self.surface,
@@ -166,18 +172,19 @@ class TestCheckerRenderer(unittest.TestCase):
         checkers = ["W", "W"]
         checker_positions = []
 
-        with patch.object(self.renderer, "_get_point_x_center", return_value=500.0) as mock_get_x:
+        with patch.object(
+            self.renderer, "_get_point_x_center", return_value=500.0
+        ) as mock_get_x:
             self.renderer._draw_point_checkers(
                 self.surface, point_index, checkers, checker_positions
             )
 
         mock_get_x.assert_called_with(5)
         self.assertEqual(mock_draw_single.call_count, 2)
-        
-        mock_draw_single.assert_has_calls([
-            call(self.surface, 500.0, 585, "W"),
-            call(self.surface, 500.0, 540, "W")
-        ])
+
+        mock_draw_single.assert_has_calls(
+            [call(self.surface, 500.0, 585, "W"), call(self.surface, 500.0, 540, "W")]
+        )
 
         expected_positions = [
             (500, 585, self.mock_config.CHECKER_RADIUS, 5, "W"),
@@ -192,18 +199,19 @@ class TestCheckerRenderer(unittest.TestCase):
         checkers = ["B", "B"]
         checker_positions = []
 
-        with patch.object(self.renderer, "_get_point_x_center", return_value=300.0) as mock_get_x:
+        with patch.object(
+            self.renderer, "_get_point_x_center", return_value=300.0
+        ) as mock_get_x:
             self.renderer._draw_point_checkers(
                 self.surface, point_index, checkers, checker_positions
             )
-        
+
         mock_get_x.assert_called_with(15)
         self.assertEqual(mock_draw_single.call_count, 2)
-        
-        mock_draw_single.assert_has_calls([
-            call(self.surface, 300.0, 35, "B"),
-            call(self.surface, 300.0, 80, "B")
-        ])
+
+        mock_draw_single.assert_has_calls(
+            [call(self.surface, 300.0, 35, "B"), call(self.surface, 300.0, 80, "B")]
+        )
 
         expected_positions = [
             (300, 35, self.mock_config.CHECKER_RADIUS, 15, "B"),
@@ -218,12 +226,15 @@ class TestCheckerRenderer(unittest.TestCase):
         self.renderer._draw_bar_checkers(self.surface, bar_dict)
 
         self.assertEqual(mock_draw_single.call_count, 3)
-        
-        mock_draw_single.assert_has_calls([
-            call(self.surface, 425, 65, "W"),
-            call(self.surface, 425, 110, "W"),
-            call(self.surface, 425, 555, "B")
-        ], any_order=True)
+
+        mock_draw_single.assert_has_calls(
+            [
+                call(self.surface, 425, 65, "W"),
+                call(self.surface, 425, 110, "W"),
+                call(self.surface, 425, 555, "B"),
+            ],
+            any_order=True,
+        )
 
     @patch.object(CheckerRenderer, "_draw_single_checker")
     def test_draw_bar_checkers_empty(self, mock_draw_single: Mock) -> None:
@@ -239,30 +250,36 @@ class TestCheckerRenderer(unittest.TestCase):
         self.renderer._draw_borne_off_checkers(self.surface, borne_off_dict)
 
         self.assertEqual(mock_draw_single.call_count, 8)
-        
-        w_calls = [
-            call(self.surface, 850, 505, 'W'),
-            call(self.surface, 850, 460, 'W')
-        ]
-        b_calls = [
-            call(self.surface, 850, 115, 'B')
-        ]
-        
+
+        w_calls = [call(self.surface, 850, 505, "W"), call(self.surface, 850, 460, "W")]
+        b_calls = [call(self.surface, 850, 115, "B")]
+
         mock_draw_single.assert_has_calls(w_calls, any_order=True)
         self.assertEqual(
-            [c[0][1] for c in mock_draw_single.call_args_list if c[0][3] == "W"].count(850), 6
+            [c[0][1] for c in mock_draw_single.call_args_list if c[0][3] == "W"].count(
+                850
+            ),
+            6,
         )
         self.assertEqual(
-            [c[0][2] for c in mock_draw_single.call_args_list if c[0][3] == "W"].count(505), 5
+            [c[0][2] for c in mock_draw_single.call_args_list if c[0][3] == "W"].count(
+                505
+            ),
+            5,
         )
         self.assertEqual(
-            [c[0][2] for c in mock_draw_single.call_args_list if c[0][3] == "W"].count(460), 1
+            [c[0][2] for c in mock_draw_single.call_args_list if c[0][3] == "W"].count(
+                460
+            ),
+            1,
         )
         mock_draw_single.assert_has_calls(b_calls, any_order=True)
         self.assertEqual(
-            [c[0][2] for c in mock_draw_single.call_args_list if c[0][3] == "B"].count(115), 2
+            [c[0][2] for c in mock_draw_single.call_args_list if c[0][3] == "B"].count(
+                115
+            ),
+            2,
         )
-
 
     @patch.object(CheckerRenderer, "_draw_single_checker")
     def test_draw_borne_off_checkers_exceeds_15(self, mock_draw_single: Mock) -> None:
@@ -296,15 +313,11 @@ class TestCheckerRenderer(unittest.TestCase):
         checker_positions = self.renderer.draw(self.surface, self.mock_board)
 
         self.assertEqual(mock_draw_point.call_count, 2)
-        mock_draw_point.assert_any_call(
-            self.surface, 1, ["W"], checker_positions
-        )
-        mock_draw_point.assert_any_call(
-            self.surface, 15, ["B", "B"], checker_positions
-        )
+        mock_draw_point.assert_any_call(self.surface, 1, ["W"], checker_positions)
+        mock_draw_point.assert_any_call(self.surface, 15, ["B", "B"], checker_positions)
         mock_draw_bar.assert_called_once_with(self.surface, {"W": 1, "B": 0})
         mock_draw_borne_off.assert_called_once_with(self.surface, {"W": 0, "B": 3})
-    
+
     @patch.object(CheckerRenderer, "_draw_point_checkers")
     @patch.object(CheckerRenderer, "_draw_bar_checkers")
     @patch.object(CheckerRenderer, "_draw_borne_off_checkers")

@@ -1,4 +1,5 @@
 """Comprehensive test module for Game class with improved coverage."""
+
 import unittest
 from core.BackgammonGame import Game
 
@@ -106,7 +107,7 @@ class TestGameEnhanced(unittest.TestCase):
         self.game.current_player = "white"
         self.assertEqual(self.game.get_entry_point_for_dice(1), 23)
         self.assertEqual(self.game.get_entry_point_for_dice(6), 18)
-        
+
         self.game.current_player = "black"
         self.assertEqual(self.game.get_entry_point_for_dice(1), 0)
         self.assertEqual(self.game.get_entry_point_for_dice(6), 5)
@@ -158,7 +159,7 @@ class TestGameEnhanced(unittest.TestCase):
         self.game.set_piece(7, 4, "B")
         self.assertEqual(len(self.game.board.points[7]), 4)
         self.assertEqual(self.game.board.points[7][0], "B")
-        
+
         self.game.set_piece(8, 3, "W")
         self.assertEqual(len(self.game.board.points[8]), 3)
         self.assertEqual(self.game.board.points[8][0], "W")
@@ -188,7 +189,7 @@ class TestGameEnhanced(unittest.TestCase):
         initial_count = self.game.board.bar["W"]
         self.game.add_to_bar("W")
         self.assertEqual(self.game.board.bar["W"], initial_count + 1)
-        
+
         initial_count = self.game.board.bar["B"]
         self.game.add_to_bar("B")
         self.assertEqual(self.game.board.bar["B"], initial_count + 1)
@@ -216,10 +217,10 @@ class TestGameEnhanced(unittest.TestCase):
         """Test must_move_from_bar for both players."""
         self.game.board.bar["W"] = 2
         self.game.board.bar["B"] = 0
-        
+
         self.game.current_player = "white"
         self.assertTrue(self.game.must_move_from_bar())
-        
+
         self.game.current_player = "black"
         self.assertFalse(self.game.must_move_from_bar())
 
@@ -304,10 +305,10 @@ class TestGameEnhanced(unittest.TestCase):
         self.game.current_player = "white"
         self.game.board.borne_off["W"] = 10
         self.assertFalse(self.game.check_winner())
-        
+
         self.game.board.borne_off["W"] = 0
         self.assertFalse(self.game.check_winner())
-        
+
         self.game.board.borne_off["W"] = 14
         self.assertFalse(self.game.check_winner())
 
@@ -379,10 +380,10 @@ class TestGameEnhanced(unittest.TestCase):
         """Test getting current player color after switching."""
         self.game.current_player = "white"
         self.assertEqual(self.game.get_current_player_color(), "W")
-        
+
         self.game.switch_player()
         self.assertEqual(self.game.get_current_player_color(), "B")
-        
+
         self.game.switch_player()
         self.assertEqual(self.game.get_current_player_color(), "W")
 
@@ -397,18 +398,18 @@ class TestGameEnhanced(unittest.TestCase):
         """Test a complete game flow scenario."""
         # Start with white
         self.assertEqual(self.game.current_player, "white")
-        
+
         # Roll dice
         moves = self.game.roll_dice()
         self.assertGreater(len(moves), 0)
-        
+
         # Check winner (should be false at start)
         self.assertFalse(self.game.check_winner())
-        
+
         # Switch player
         self.game.switch_player()
         self.assertEqual(self.game.current_player, "black")
-        
+
         # Switch back
         self.game.switch_player()
         self.assertEqual(self.game.current_player, "white")
@@ -416,14 +417,14 @@ class TestGameEnhanced(unittest.TestCase):
     def test_bearing_off_workflow(self):
         """Test complete bearing off workflow."""
         self.game.current_player = "white"
-        
+
         # Setup scenario
         self.game.setup_bearing_off_scenario()
-        
+
         # Should be able to bear off
         can_bear = self.game.can_bear_off()
         self.assertIsInstance(can_bear, bool)
-        
+
         # Get current color
         color = self.game.get_current_player_color()
         self.assertEqual(color, "W")
@@ -435,12 +436,12 @@ class TestGameEnhanced(unittest.TestCase):
         self.game.add_to_bar()
         self.assertEqual(self.game.get_bar_pieces(), 1)
         self.assertTrue(self.game.must_move_from_bar())
-        
+
         # Switch to black
         self.game.switch_player()
         self.assertEqual(self.game.get_bar_pieces(), 0)
         self.assertFalse(self.game.must_move_from_bar())
-        
+
         # Add black to bar
         self.game.add_to_bar()
         self.assertEqual(self.game.get_bar_pieces(), 1)

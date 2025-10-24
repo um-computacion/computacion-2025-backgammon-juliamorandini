@@ -47,8 +47,12 @@ class BackgammonCLI:
         print("\n")
 
         # Display bar pieces
-        print(f"Bar - White: {self.game.board.bar['W']} Black: {self.game.board.bar['B']}")
-        print(f"Borne Off - White: {self.game.board.borne_off['W']} Black: {self.game.board.borne_off['B']}")
+        print(
+            f"Bar - White: {self.game.board.bar['W']} Black: {self.game.board.bar['B']}"
+        )
+        print(
+            f"Borne Off - White: {self.game.board.borne_off['W']} Black: {self.game.board.borne_off['B']}"
+        )
 
     def get_move_input(self) -> Optional[Tuple[int, int]]:
         """Get move input from user.
@@ -68,13 +72,15 @@ class BackgammonCLI:
 
     def show_help(self) -> None:
         """Display help text."""
-        print("""
+        print(
+            """
         Commands:
         - move <from> <to>: Move a checker
         - roll: Roll the dice
         - help: Show this help
         - quit: Exit game
-        """)
+        """
+        )
 
     def quit_game(self) -> None:
         """Exit the game."""
@@ -98,7 +104,7 @@ class BackgammonCLI:
 
     def process_command(self, command: str) -> None:
         """Process user command.
-        
+
         Args:
             command: Command to process
         """

@@ -26,24 +26,20 @@ class TestBackgammonBoard(unittest.TestCase):
         Simulamos (patch) todas las dependencias que BackgammonBoard importa
         y crea en su __init__.
         """
-        
+
         # 1. Definir los patchers para cada dependencia
         # Usamos 'autospec=True' para que los mocks tengan la misma firma
         # que las clases reales.
-        self.patcher_board = patch(
-            'pygame_ui.backgammon_board.Board', autospec=True
-        )
-        self.patcher_dice = patch(
-            'pygame_ui.backgammon_board.Dice', autospec=True
-        )
+        self.patcher_board = patch("pygame_ui.backgammon_board.Board", autospec=True)
+        self.patcher_dice = patch("pygame_ui.backgammon_board.Dice", autospec=True)
         self.patcher_board_renderer = patch(
-            'pygame_ui.backgammon_board.BoardRenderer', autospec=True
+            "pygame_ui.backgammon_board.BoardRenderer", autospec=True
         )
         self.patcher_checker_renderer = patch(
-            'pygame_ui.backgammon_board.CheckerRenderer', autospec=True
+            "pygame_ui.backgammon_board.CheckerRenderer", autospec=True
         )
         self.patcher_dice_renderer = patch(
-            'pygame_ui.backgammon_board.DiceRenderer', autospec=True
+            "pygame_ui.backgammon_board.DiceRenderer", autospec=True
         )
 
         # 2. Iniciar los patchers
@@ -66,7 +62,7 @@ class TestBackgammonBoard(unittest.TestCase):
         self.mock_board_renderer_inst = self.MockBoardRenderer.return_value
         self.mock_checker_renderer_inst = self.MockCheckerRenderer.return_value
         self.mock_dice_renderer_inst = self.MockDiceRenderer.return_value
-        
+
         # 5. Crear la instancia de la clase bajo prueba
         # Su __init__ ahora usará nuestras clases Mock
         self.game_board = BackgammonBoard()
@@ -99,13 +95,11 @@ class TestBackgammonBoard(unittest.TestCase):
         self.game_board.render(self.mock_surface)
 
         # Debe dibujar el tablero y las fichas
-        self.mock_board_renderer_inst.draw.assert_called_once_with(
-            self.mock_surface
-        )
+        self.mock_board_renderer_inst.draw.assert_called_once_with(self.mock_surface)
         self.mock_checker_renderer_inst.draw.assert_called_once_with(
             self.mock_surface, self.mock_board_inst
         )
-        
+
         # No debe dibujar los dados
         self.mock_dice_renderer_inst.draw.assert_not_called()
 
@@ -115,18 +109,19 @@ class TestBackgammonBoard(unittest.TestCase):
         Cubre las líneas 99-102.
         """
         # Forzamos el estado para tener valores de dados
-        self.game_board.__dict__['__dice_values__'] = [5, 2] # Acceso directo para la prueba
+        self.game_board.__dict__["__dice_values__"] = [
+            5,
+            2,
+        ]  # Acceso directo para la prueba
 
         self.game_board.render(self.mock_surface)
 
         # Debe dibujar todo
-        self.mock_board_renderer_inst.draw.assert_called_once_with(
-            self.mock_surface
-        )
+        self.mock_board_renderer_inst.draw.assert_called_once_with(self.mock_surface)
         self.mock_checker_renderer_inst.draw.assert_called_once_with(
             self.mock_surface, self.mock_board_inst
         )
-        
+
         # Debe dibujar los dados con los valores correctos
         self.mock_dice_renderer_inst.draw.assert_called_once_with(
             self.mock_surface, [5, 2]
@@ -137,13 +132,13 @@ class TestBackgammonBoard(unittest.TestCase):
         Prueba que el renderizado solo muestra 2 dados incluso si hay 4 (dobles).
         Confirma la lógica de 'display_values' (línea 101).
         """
-        self.game_board.__dict__['__dice_values__'] = [3, 3, 3, 3]
+        self.game_board.__dict__["__dice_values__"] = [3, 3, 3, 3]
 
         self.game_board.render(self.mock_surface)
-        
+
         # Debe dibujar los dados, pero solo los dos primeros
         self.mock_dice_renderer_inst.draw.assert_called_once_with(
-            self.mock_surface, [3, 3] # Solo los dos primeros
+            self.mock_surface, [3, 3]  # Solo los dos primeros
         )
 
     def test_update(self):
@@ -161,8 +156,8 @@ class TestBackgammonBoard(unittest.TestCase):
     def test_reset(self):
         """Prueba que el reseteo llama a sus dependencias y reinicia el estado."""
         # Cambiamos el estado
-        self.game_board.__dict__['__current_player__'] = "B"
-        self.game_board.__dict__['__dice_values__'] = [1, 2]
+        self.game_board.__dict__["__current_player__"] = "B"
+        self.game_board.__dict__["__dice_values__"] = [1, 2]
 
         # Ejecutamos el reseteo
         self.game_board.reset()
@@ -179,13 +174,13 @@ class TestBackgammonBoard(unittest.TestCase):
         """Prueba que 'roll_dice' usa la clase Dice y actualiza el estado."""
         expected_moves = [4, 6]
         self.mock_dice_inst.get_moves.return_value = expected_moves
-        
+
         moves = self.game_board.roll_dice()
 
         # Verificar que se usó la dependencia
         self.mock_dice_inst.roll.assert_called_once()
         self.mock_dice_inst.get_moves.assert_called_once()
-        
+
         # Verificar que el estado y el valor de retorno son correctos
         self.assertEqual(moves, expected_moves)
         self.assertEqual(self.game_board.dice_values, expected_moves)
@@ -196,13 +191,13 @@ class TestBackgammonBoard(unittest.TestCase):
         Cubre las líneas 148-150.
         """
         self.mock_board_inst.move_checker.return_value = True
-        
+
         # El jugador actual es 'W'
         result = self.game_board.move_checker(from_point=10, to_point=15)
 
         # Verificar que se llamó al tablero con los argumentos correctos
         self.mock_board_inst.move_checker.assert_called_once_with(
-            10, 15, "W" # Asegurarse de que pasa al jugador actual
+            10, 15, "W"  # Asegurarse de que pasa al jugador actual
         )
         self.assertTrue(result)
 
@@ -212,7 +207,7 @@ class TestBackgammonBoard(unittest.TestCase):
         Cubre la línea 165 (limpiar 'dice_values').
         """
         # Estado inicial: W, con dados
-        self.game_board.__dict__['__dice_values__'] = [5, 5]
+        self.game_board.__dict__["__dice_values__"] = [5, 5]
         self.assertEqual(self.game_board.current_player, "W")
 
         # Primer cambio
