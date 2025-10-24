@@ -29,7 +29,7 @@ class CheckerRenderer:
                 )
 
         self._draw_bar_checkers(surface, board.bar)
-        self._draw_borne_off_checkers(surface, board.borne_off)
+        #self._draw_borne_off_checkers(surface, board.borne_off)
 
         return checker_positions
 

@@ -33,9 +33,9 @@ class Config:
     BAR_WIDTH = 60
     BAR_X = BOARD_X + (BOARD_WIDTH - BAR_WIDTH) // 2
 
-    # Right panel dimensions
-    RIGHT_PANEL_WIDTH = 80
-    RIGHT_PANEL_X = BOARD_X + BOARD_WIDTH - RIGHT_PANEL_WIDTH
+    # Right panel dimensions (COMMENTED OUT, no longer used for striped panel)
+    # RIGHT_PANEL_WIDTH = 80
+    # RIGHT_PANEL_X = BOARD_X + BOARD_WIDTH - RIGHT_PANEL_WIDTH
 
     # Colors - Board
     DARK_BROWN = (60, 40, 30)
@@ -44,8 +44,8 @@ class Config:
     DARK_POINT = (100, 70, 50)
     GREEN_BAR = (40, 90, 60)
     BRASS = (184, 134, 11)
-    STRIPE_GREEN = (60, 120, 80)
-    STRIPE_YELLOW = (220, 200, 100)
+    # STRIPE_GREEN = (60, 120, 80) # Removed
+    # STRIPE_YELLOW = (220, 200, 100) # Removed
 
     # Colors - Checkers
     WHITE_CHECKER = (240, 240, 240)

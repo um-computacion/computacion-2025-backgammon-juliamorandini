@@ -23,7 +23,7 @@ class BoardRenderer:
         self._draw_board_background(surface)
         self._draw_points(surface)
         self._draw_bar(surface)
-        self._draw_right_panel(surface)
+       # self._draw_right_panel(surface)
 
     def _draw_border(self, surface: pygame.Surface) -> None:
         outer_rect = pygame.Rect(
@@ -115,33 +115,6 @@ class BoardRenderer:
         pygame.draw.rect(surface, Config.BRASS, bottom_hinge)
         pygame.draw.rect(surface, (140, 100, 0), bottom_hinge, 2)
 
-    def _draw_right_panel(self, surface: pygame.Surface) -> None:
-        panel_height = self._inner_bottom - self._inner_top
-        section_height = panel_height // 3
-
-        self._draw_stripes(
-            surface,
-            Config.RIGHT_PANEL_X,
-            self._inner_top,
-            Config.RIGHT_PANEL_WIDTH,
-            section_height,
-        )
-
-        middle_rect = pygame.Rect(
-            Config.RIGHT_PANEL_X,
-            self._inner_top + section_height,
-            Config.RIGHT_PANEL_WIDTH,
-            section_height,
-        )
-        pygame.draw.rect(surface, Config.WOOD_BROWN, middle_rect)
-
-        self._draw_stripes(
-            surface,
-            Config.RIGHT_PANEL_X,
-            self._inner_top + 2 * section_height,
-            Config.RIGHT_PANEL_WIDTH,
-            section_height,
-        )
 
     def _draw_stripes(
         self, surface: pygame.Surface, x: int, y: int, width: int, height: int
