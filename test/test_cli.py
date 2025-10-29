@@ -20,6 +20,7 @@ class TestBoardRenderer(unittest.TestCase):
     """Tests for the BoardRenderer class."""
 
     def setUp(self):
+        """Set up test fixtures."""
         self.renderer = BoardRenderer()
         self.game = Game()  # Use the (Mock)Game from the CLI module
 
@@ -42,6 +43,7 @@ class TestUserInterface(unittest.TestCase):
     """Tests for the UserInterface class."""
 
     def setUp(self):
+        """Set up test fixtures."""
         self.ui = UserInterface()
 
     @patch("sys.stdout", new_callable=StringIO)
@@ -72,6 +74,7 @@ class TestInputValidator(unittest.TestCase):
     """Tests for the InputValidator class."""
 
     def setUp(self):
+        """Set up test fixtures."""
         self.validator = InputValidator()
 
     def test_validate_move_valid(self):
@@ -98,6 +101,7 @@ class TestCommandParser(unittest.TestCase):
     """Tests for the CommandParser class."""
 
     def setUp(self):
+        """Set up test fixtures."""
         self.parser = CommandParser()
 
     def test_parse_move_command(self):
@@ -237,7 +241,7 @@ class TestBackgammonCLI(unittest.TestCase):
 
     @patch("sys.stdout", new_callable=StringIO)
     @patch("builtins.input", side_effect=["roll", "quit"])
-    def test_run_roll_command(self, mock_stdout):
+    def test_run_roll_command(self, mock_input, mock_stdout):
         """Test roll command in game loop."""
         cli = BackgammonCLI()
         cli.run()
@@ -251,7 +255,7 @@ class TestBackgammonCLI(unittest.TestCase):
     # --- FIX 2 ---
     # The input should be "move 1 3" on one line, not three separate inputs.
     @patch("builtins.input", side_effect=["move 1 3", "quit"])
-    def test_run_move_command_invalid_logic(self, mock_stdout):
+    def test_run_move_command_invalid_logic(self, mock_input, mock_stdout):
         """Test move command in game loop that fails game logic."""
         # This test assumes the mock move (1, 3) is invalid
         cli = BackgammonCLI()
@@ -269,7 +273,7 @@ class TestBackgammonCLI(unittest.TestCase):
     # --- FIX 3 (Related to FIX 2) ---
     # The input should be "move invalid" on one line.
     @patch("builtins.input", side_effect=["move invalid", "quit"])
-    def test_run_invalid_move_format(self, mock_stdout):
+    def test_run_invalid_move_format(self, mock_input, mock_stdout):
         """Test invalid move *format* in game loop."""
         cli = BackgammonCLI()
         cli.run()
@@ -281,7 +285,7 @@ class TestBackgammonCLI(unittest.TestCase):
 
     @patch("sys.stdout", new_callable=StringIO)
     @patch("builtins.input", side_effect=["winner", "quit"])
-    def test_run_invalid_command(self, mock_stdout):
+    def test_run_invalid_command(self, mock_input, mock_stdout):
         """Test invalid command handling."""
         cli = BackgammonCLI()
         cli.run()
