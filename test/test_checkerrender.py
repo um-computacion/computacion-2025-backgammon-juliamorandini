@@ -4,12 +4,14 @@ Pruebas unitarias para pygame_ui/checker_renderer.py
 """
 
 import unittest
-import pygame
-from unittest.mock import Mock, patch, call
-from typing import List, Dict
+from typing import Dict, List
+from unittest.mock import Mock, call, patch
 
-# Disable specific pylint warnings for pygame
-# pylint: disable=no-member
+import pygame  # Third-party libraries after standard libraries
+
+# Disable specific pylint warnings for pygame, test access, and disallowed names
+# pylint: disable=no-member, protected-access, disallowed-name, invalid-name
+
 
 # --- Dependencias simuladas ---
 
@@ -22,42 +24,27 @@ class Board:  #! CORRECCIÓN: Renombrado de 'test_Board' a 'Board'
     borne_off: Dict[str, int]
 
     def __init__(self) -> None:
+        """Inicializa un tablero simulado vacío."""
         self.points = [[] for _ in range(24)]
         self.bar = {"W": 0, "B": 0}
         self.borne_off = {"W": 0, "B": 0}
 
 
-# --- Clases bajo prueba ---
-
-# pylint: disable=protected-access
-# Justification: Tests need to access protected members to verify internal state
-try:
-    from pygame_ui.checker_renderer import CheckerRenderer
-except ImportError:
-    print(
-        "ADVERTENCIA: No se pudo importar CheckerRenderer. Usando versión local simulada."
-    )
-
+from pygame_ui.checker_renderer import CheckerRenderer
 # --- Pruebas ---
 
 
-#! 1. ELIMINAR EL DECORADOR @patch DE LA CLASE
 class TestCheckerRenderer(unittest.TestCase):
     """Pruebas unitarias para la clase CheckerRenderer."""
 
-    #! 2. CAMBIAR LA FIRMA DE 'setUp'
     def setUp(self) -> None:
         """Configura el entorno de prueba antes de cada test."""
 
-        #! 3. INICIAR EL PATCH MANUALMENTE
         self.patcher = patch("pygame_ui.checker_renderer.Config")
         mock_config = self.patcher.start()
 
-        # Esto asegura que self.patcher.stop() se llame automáticamente
-        # después de cada prueba, incluso si falla.
         self.addCleanup(self.patcher.stop)
 
-        #! 4. CONFIGURAMOS EL MOCK (igual que antes)
         mock_config.BOARD_X = 10
         mock_config.BOARD_Y = 10
         mock_config.BORDER_THICKNESS = 5
@@ -73,12 +60,12 @@ class TestCheckerRenderer(unittest.TestCase):
         mock_config.CHECKER_HIGHLIGHT_WHITE = (200, 200, 200)
         mock_config.CHECKER_HIGHLIGHT_BLACK = (50, 50, 50)
         mock_config.CHECKER_OUTLINE = (10, 10, 10)
+        mock_config.CHECKER_SIZE = 40
+        mock_config.BOARD_WIDTH = 890
 
         pygame.init()
         self.surface = pygame.Surface((1000, 800))
 
-        # Ahora, cuando se llame a CheckerRenderer(), usará el mock_config
-        # que acabamos de configurar.
         self.renderer = CheckerRenderer()
 
         # Usa la clase 'Board' corregida para el 'spec'
@@ -93,12 +80,6 @@ class TestCheckerRenderer(unittest.TestCase):
     def tearDown(self) -> None:
         """Limpia después de cada prueba."""
         pygame.quit()
-        # No es necesario llamar a self.patcher.stop() aquí,
-        # self.addCleanup() ya se encarga de eso.
-
-    #! 5. TODOS LOS MÉTODOS DE PRUEBA PERMANECEN EXACTAMENTE IGUAL
-    # Ya no necesitan recibir 'mock_config' como argumento,
-    # ya que acceden a él a través de 'self.mock_config' guardado en setUp.
 
     def test_init_calculates_dimensions_correctly(self) -> None:
         """Prueba que __init__ calcula las dimensiones internas correctamente."""
@@ -167,8 +148,6 @@ class TestCheckerRenderer(unittest.TestCase):
             (195, 245),
             self.mock_config.CHECKER_RADIUS // 3,
         )
-
-    # ... (El resto de tus métodos de prueba van aquí sin cambios) ...
 
     @patch.object(CheckerRenderer, "_draw_single_checker")
     def test_draw_point_checkers_bottom_row(self, mock_draw_single: Mock) -> None:

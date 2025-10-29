@@ -3,6 +3,8 @@ Configuration constants for the Backgammon board.
 Centralizes all color schemes, dimensions, and layout settings.
 """
 
+# pylint: disable=too-few-public-methods, too-many-instance-attributes
+
 
 class Config:
     """Game configuration settings."""
@@ -28,9 +30,9 @@ class Config:
     POINT_HEIGHT = 200
     POINTS_PER_QUADRANT = 6
     TOTAL_POINTS = 24
-    
+
     # Checker dimensions
-    CHECKER_SIZE = 40  # Diameter of checker pieces
+    CHECKER_SIZE = 40  # Note: This might be inconsistent with CHECKER_RADIUS
 
     # Bar dimensions
     BAR_WIDTH = 60

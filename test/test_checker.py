@@ -8,9 +8,10 @@ including movement rules, board interactions, and state transitions.
 import unittest
 from core.Checker import Checker
 
+
 class TestChecker(unittest.TestCase):
     """Test suite for the Checker class."""
-    
+
     def setUp(self):
         """Set up test fixtures before each test method."""
         self.white_checker = Checker("white", 1)
@@ -132,27 +133,32 @@ class TestChecker(unittest.TestCase):
     # --- Utility Tests ---
 
     def test_checker_color(self):
+        """Test that checker color is one of the valid options."""
         self.assertIn(self.white_checker.color, ["white", "black"])
         self.assertIn(self.black_checker.color, ["white", "black"])
 
     def test_invalid_color(self):
+        """Test that initializing with an invalid color raises ValueError."""
         with self.assertRaises(ValueError):
             Checker("red", 1)
 
     # --- Bar and Bear Off Tests ---
 
     def test_send_to_bar(self):
+        """Test that send_to_bar updates state and position correctly."""
         self.white_checker.send_to_bar()
         self.assertTrue(self.white_checker.is_on_bar)
         self.assertEqual(self.white_checker.position, "bar")
 
     def test_bear_off_updates_state(self):
+        """Test that bear_off updates state and position correctly."""
         self.white_checker.bear_off()
         self.assertTrue(self.white_checker.is_borne_off)
         self.assertFalse(self.white_checker.is_on_bar)
         self.assertEqual(self.white_checker.position, "off")
 
     def test_cannot_move_from_bar_to_blocked(self):
+        """Test that a checker on the bar cannot move to a blocked point."""
         self.white_checker.send_to_bar()
         self.board[1] = [Checker("black", 1), Checker("black", 1)]
         self.assertFalse(self.white_checker.can_move_to(1, self.board))
@@ -160,6 +166,7 @@ class TestChecker(unittest.TestCase):
 
     # NEW: Comprehensive can_bear_off tests
     def test_can_bear_off_comprehensive(self):
+        """Test all scenarios for the can_bear_off method."""
         # 1. Failure: All home is False
         self.assertFalse(self.white_checker.can_bear_off(False))
 
