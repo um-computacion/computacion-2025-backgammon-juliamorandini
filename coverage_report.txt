@@ -1,18 +1,34 @@
-Name                     Stmts   Miss  Cover   Missing
-------------------------------------------------------
-cli/CLI.py                  73      8    89%   65-67, 90, 123-124, 128-129
-cli/__init__.py              0      0   100%
-core/BackgammonGame.py      57      6    89%   69-70, 94-95, 99-100
-core/Checker.py             54     11    80%   36-41, 65, 67, 70, 101, 123
-core/Dice.py                63      0   100%
-core/__init__.py             6      0   100%
-core/board.py               65      8    88%   43, 56, 90, 103, 121, 123, 136, 143
-core/player.py              27      0   100%
-test/test_Game.py           50      1    98%   80
-test/test_board.py          67      1    99%   163
-test/test_checker.py        44      1    98%   79
-test/test_cli.py            74      1    99%   110
-test/test_dice.py          121      2    98%   178, 184
-test/test_player.py         49      1    98%   87
-------------------------------------------------------
-TOTAL                      750     40    95%
+Name                             Stmts   Miss  Cover   Missing
+--------------------------------------------------------------
+PygameUI.py                        279    175    37%   101-114, 119-120, 123-124, 147, 205-277, 281-414, 418, 422-505, 512-513, 517
+cli/CLI.py                         121      6    95%   94, 102, 193-194, 239-240
+cli/__init__.py                      0      0   100%
+config.py                           35      0   100%
+core/BackgammonGame.py              76      0   100%
+core/Checker.py                     54      1    98%   123
+core/Dice.py                        63      0   100%
+core/__init__.py                     6      0   100%
+core/board.py                       95      0   100%
+core/player.py                      27      0   100%
+pygame_ui/__init__.py                0      0   100%
+pygame_ui/backgammon_board.py       46      0   100%
+pygame_ui/board_interaction.py      71      0   100%
+pygame_ui/board_renderer.py         55      0   100%
+pygame_ui/button.py                 24      0   100%
+pygame_ui/checker_renderer.py       74      0   100%
+pygame_ui/dice_renderer.py          51      0   100%
+test/test_Game.py                  302      1    99%   452
+test/test_backgammon_board.py       90      4    96%   151-152, 225-226
+test/test_board.py                 169      1    99%   307
+test/test_boardinteraction.py      115      1    99%   249
+test/test_boardrender.py           142      5    96%   226-227, 244-245, 249
+test/test_button.py                 57      1    98%   154
+test/test_checker.py               101      1    99%   195
+test/test_checkerrender.py         152      4    97%   28-30, 324
+test/test_cli.py                   166      1    99%   300
+test/test_dice.py                  121      2    98%   178, 184
+test/test_dicerender.py             67      1    99%   130
+test/test_player.py                 48      1    98%   87
+test/test_pygame.py                113      1    99%   258
+--------------------------------------------------------------
+TOTAL                             2720    206    92%
