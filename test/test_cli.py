@@ -4,8 +4,6 @@ import unittest
 from unittest.mock import patch, MagicMock
 from io import StringIO
 
-# Import all the new classes from your CLI module
-# (Assuming your refactored code is saved as 'cli/CLI.py')
 from cli.CLI import (
     BackgammonCLI,
     BoardRenderer,
@@ -112,7 +110,7 @@ class TestCommandParser(unittest.TestCase):
 
     def test_parse_simple_command_case_insensitive(self):
         """Test parsing a simple command, ignoring case."""
-        command, args = self.parser.parse_command("  rOlL  ")
+        command, args = self.parser.parse_command("  rOlL  ")
         self.assertEqual(command, "roll")
         self.assertEqual(args, [])
 
@@ -235,14 +233,11 @@ class TestBackgammonCLI(unittest.TestCase):
             "Unknown command. Type 'help' for commands."
         )
 
-    # --- Integration Tests for the `run` loop ---
-    # For these, we un-mock the CLI and patch stdout/input
-    # to test the real component interactions.
-
     @patch("sys.stdout", new_callable=StringIO)
     @patch("builtins.input", side_effect=["roll", "quit"])
     def test_run_roll_command(self, mock_input, mock_stdout):
         """Test roll command in game loop."""
+        # pylint: disable=unused-argument
         cli = BackgammonCLI()
         cli.run()
         output = mock_stdout.getvalue()
@@ -257,6 +252,7 @@ class TestBackgammonCLI(unittest.TestCase):
     @patch("builtins.input", side_effect=["move 1 3", "quit"])
     def test_run_move_command_invalid_logic(self, mock_input, mock_stdout):
         """Test move command in game loop that fails game logic."""
+        # pylint: disable=unused-argument
         # This test assumes the mock move (1, 3) is invalid
         cli = BackgammonCLI()
         # Mock the game logic to fail this specific move
@@ -275,6 +271,7 @@ class TestBackgammonCLI(unittest.TestCase):
     @patch("builtins.input", side_effect=["move invalid", "quit"])
     def test_run_invalid_move_format(self, mock_input, mock_stdout):
         """Test invalid move *format* in game loop."""
+        # pylint: disable=unused-argument
         cli = BackgammonCLI()
         cli.run()
         output = mock_stdout.getvalue()
@@ -287,6 +284,7 @@ class TestBackgammonCLI(unittest.TestCase):
     @patch("builtins.input", side_effect=["winner", "quit"])
     def test_run_invalid_command(self, mock_input, mock_stdout):
         """Test invalid command handling."""
+        # pylint: disable=unused-argument
         cli = BackgammonCLI()
         cli.run()
         output = mock_stdout.getvalue()
