@@ -113,7 +113,7 @@ class BackgammonBoard:
         Returns:
             None
         """
-        pass
+        pass # pylint: disable=unnecessary-pass
 
     def reset(self) -> None:
         """

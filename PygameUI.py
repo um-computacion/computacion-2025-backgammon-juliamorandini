@@ -42,7 +42,7 @@ class GameUI:
 
     def __init__(self):
         """Initializes the game, Pygame, and all game state variables."""
-        pygame.init() # pylint: disable=no-member
+        pygame.init()  # pylint: disable=no-member
         self.screen: pygame.Surface = pygame.display.set_mode(
             (Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT)
         )
@@ -129,15 +129,15 @@ class GameUI:
 
             self.clock.tick(60)
 
-        pygame.quit() # pylint: disable=no-member
+        pygame.quit()  # pylint: disable=no-member
 
     def handle_event(self, event: pygame.event.Event):
         """Handles a single Pygame event."""
-        if event.type == pygame.QUIT: # pylint: disable=no-member
+        if event.type == pygame.QUIT:  # pylint: disable=no-member
             self.running = False
             return
 
-        if event.type == pygame.KEYDOWN: # pylint: disable=no-member
+        if event.type == pygame.KEYDOWN:  # pylint: disable=no-member
             self.handle_keydown(event.key)
             return
 
@@ -155,19 +155,19 @@ class GameUI:
             return
 
         # --- Mouse Click on Board ---
-        if event.type == pygame.MOUSEBUTTONDOWN: # pylint: disable=no-member
+        if event.type == pygame.MOUSEBUTTONDOWN:  # pylint: disable=no-member
             self.handle_mouse_click(event.pos)
             return
 
     def handle_keydown(self, key: int):
         """Handles keyboard press events."""
-        if key == pygame.K_ESCAPE: # pylint: disable=no-member
+        if key == pygame.K_ESCAPE:  # pylint: disable=no-member
             self.running = False
-        elif key == pygame.K_SPACE: # pylint: disable=no-member
+        elif key == pygame.K_SPACE:  # pylint: disable=no-member
             self.do_roll_dice()
-        elif key == pygame.K_n: # pylint: disable=no-member
+        elif key == pygame.K_n:  # pylint: disable=no-member
             self.do_next_turn()
-        elif key == pygame.K_r: # pylint: disable=no-member
+        elif key == pygame.K_r:  # pylint: disable=no-member
             self.do_reset()
 
     def do_roll_dice(self):
@@ -462,7 +462,7 @@ class GameUI:
         text_surface: pygame.Surface = self.font.render(
             player_text, True, (255, 255, 255)
         )
-        self.screen.blit(text_surface, (self.bear_off_area_x, 660))
+        self.screen.blit(text_surface, (580, 750))
 
         # Display bar pieces if any
         bar_pieces = self.backgammon_board.board.bar[
@@ -473,7 +473,7 @@ class GameUI:
             bar_surface: pygame.Surface = self.font.render(
                 bar_text, True, (255, 100, 100)
             )
-            self.screen.blit(bar_surface, (self.bear_off_area_x, 620))
+            self.screen.blit(bar_surface, (850, 780))
 
         borne_off_w = self.backgammon_board.board.borne_off["W"]
         borne_off_b = self.backgammon_board.board.borne_off["B"]
@@ -538,10 +538,11 @@ class GameUI:
         )
         # Place text relative to the new rects
         self.screen.blit(
-            borne_off_surf_b, (self.bear_off_rect_b.x, self.bear_off_rect_b.y - 40)
+            borne_off_surf_b, (self.bear_off_rect_b.x - 50, self.bear_off_rect_b.y - 45)
         )
         self.screen.blit(
-            borne_off_surf_w, (self.bear_off_rect_w.x, self.bear_off_rect_w.y - 40)
+            borne_off_surf_w,
+            (self.bear_off_rect_w.x - 50, self.bear_off_rect_w.y + 340),
         )
 
         # Display dice info
