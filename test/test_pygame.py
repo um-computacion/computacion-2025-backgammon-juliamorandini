@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 from config import Config
 import pygame
 import PygameUI
-from PygameUI import Game, is_valid_direction, get_entry_point_for_dice
+from PygameUI import GameUI, is_valid_direction, get_entry_point_for_dice
 
 # ---
 # Test Cases for Helper Functions
@@ -35,7 +35,7 @@ class TestHelperFunctions(unittest.TestCase):
 # ---
 
 
-class TestGame(unittest.TestCase):
+class TestGameUI(unittest.TestCase):
     """Groups all tests for the Game class."""
 
     def setUp(self):
@@ -120,7 +120,7 @@ class TestGame(unittest.TestCase):
         ]
 
         # --- FINALLY, create the Game instance ---
-        self.game = Game()
+        self.game = GameUI()
 
     def start_patcher(self, target, **kwargs):
         """Helper to create, start, and track patchers."""
@@ -196,20 +196,22 @@ class TestGame(unittest.TestCase):
 
     def test_handle_event_quit(self):
         """Tests the QUIT event."""
-        mock_event = MagicMock(type=pygame.QUIT) # pylint: disable=no-member
+        mock_event = MagicMock(type=pygame.QUIT)  # pylint: disable=no-member
         self.game.handle_event(mock_event)
         self.assertFalse(self.game.running)
 
     def test_handle_event_keydown(self):
         """Tests delegation to handle_keydown."""
         with patch.object(self.game, "handle_keydown") as mock_keydown:
-            mock_event = MagicMock(type=pygame.KEYDOWN, key=pygame.K_SPACE) # pylint: disable=no-member
+            mock_event = MagicMock(
+                type=pygame.KEYDOWN, key=pygame.K_SPACE # pylint: disable=no-member
+            )  # pylint: disable=no-member
             self.game.handle_event(mock_event)
-            mock_keydown.assert_called_with(pygame.K_SPACE) # pylint: disable=no-member
+            mock_keydown.assert_called_with(pygame.K_SPACE)  # pylint: disable=no-member
 
     def test_handle_event_button_clicks(self):
         """Tests button click events."""
-        mock_event = MagicMock(type=pygame.MOUSEBUTTONDOWN) # pylint: disable=no-member
+        mock_event = MagicMock(type=pygame.MOUSEBUTTONDOWN)  # pylint: disable=no-member
 
         with patch.object(self.game, "do_roll_dice") as mock_roll, patch.object(
             self.game, "do_reset"
@@ -241,7 +243,9 @@ class TestGame(unittest.TestCase):
             self.mock_reset_btn.handle_event.return_value = False
             self.mock_next_turn_btn.handle_event.return_value = False
 
-            mock_event = MagicMock(type=pygame.MOUSEBUTTONDOWN, pos=(123, 456)) # pylint: disable=no-member
+            mock_event = MagicMock(
+                type=pygame.MOUSEBUTTONDOWN, pos=(123, 456) # pylint: disable=no-member
+            )  # pylint: disable=no-member
             self.game.handle_event(mock_event)
 
             mock_click.assert_called_with((123, 456))
@@ -252,17 +256,17 @@ class TestGame(unittest.TestCase):
             self.game, "do_reset"
         ) as mock_reset, patch.object(self.game, "do_next_turn") as mock_next:
 
-            self.game.handle_keydown(pygame.K_SPACE) # pylint: disable=no-member
+            self.game.handle_keydown(pygame.K_SPACE)  # pylint: disable=no-member
             mock_roll.assert_called_once()
 
-            self.game.handle_keydown(pygame.K_n) # pylint: disable=no-member
+            self.game.handle_keydown(pygame.K_n)  # pylint: disable=no-member
             mock_next.assert_called_once()
 
-            self.game.handle_keydown(pygame.K_r) # pylint: disable=no-member
+            self.game.handle_keydown(pygame.K_r)  # pylint: disable=no-member
             mock_reset.assert_called_once()
 
             self.game.running = True
-            self.game.handle_keydown(pygame.K_ESCAPE) # pylint: disable=no-member
+            self.game.handle_keydown(pygame.K_ESCAPE)  # pylint: disable=no-member
             self.assertFalse(self.game.running)
 
     # --- Action Method Tests ---
@@ -762,7 +766,7 @@ class TestGame(unittest.TestCase):
 class TestMainFunction(unittest.TestCase):
     """Tests the main() function to ensure full coverage."""
 
-    @patch("PygameUI.Game")  # Mock the Game class in the 'PygameUI' module
+    @patch("PygameUI.GameUI")  # Mock the Game class in the 'PygameUI' module
     def test_main(self, mock_game_cls):
         """Tests if main() creates a Game and calls run()."""
         # Create a mock instance that will be returned by mock_game_cls()

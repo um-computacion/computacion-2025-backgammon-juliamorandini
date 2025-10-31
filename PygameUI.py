@@ -35,7 +35,7 @@ def get_entry_point_for_dice(dice_value: int, player: str) -> int:
         return dice_value - 1
 
 
-class Game:
+class GameUI:
     """
     Encapsulates the main game logic, state, and rendering.
     """
@@ -565,7 +565,7 @@ def main() -> None:
     """
     Main function to create and run the game.
     """
-    game = Game()
+    game = GameUI()
     game.run()
 
 
