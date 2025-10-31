@@ -1,40 +1,20 @@
 # Automated Reports
 ## Coverage Report
 ```text
-Name                             Stmts   Miss  Cover   Missing
---------------------------------------------------------------
-PygameUI.py                        279    175    37%   101-114, 119-120, 123-124, 147, 205-277, 281-414, 418, 422-505, 512-513, 517
-cli/CLI.py                         121      6    95%   94, 102, 193-194, 239-240
-cli/__init__.py                      0      0   100%
-config.py                           35      0   100%
-core/BackgammonGame.py              76      0   100%
-core/Checker.py                     54      1    98%   123
-core/Dice.py                        63      0   100%
-core/__init__.py                     6      0   100%
-core/board.py                       95      0   100%
-core/player.py                      27      0   100%
-pygame_ui/__init__.py                0      0   100%
-pygame_ui/backgammon_board.py       46      0   100%
-pygame_ui/board_interaction.py      71      0   100%
-pygame_ui/board_renderer.py         55      0   100%
-pygame_ui/button.py                 24      0   100%
-pygame_ui/checker_renderer.py       74      0   100%
-pygame_ui/dice_renderer.py          51      0   100%
-test/test_Game.py                  302      1    99%   452
-test/test_backgammon_board.py       90      4    96%   151-152, 225-226
-test/test_board.py                 169      1    99%   307
-test/test_boardinteraction.py      115      1    99%   249
-test/test_boardrender.py           142      5    96%   226-227, 244-245, 249
-test/test_button.py                 57      1    98%   154
-test/test_checker.py               101      1    99%   195
-test/test_checkerrender.py         152      4    97%   28-30, 324
-test/test_cli.py                   166      1    99%   300
-test/test_dice.py                  121      2    98%   178, 184
-test/test_dicerender.py             67      1    99%   130
-test/test_player.py                 48      1    98%   87
-test/test_pygame.py                113      1    99%   258
---------------------------------------------------------------
-TOTAL                             2720    206    92%
+Name                     Stmts   Miss  Cover   Missing
+------------------------------------------------------
+PygameUI.py                281      7    98%   240-243, 355, 394, 504, 522, 573
+cli/CLI.py                 263     16    94%   112, 145, 151-152, 165, 167, 172, 299, 303, 307, 365-366, 396-397, 452-453
+cli/__init__.py              0      0   100%
+config.py                   35      0   100%
+core/BackgammonGame.py      76      0   100%
+core/Checker.py             54      1    98%   123
+core/Dice.py                63      0   100%
+core/__init__.py             6      0   100%
+core/board.py               95      0   100%
+core/player.py              27      0   100%
+------------------------------------------------------
+TOTAL                      900     24    97%
 
 ```
 ## Pylint Report
@@ -64,12 +44,11 @@ core/Checker.py:100:0: C0325: Unnecessary parens after 'not' keyword (superfluou
 core/Checker.py:1:0: C0103: Module name "Checker" doesn't conform to snake_case naming style (invalid-name)
 core/Checker.py:3:0: W0611: Unused Optional imported from typing (unused-import)
 ************* Module computacion-2025-backgammon-juliamorandini.test.test_cli
-test/test_cli.py:9:0: E0401: Unable to import 'cli.CLI' (import-error)
-test/test_cli.py:16:0: E0401: Unable to import 'core.BackgammonGame' (import-error)
-test/test_cli.py:244:36: W0613: Unused argument 'mock_input' (unused-argument)
-test/test_cli.py:258:50: W0613: Unused argument 'mock_input' (unused-argument)
-test/test_cli.py:276:43: W0613: Unused argument 'mock_input' (unused-argument)
-test/test_cli.py:288:39: W0613: Unused argument 'mock_input' (unused-argument)
+test/test_cli.py:7:0: E0401: Unable to import 'cli.CLI' (import-error)
+test/test_cli.py:15:0: E0401: Unable to import 'core.BackgammonGame' (import-error)
+test/test_cli.py:481:50: W0613: Unused argument 'mock_input' (unused-argument)
+test/test_cli.py:497:43: W0613: Unused argument 'mock_input' (unused-argument)
+test/test_cli.py:199:0: R0904: Too many public methods (27/20) (too-many-public-methods)
 ************* Module computacion-2025-backgammon-juliamorandini.test.test_checkerrender
 test/test_checkerrender.py:19:0: R0903: Too few public methods (0/2) (too-few-public-methods)
 test/test_checkerrender.py:33:0: E0401: Unable to import 'pygame_ui.checker_renderer' (import-error)
@@ -84,8 +63,13 @@ test/test_player.py:1:0: C0114: Missing module docstring (missing-module-docstri
 test/test_player.py:2:0: E0401: Unable to import 'core.player' (import-error)
 test/test_player.py:5:0: C0115: Missing class docstring (missing-class-docstring)
 ************* Module computacion-2025-backgammon-juliamorandini.test.test_pygame
-test/test_pygame.py:21:0: E0401: Unable to import 'PygameUI' (import-error)
-test/test_pygame.py:22:0: E0401: Unable to import 'pygame_ui.backgammon_board' (import-error)
+test/test_pygame.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+test/test_pygame.py:5:0: E0401: Unable to import 'config' (import-error)
+test/test_pygame.py:7:0: E0401: Unable to import 'PygameUI' (import-error)
+test/test_pygame.py:8:0: E0401: Unable to import 'PygameUI' (import-error)
+test/test_pygame.py:38:0: R0902: Too many instance attributes (21/7) (too-many-instance-attributes)
+test/test_pygame.py:38:0: R0904: Too many public methods (45/20) (too-many-public-methods)
+test/test_pygame.py:6:0: C0411: third party import "pygame" should be placed before first party import "config.Config"  (wrong-import-order)
 ************* Module computacion-2025-backgammon-juliamorandini.test.test_button
 test/test_button.py:12:0: E0401: Unable to import 'pygame_ui.button' (import-error)
 test/test_button.py:7:0: C0411: standard import "unittest.mock.patch" should be placed before third party import "pygame" (wrong-import-order)
@@ -123,15 +107,15 @@ test/test_board.py:1:0: R0801: Similar lines in 2 files
 ==computacion-2025-backgammon-juliamorandini.test.test_boardrender:[28:35]
 ==computacion-2025-backgammon-juliamorandini.test.test_checkerrender:[43:50]
         mock_config = self.patcher.start()
-
         self.addCleanup(self.patcher.stop)
 
+        # Configuración del mock de Config
         mock_config.BOARD_X = 10
         mock_config.BOARD_Y = 10
         mock_config.BORDER_THICKNESS = 5 (duplicate-code)
 
 -----------------------------------
-Your code has been rated at 9.25/10
+Your code has been rated at 9.37/10
 
 
 ```
