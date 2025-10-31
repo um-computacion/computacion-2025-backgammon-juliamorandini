@@ -20,5 +20,5 @@ version 1.0.2
 [18/10] agregado de pygame
 [19/10] diagrama UML
 [28/10] read me
-[31/10] arreglo de nombre de claso pygame
+[31/10] arreglo de nombre de claso pygame, cambio de pos en pylint
 Finish
