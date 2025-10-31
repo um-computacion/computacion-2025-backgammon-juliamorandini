@@ -1946,3 +1946,25 @@ nbsp;     return self.board.borne_off[color] == 15
         """Get current player's color code."""
         return "W" if self.current_player == "white" else "B"
 
+promp: make it so that that text that says "current player" is actually in a good place that you can read and also make the text for the white off and black off be visible and well placed [Claude 3.5]
+respuesta:
+# --- Draw Text Info ---
+        player_color: str = (
+            "White" if self.backgammon_board.current_player == "W" else "Black"
+        )
+        player_text: str = f"Current Player: {player_color}"
+        text_surface: pygame.Surface = self.font.render(
+            player_text, True, (255, 255, 255)
+        )
+        self.screen.blit(text_surface, (560, 710))
+
+        # Display bar pieces if any
+        bar_pieces = self.backgammon_board.board.bar[
+            self.backgammon_board.current_player
+        ]
+        if bar_pieces > 0:
+            bar_text: str = f"On Bar: {bar_pieces}"
+            bar_surface: pygame.Surface = self.font.render(
+                bar_text, True, (255, 100, 100)
+            )
+            self.screen.blit(bar_surface, (560, 670))
