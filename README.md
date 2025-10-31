@@ -61,23 +61,38 @@ python -m cli.CLI
 
 ## Modo Testing
 
-### Ejecutar Tests
+### Ejecutar Tests y Generar Reportes
+
+1. Para ejecutar todos los tests y generar reporte de cobertura:
 ```bash
-# Ejecutar todos los tests
-python -m pytest
-
-# Ejecutar tests con cobertura
-python -m pytest --cov=.
-
-# Generar reporte de cobertura HTML
-python -m pytest --cov=. --cov-report=html
+coverage run -m unittest discover -s test
+coverage report
 ```
 
-### Generar Reportes
+2. Para generar un reporte más detallado en HTML:
 ```bash
-# Generar todos los reportes
+coverage run -m unittest discover -s test
+coverage html
+```
+
+3. Para ver los tests que fallan o tienen errores:
+```bash
+python -m unittest discover -v -s test
+```
+
+4. Para generar todos los reportes (incluyendo pylint):
+```bash
 python generate_reports.py
 ```
+
+### Ver Resultados
+
+- El reporte de cobertura se mostrará en la terminal después de ejecutar `coverage report`
+- El reporte HTML se generará en el directorio `htmlcov/`
+- Los reportes generados por `generate_reports.py` se guardarán en:
+  - `coverage_report.txt`: Reporte de cobertura
+  - `pylint_report.txt`: Reporte de análisis de código
+  - `cobertura.xml`: Reporte en formato XML
 
 ## Estructura del Proyecto
 
@@ -100,81 +115,9 @@ python generate_reports.py
 - **dice_renderer.py**: Renderizado de dados
 - **button.py**: Componentes de botones
 
-## UML Class Reference
+## Diagrama UML
 
-### Core Classes
-
-#### BackgammonGame
-- **Attributes**:
-  - board: Board
-  - current_player: str
-  - dice_values: List[int]
-  - moves_made: int
-- **Methods**:
-  - roll_dice()
-  - move_checker(from_point, to_point)
-  - next_turn()
-  - is_game_over()
-
-#### Board
-- **Attributes**:
-  - points: Dict[int, List[Checker]]
-  - bar: Dict[str, int]
-  - borne_off: Dict[str, int]
-- **Methods**:
-  - move_checker(from_point, to_point)
-  - can_bear_off(color)
-  - is_valid_move(from_point, to_point)
-
-#### Checker
-- **Attributes**:
-  - color: str
-  - position: Union[int, str]
-  - is_on_bar: bool
-  - is_borne_off: bool
-- **Methods**:
-  - move_to(point)
-  - can_move_to(point, board)
-  - send_to_bar()
-  - bear_off()
-
-### UI Classes
-
-#### PygameUI
-- **Attributes**:
-  - game: BackgammonGame
-  - board: BackgammonBoard
-  - screen: pygame.Surface
-- **Methods**:
-  - handle_events()
-  - update()
-  - draw()
-
-#### BackgammonBoard
-- **Attributes**:
-  - board_renderer: BoardRenderer
-  - checker_renderer: CheckerRenderer
-  - dice_renderer: DiceRenderer
-- **Methods**:
-  - draw()
-  - handle_click(pos)
-  - update()
-
-## Relationship Map
-
-- BackgammonGame ─┬─> Board
-                  ├─> Dice
-                  └─> Player
-
-- Board ─────────┬─> Checker
-                 └─> Point
-
-- PygameUI ─────┬─> BackgammonGame
-                └─> BackgammonBoard
-
-- BackgammonBoard ─┬─> BoardRenderer
-                   ├─> CheckerRenderer
-                   └─> DiceRenderer
+![alt text](<Untitled Diagram.drawio.png>)
 
 ## Testing Coverage
 

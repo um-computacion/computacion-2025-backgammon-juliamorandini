@@ -1332,3 +1332,617 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
+promp: [pedi arreglos de cli porque no funcionaba], no tengo la promp exacta
+respuesta
+"""
+Command Line Interface module for Backgammon game,
+refactored for SOLID principles with proper game flow.
+"""
+
+from typing import Optional, Tuple, List
+from core.BackgammonGame import Game
+
+
+class BoardRenderer:
+    """Handles only board display logic."""
+
+    def render_board(self, game: Game) -> str:
+        """Create a string representation of the current board state."""
+        lines = []
+        lines.append("\nCurrent Board:")
+        lines.append("Points:  13 14 15 16 17 18   19 20 21 22 23 24")
+        lines.append("       +------------------+------------------+")
+
+        # Top row (points 12 to 23)
+        top_row = "       "
+        for i in range(12, 24):
+            count = len(game.board.points[i])
+            if count:
+                color = "W" if game.board.points[i][0] == "W" else "B"
+                top_row += f"{color}{count:2} "
+            else:
+                top_row += " .  "
+            if i == 17:  # Add bar separator
+                top_row += " "
+        lines.append(top_row)
+
+        # Bottom row (points 11 down to 0)
+        bottom_row = "       "
+        for i in range(11, -1, -1):
+            count = len(game.board.points[i])
+            if count:
+                color = "W" if game.board.points[i][0] == "W" else "B"
+                bottom_row += f"{color}{count:2} "
+            else:
+                bottom_row += " .  "
+            if i == 6:  # Add bar separator
+                bottom_row += " "
+        lines.append(bottom_row)
+        lines.append("       +------------------+------------------+")
+        lines.append("Points:  12 11 10  9  8  7    6  5  4  3  2  1")
+
+        # Bar and Borne off
+        lines.append(
+            f"\nBar - White: {game.board.bar['W']} Black: {game.board.bar['B']}"
+        )
+        lines.append(
+            f"Borne Off - White: {game.board.borne_off['W']} Black: {game.board.borne_off['B']}"
+        )
+
+        return "\n".join(lines)
+
+
+class UserInterface:
+    """Handles only user input and output."""
+
+    def display_message(self, message: str) -> None:
+        """Prints a message to the console."""
+        print(message)
+
+    def get_input(self, prompt: str) -> str:
+        """Gets user input from the console."""
+        return input(prompt)
+
+    def display_welcome(self) -> None:
+        """Prints the welcome message."""
+        self.display_message("=" * 50)
+        self.display_message("Welcome to Backgammon!")
+        self.display_message("=" * 50)
+
+    def display_help(self) -> None:
+        """Prints the help text."""
+        self.display_message(
+            """
+Commands:
+- roll: Roll the dice to start your turn
+- move <from> <to>: Move a checker (e.g., 'move 24 20')
+  * Use 'bar' for moving from the bar (e.g., 'move bar 20')
+  * Use 'off' to bear off (e.g., 'move 3 off')
+- skip: Skip turn if no moves available
+- help: Show this help
+- quit: Exit game
+
+Game Rules:
+- White moves from 24→1 (counterclockwise)
+- Black moves from 1→24 (clockwise)
+- You must roll before making moves
+- Use all dice rolls if possible
+- If you have pieces on the bar, you must enter them first
+"""
+        )
+
+    def display_goodbye(self) -> None:
+        """Prints the exit message."""
+        # FIX 1: Match the test assertion exactly
+        self.display_message("\nThanks for playing!")
+
+    def display_turn(self, player: str) -> None:
+        """Displays the current player's turn."""
+        color = "●" if player == "black" else "○"
+        self.display_message(f"\n{'=' * 50}")
+        self.display_message(f"{color} Current player: {player.upper()}")
+        self.display_message(f"{'=' * 50}")
+
+    def display_roll(self, values: List[int]) -> None:
+        """Displays the dice roll results."""
+        if len(values) == 2:
+            self.display_message(f"\n🎲 Rolled: {values[0]} and {values[1]}")
+        else:
+            # Doubles
+            self.display_message(
+                f"\n🎲 Rolled DOUBLES: {values[0]} and {values[0]} (4 moves!)"
+            )
+        self.display_message(f"📋 Available moves: {values}")
+
+    def display_move_success(self, from_point: str, to_point: str) -> None:
+        """Notifies user of a successful move."""
+        self.display_message(f"✓ Moved from {from_point} to {to_point}")
+
+    def display_move_failure(self, reason: str = "Invalid move") -> None:
+        """Notifies user of an invalid move."""
+        self.display_message(f"✗ {reason}")
+
+    def display_winner(self, player: str) -> None:
+        """Displays the game winner."""
+        self.display_message("\n" + "=" * 50)
+        self.display_message(f"🎉 {player.upper()} WINS! 🎉")
+        self.display_message("=" * 50)
+
+    def display_error(self, message: str) -> None:
+        """Displays an error message."""
+        self.display_message(f"⚠ Error: {message}")
+
+    def display_must_roll(self) -> None:
+        """Reminds player to roll first."""
+        self.display_message("⚠ You must roll the dice first! Type 'roll'")
+
+    def display_remaining_dice(self, remaining: List[int]) -> None:
+        """Display remaining dice."""
+        if remaining:
+            self.display_message(f"📋 Remaining moves: {remaining}")
+        else:
+            self.display_message("✓ All dice used! Turn complete.")
+
+    def display_must_move_from_bar(self) -> None:
+        """Notify that player must move from bar."""
+        self.display_message("⚠ You have pieces on the bar! You must enter them first.")
+        self.display_message("   Use: move bar <point>")
+
+
+class InputValidator:
+    """Handles only input validation logic."""
+
+    def parse_point(self, point_str: str) -> Optional[int]:
+        """
+        Convert point string to integer.
+        Special cases: 'bar' -> -1, 'off' -> -1
+        """
+        point_str = point_str.lower()
+        if point_str == "bar":
+            return -1
+        if point_str == "off":
+            return -1
+        try:
+            point = int(point_str)
+            if 0 <= point <= 24:
+                return point
+            return None
+        except ValueError:
+            return None
+
+    def validate_move(self, args: List[str]) -> Optional[Tuple[int, int]]:
+        """
+        Validates if the move arguments are valid.
+        Returns:
+            A tuple of (from_point, to_point) as integers, or None if invalid.
+        """
+        if len(args) != 2:
+            return None
+
+        from_p = self.parse_point(args[0])
+        to_p = self.parse_point(args[1])
+
+        if from_p is None or to_p is None:
+            return None
+        
+        # This was part of my previous fix, and it's correct.
+        # The original code returned strings, but the tests need ints.
+        return (from_p, to_p)
+
+
+class CommandParser:
+    """Handles only command parsing and routing."""
+
+    def __init__(self):
+        self.known_commands = {"move", "roll", "help", "quit", "skip"}
+
+    def parse_command(self, raw_input: str) -> Tuple[str, List[str]]:
+        """
+        Parses raw user input into a command and its arguments.
+        """
+        parts = raw_input.lower().strip().split()
+        if not parts:
+            return "unknown", []
+
+        command = parts[0]
+        args = parts[1:]
+
+        if command in self.known_commands:
+            return command, args
+        else:
+            return "unknown", []
+
+
+class GameStateManager:
+    """Manages game state and turn logic."""
+
+    def __init__(self, game: Game):
+        self.game = game
+        self.has_rolled = False
+        self.remaining_dice = []
+        self.original_roll = []
+        
+        # REMOVED HACK FROM HERE.
+        # The hack in __init__ breaks the 'roll' tests.
+
+    # FIX 2: Renamed 'start_turn' to 'set_roll'
+    def set_roll(self, values: List[int]) -> None:
+        """Sets the dice roll values for the turn."""
+        self.original_roll = values.copy()
+        self.remaining_dice = values.copy()
+        self.has_rolled = True
+
+    def can_move(self) -> bool:
+        """Check if player can make a move."""
+        return self.has_rolled and len(self.remaining_dice) > 0
+
+    def use_die(self, value: int) -> bool:
+        """Remove a die value from remaining dice."""
+        if value in self.remaining_dice:
+            self.remaining_dice.remove(value)
+            return True
+        return False
+
+    def end_turn(self):
+        """End current turn and switch players."""
+        self.has_rolled = False
+        self.remaining_dice = []
+        self.original_roll = []
+        self.game.switch_player()
+
+    def get_remaining(self) -> List[int]:
+        """Get remaining dice values."""
+        return self.remaining_dice.copy()
+
+
+class BackgammonCLI:
+    """
+    Acts as a coordinator, delegating to specialized classes.
+    Manages the main game loop and application state.
+    """
+
+    def __init__(self):
+        """Initialize CLI with new game and specialized components."""
+        self.game = Game()
+        self.ui = UserInterface()
+        self.renderer = BoardRenderer()
+        self.parser = CommandParser()
+        self.validator = InputValidator()
+        self.state_manager = GameStateManager(self.game)
+        self.is_running = True
+
+    def run(self) -> None:
+        """Main game loop."""
+        self.ui.display_welcome()
+        self.ui.display_help()
+
+        while self.is_running:
+            # Display current state
+            board_string = self.renderer.render_board(self.game)
+            self.ui.display_message(board_string)
+            self.ui.display_turn(self.game.current_player)
+
+            # Check for winner first
+            if self.game.check_winner():
+                self.ui.display_winner(self.game.current_player)
+                self.is_running = False
+                break
+
+            # Get and process command
+            command_raw = self.ui.get_input("\n> ")
+            self.process_input(command_raw)
+
+    def process_input(self, command_raw: str) -> None:
+        """
+        Parse and route the user's command to the correct handler.
+        """
+        command, args = self.parser.parse_command(command_raw)
+
+        if command == "move":
+            self.handle_move(args)
+        elif command == "roll":
+            self.handle_roll()
+        elif command == "skip":
+            self.handle_skip()
+        elif command == "help":
+            self.ui.display_help()
+        elif command == "quit":
+            self.handle_quit()
+        else:
+            self.ui.display_error("Unknown command. Type 'help' for commands.")
+
+    def handle_move(self, args: List[str]) -> None:
+        """Handle move command."""
+        
+        # This check is correct, but the tests fail it.
+        if not self.state_manager.has_rolled:
+            self.ui.display_must_roll()
+            return
+
+        if not self.state_manager.remaining_dice:
+            self.ui.display_error("No dice remaining. Type 'skip' to end turn.")
+            return
+
+        # Keep original strings for UI messages
+        from_str = args[0].lower() if args else "?"
+        to_str = args[1].lower() if len(args) > 1 else "?"
+
+        move_points_ints = self.validator.validate_move(args)
+        if not move_points_ints:
+            self.ui.display_error("Invalid move format. Use: move <from> <to>")
+            return
+
+        from_point, to_point = move_points_ints # These are ints (-1 for bar/off)
+
+        # Handle bar move (from_point == -1)
+        if from_point == -1:
+            if not self.game.must_move_from_bar():
+                self.ui.display_move_failure("No pieces on the bar")
+                return
+
+            if to_point == -1:  # "move bar off" - invalid
+                self.ui.display_error("Invalid point for entering from bar")
+                return
+            
+            color = self.game.get_current_player_color()
+            if color == "W":
+                required_die = 25 - to_point
+            else:
+                required_die = to_point + 1 
+
+            if required_die not in self.state_manager.remaining_dice:
+                self.ui.display_move_failure(
+                    f"No die with value {required_die} to enter at point {to_point}"
+                )
+                return
+
+            if self.game.make_bar_move(to_point):
+                self.state_manager.use_die(required_die)
+                self.ui.display_move_success(from_str, to_str)
+                self.ui.display_remaining_dice(self.state_manager.get_remaining())
+
+                if not self.state_manager.remaining_dice:
+                    self.state_manager.end_turn()
+            else:
+                self.ui.display_move_failure(
+                    "Cannot enter at that point (occupied by opponent)"
+                )
+            return
+
+        # Handle bearing off (to_point == -1)
+        if to_point == -1:
+            if from_point == -1: 
+                self.ui.display_error("Invalid move")
+                return
+
+            if not self.game.can_bear_off():
+                self.ui.display_move_failure(
+                    "You cannot bear off yet (not all pieces in home board)"
+                )
+                return
+
+            color = self.game.get_current_player_color()
+            if color == "W":
+                required_die = from_point
+            else:
+                required_die = 25 - from_point
+
+            if required_die not in self.state_manager.remaining_dice:
+                self.ui.display_move_failure(f"No die with value {required_die}")
+                return
+
+            if self.game.bear_off(from_point):
+                self.state_manager.use_die(required_die)
+                self.ui.display_move_success(from_str, to_str)
+                self.ui.display_remaining_dice(self.state_manager.get_remaining())
+
+                if not self.state_manager.remaining_dice:
+                    self.state_manager.end_turn()
+            else:
+                self.ui.display_move_failure("Cannot bear off from that point")
+            return
+
+        # Normal move
+        if self.game.must_move_from_bar():
+            self.ui.display_must_move_from_bar()
+            return
+
+        distance = abs(from_point - to_point)
+
+        if distance not in self.state_manager.remaining_dice:
+            self.ui.display_move_failure(
+                f"No die with value {distance}. Available: {self.state_manager.remaining_dice}"
+            )
+            return
+
+        if self.game.make_move(from_point, to_point):
+            self.state_manager.use_die(distance)
+            self.ui.display_move_success(from_str, to_str)
+            self.ui.display_remaining_dice(self.state_manager.get_remaining())
+
+            if not self.state_manager.remaining_dice:
+                self.state_manager.end_turn()
+        else:
+            # This message needs to match the test
+            self.ui.display_move_failure("Invalid move!") 
+
+    # FIX 3: Refactored handle_roll
+    def handle_roll(self) -> None:
+        """Handle roll command."""
+        if self.state_manager.has_rolled:
+            self.ui.display_error(
+                "You've already rolled! Make your moves or type 'skip' to end turn."
+            )
+            return
+
+        # Call roll on self.game (which is the mock in tests)
+        # The test expects game.dice.roll() and returns a tuple.
+        values_tuple = self.game.dice.roll()
+        values_list = list(values_tuple)
+
+        # Pass the values to the state manager to update state
+        self.state_manager.set_roll(values_list)
+        self.ui.display_roll(values_list)
+
+    def handle_skip(self) -> None:
+        """Handle skip turn command."""
+        if not self.state_manager.has_rolled:
+            self.ui.display_error("You must roll first before skipping!")
+            return
+
+        remaining = self.state_manager.get_remaining()
+        if remaining:
+            self.ui.display_message(
+                f"Skipping turn with {len(remaining)} unused dice: {remaining}"
+            )
+
+        self.state_manager.end_turn()
+        self.ui.display_message("Turn ended. Next player's turn.")
+
+    def handle_quit(self) -> None:
+        """Exit the game."""
+        self.is_running = False
+        self.ui.display_goodbye()
+
+
+if __name__ == "__main__":
+    cli = BackgammonCLI()
+    cli.run()
+
+
+hecho otra vez:
+"""Module containing the main Backgammon game logic."""
+
+from core.board import Board
+from core.player import Player
+from core.Dice import Dice
+
+
+class Game:
+    """A Backgammon game."""
+
+    def __init__(self):
+        """Initialize game components."""
+        self.board = Board()
+        self.dice = Dice()
+        self.current_player = "white"
+        self.players = {
+            "white": Player("Player 1", "white"),
+            "black": Player("Player 2", "black"),
+        }
+
+    def get_board(self) -> list:
+        """Get current board state as point counts."""
+        board_state = []
+        for point in self.board.points:
+            if not point:
+                board_state.append(0)
+            else:
+                count = len(point)
+                if point[0] == "B":
+                    board_state.append(-count)
+                else:
+                    board_state.append(count)
+        return board_state
+
+    def make_move(self, from_point: int, to_point: int) -> bool:
+        """Make a move if valid."""
+        color = "W" if self.current_player == "white" else "B"
+
+        if self.board.bar[color] > 0:
+            return False
+
+        return self.board.move_checker(from_point, to_point, color)
+
+    def make_bar_move(self, to_point: int) -> bool:
+        """Move a checker from the bar to a valid entry point."""
+        color = "W" if self.current_player == "white" else "B"
+        return self.board.move_checker_from_bar(to_point, color)
+
+    def get_entry_point_for_dice(self, dice_value: int) -> int:
+        """Get the entry point corresponding to a dice value."""
+        color = "W" if self.current_player == "white" else "B"
+
+        if color == "W":
+            return 24 - dice_value
+        else:
+            return dice_value - 1
+
+    def set_dice(self, values: list) -> None:
+        """Set dice values for testing."""
+        self.dice.die1 = values[0]
+        self.dice.die2 = values[1]
+
+    def get_available_moves(self) -> list:
+        """Get available moves based on dice."""
+        return self.dice.get_moves()
+
+    def set_piece(self, point: int, count: int, color: str = None) -> None:
+        """Set pieces at point for testing."""
+        if color is None:
+            color = "W" if self.current_player == "white" else "B"
+        self.board.points[point] = [color] * abs(count)
+
+    def add_to_bar(self, color: str = None) -> None:
+        """Add current player's piece to bar."""
+        if color is None:
+            color = "W" if self.current_player == "white" else "B"
+        self.board.bar[color] += 1
+
+    def must_move_from_bar(self) -> bool:
+        """Check if player must move from bar."""
+        color = "W" if self.current_player == "white" else "B"
+        return self.board.bar[color] > 0
+
+    def get_bar_pieces(self) -> int:
+        """Get number of pieces on bar for current player."""
+        color = "W" if self.current_player == "white" else "B"
+        return self.board.bar[color]
+
+    def bear_off(self, point: int) -> bool:
+        """Bear off a piece if possible."""
+        color = "W" if self.current_player == "white" else "B"
+        return self.board.bear_off(color, point)
+
+    def setup_bearing_off_scenario(self):
+        """Setup board for bearing off test."""
+        self.board.points = [[] for _ in range(24)]
+A         color = "W" if self.current_player == "white" else "B"
+        if color == "W":
+            self.board.points[18] = [color] * 5
+        else:
+            self.board.points[0] = [color] * 5
+
+    def setup_winning_scenario(self) -> None:
+        """Setup board for win condition test."""
+        color = "W" if self.current_player == "white" else "B"
+        self.board.borne_off[color] = 15
+
+    def check_winner(self) -> bool:
+        """Check if current player has won."""
+        color = "W" if self.current_player == "white" else "B"
+nbsp;     return self.board.borne_off[color] == 15
+
+    def switch_player(self) -> None:
+        """Switch to the other player."""
+        self.current_player = "black" if self.current_player == "white" else "white"
+
+    def roll_dice(self) -> list:
+        """Roll the dice and return the values."""
+        self.dice.roll()
+        return self.get_available_moves()
+
+    def can_bear_off(self) -> bool:
+        """Check if current player can bear off."""
+        color = "W" if self.current_player == "white" else "B"
+        return self.board.can_bear_off(color)
+
+    def get_current_player_color(self) -> str:
+        """Get current player's color code."""
+        return "W" if self.current_player == "white" else "B"
+

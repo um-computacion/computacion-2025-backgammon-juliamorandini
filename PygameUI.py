@@ -1,5 +1,5 @@
 import pygame
-from typing import Optional, List, Tuple
+from typing import Optional, Tuple
 
 from config import Config
 from pygame_ui.backgammon_board import BackgammonBoard
@@ -35,14 +35,14 @@ def get_entry_point_for_dice(dice_value: int, player: str) -> int:
         return dice_value - 1
 
 
-class Game:
+class GameUI:
     """
     Encapsulates the main game logic, state, and rendering.
     """
 
     def __init__(self):
         """Initializes the game, Pygame, and all game state variables."""
-        pygame.init()
+        pygame.init() # pylint: disable=no-member
         self.screen: pygame.Surface = pygame.display.set_mode(
             (Config.SCREEN_WIDTH, Config.SCREEN_HEIGHT)
         )
@@ -54,13 +54,25 @@ class Game:
 
         # --- UI Elements ---
         self.roll_button: Button = Button(
-            50, 730, 150, 50, "Roll Dice", color=(70, 130, 180), hover_color=(100, 160, 210)
+            50,
+            730,
+            150,
+            50,
+            "Roll Dice",
+            color=(70, 130, 180),
+            hover_color=(100, 160, 210),
         )
         self.reset_button: Button = Button(
             220, 730, 150, 50, "Reset", color=(180, 70, 70), hover_color=(210, 100, 100)
         )
         self.next_turn_button: Button = Button(
-            390, 730, 150, 50, "Next Turn", color=(70, 180, 70), hover_color=(100, 210, 100)
+            390,
+            730,
+            150,
+            50,
+            "Next Turn",
+            color=(70, 180, 70),
+            hover_color=(100, 210, 100),
         )
         self.font: pygame.font.Font = pygame.font.Font(None, 36)
 
@@ -72,20 +84,25 @@ class Game:
         self.max_moves_this_turn: int = 0
         self.running: bool = True
 
-
-        self.bear_off_area_width: int = 80 # Width of the bear-off area
+        self.bear_off_area_width: int = 80  # Width of the bear-off area
         # Calculate x position to be on the far right, with a small margin
-        self.bear_off_area_x: int = Config.SCREEN_WIDTH - self.bear_off_area_width - Config.BORDER_THICKNESS 
-        
+        self.bear_off_area_x: int = (
+            Config.SCREEN_WIDTH - self.bear_off_area_width - Config.BORDER_THICKNESS
+        )
+
         # Black's Bear-Off Rect (Top-Right)
         self.bear_off_rect_b: pygame.Rect = pygame.Rect(
-            self.bear_off_area_x, Config.BOARD_Y + Config.BORDER_THICKNESS, 
-            self.bear_off_area_width, Config.BOARD_HEIGHT // 2 - Config.BORDER_THICKNESS * 1.5 
+            self.bear_off_area_x,
+            Config.BOARD_Y + Config.BORDER_THICKNESS,
+            self.bear_off_area_width,
+            Config.BOARD_HEIGHT // 2 - Config.BORDER_THICKNESS * 1.5,
         )
         # White's Bear-Off Rect (Bottom-Right)
         self.bear_off_rect_w: pygame.Rect = pygame.Rect(
-            self.bear_off_area_x, Config.BOARD_Y + Config.BOARD_HEIGHT // 2 + Config.BORDER_THICKNESS * 0.5, 
-            self.bear_off_area_width, Config.BOARD_HEIGHT // 2 - Config.BORDER_THICKNESS * 1.5
+            self.bear_off_area_x,
+            Config.BOARD_Y + Config.BOARD_HEIGHT // 2 + Config.BORDER_THICKNESS * 0.5,
+            self.bear_off_area_width,
+            Config.BOARD_HEIGHT // 2 - Config.BORDER_THICKNESS * 1.5,
         )
 
         self.checker_radius: int = Config.CHECKER_RADIUS
@@ -93,8 +110,9 @@ class Game:
         self.checker_color_b: Tuple[int, int, int] = Config.BLACK_CHECKER
         self.checker_outline: Tuple[int, int, int] = Config.CHECKER_OUTLINE
         # Assuming a color from Config or just hardcoding
-        self.bear_off_bg_color: Tuple[int, int, int] = Config.WOOD_BROWN # Use a board-like color
-
+        self.bear_off_bg_color: Tuple[int, int, int] = (
+            Config.WOOD_BROWN
+        )  # Use a board-like color
 
     def run(self):
         """Starts and runs the main game loop."""
@@ -111,15 +129,15 @@ class Game:
 
             self.clock.tick(60)
 
-        pygame.quit()
+        pygame.quit() # pylint: disable=no-member
 
     def handle_event(self, event: pygame.event.Event):
         """Handles a single Pygame event."""
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT: # pylint: disable=no-member
             self.running = False
             return
 
-        if event.type == pygame.KEYDOWN:
+        if event.type == pygame.KEYDOWN: # pylint: disable=no-member
             self.handle_keydown(event.key)
             return
 
@@ -137,19 +155,19 @@ class Game:
             return
 
         # --- Mouse Click on Board ---
-        if event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN: # pylint: disable=no-member
             self.handle_mouse_click(event.pos)
             return
 
     def handle_keydown(self, key: int):
         """Handles keyboard press events."""
-        if key == pygame.K_ESCAPE:
+        if key == pygame.K_ESCAPE: # pylint: disable=no-member
             self.running = False
-        elif key == pygame.K_SPACE:
+        elif key == pygame.K_SPACE: # pylint: disable=no-member
             self.do_roll_dice()
-        elif key == pygame.K_n:
+        elif key == pygame.K_n: # pylint: disable=no-member
             self.do_next_turn()
-        elif key == pygame.K_r:
+        elif key == pygame.K_r: # pylint: disable=no-member
             self.do_reset()
 
     def do_roll_dice(self):
@@ -204,9 +222,7 @@ class Game:
         # Check if clicking on bar area
         bar_x = Config.BAR_X
         bar_y_top = Config.BOARD_Y + Config.BORDER_THICKNESS
-        bar_y_bottom = (
-            Config.BOARD_Y + Config.BOARD_HEIGHT - Config.BORDER_THICKNESS
-        )
+        bar_y_bottom = Config.BOARD_Y + Config.BOARD_HEIGHT - Config.BORDER_THICKNESS
         bar_width = Config.BAR_WIDTH
 
         if (
@@ -219,7 +235,7 @@ class Game:
                 self.backgammon_board.current_player
             ]
             print(f"\n✓ Selected checker from bar! ({bar_pieces} pieces on bar)")
-            print(f"Valid entry points with current dice:")
+            print("Valid entry points with current dice:")
             for dice_val in self.backgammon_board.dice_values:
                 entry_pt = get_entry_point_for_dice(
                     dice_val, self.backgammon_board.current_player
@@ -285,19 +301,14 @@ class Game:
             # --- Select a point ---
             if clicked_point is None:
                 print("Clicked outside points.")
-                return 
-                
+                return
+
             point_pieces = self.backgammon_board.board.points[clicked_point]
-            if (
-                point_pieces
-                and point_pieces[0] == player
-            ):
+            if point_pieces and point_pieces[0] == player:
                 self.selected_point = clicked_point
                 print(f"Selected point {clicked_point}")
             else:
-                print(
-                    f"No {player} pieces at point {clicked_point}"
-                )
+                print(f"No {player} pieces at point {clicked_point}")
         else:
             # --- Move to destination ---
             is_bear_off_click = False
@@ -312,65 +323,83 @@ class Game:
                     return
                 # This is a regular move, calculate distance
                 distance = abs(clicked_point - self.selected_point)
-            
+
             else:
                 # Clicked off-point. Check if it's a valid bear-off click.
                 if player == "W" and self.bear_off_rect_w.collidepoint(mouse_pos):
                     is_bear_off_click = True
-                    distance = self.selected_point + 1 # e.g., point 0 -> distance 1
+                    distance = self.selected_point + 1  # e.g., point 0 -> distance 1
                 elif player == "B" and self.bear_off_rect_b.collidepoint(mouse_pos):
                     is_bear_off_click = True
-                    distance = 24 - self.selected_point # e.g., point 23 -> distance 1
+                    distance = 24 - self.selected_point  # e.g., point 23 -> distance 1
                 else:
                     # Clicked somewhere invalid (not a point, not correct bear-off)
                     print("Invalid destination click.")
-                    self.selected_point = None # Deselect
+                    self.selected_point = None  # Deselect
                     return
-            
+
             # --- Process the move (Bear off or Regular) ---
 
             if is_bearing_off and is_bear_off_click:
                 # --- Handle Bear Off Attempt ---
-                
+
                 # Check if exact dice value exists
                 if distance in self.backgammon_board.dice_values:
-                    if self.backgammon_board.board.bear_off(player, self.selected_point):
+                    if self.backgammon_board.board.bear_off(
+                        player, self.selected_point
+                    ):
                         print(f"Bore off from point {self.selected_point}!")
                         self.backgammon_board.dice_values.remove(distance)
                         self.moves_made += 1
                     else:
                         print("Cannot bear off from that point (logic error)!")
-                
+
                 # Check if a higher dice value can be used (if no exact match and this is the furthest checker)
                 elif all(d > distance for d in self.backgammon_board.dice_values):
-                        # Check if this is the furthest checker
+                    # Check if this is the furthest checker
                     is_furthest = True
-                    if player == 'W':
+                    if player == "W":
                         for p in range(self.selected_point + 1, 6):
-                            if self.backgammon_board.board.points[p] and self.backgammon_board.board.points[p][0] == 'W':
+                            if (
+                                self.backgammon_board.board.points[p]
+                                and self.backgammon_board.board.points[p][0] == "W"
+                            ):
                                 is_furthest = False
                                 break
-                    else: # Player 'B'
-                        for p in range(self.selected_point - 1, 17, -1): # 17 is 18-1
-                            if self.backgammon_board.board.points[p] and self.backgammon_board.board.points[p][0] == 'B':
+                    else:  # Player 'B'
+                        for p in range(self.selected_point - 1, 17, -1):  # 17 is 18-1
+                            if (
+                                self.backgammon_board.board.points[p]
+                                and self.backgammon_board.board.points[p][0] == "B"
+                            ):
                                 is_furthest = False
                                 break
-                    
+
                     if is_furthest:
-                        if self.backgammon_board.board.bear_off(player, self.selected_point):
-                            print(f"Bore off from point {self.selected_point} (using higher dice)!")
+                        if self.backgammon_board.board.bear_off(
+                            player, self.selected_point
+                        ):
+                            print(
+                                f"Bore off from point {self.selected_point} (using higher dice)!"
+                            )
                             # Use the smallest dice that is larger than the distance
-                            used_dice = min(d for d in self.backgammon_board.dice_values if d > distance)
+                            used_dice = min(
+                                d
+                                for d in self.backgammon_board.dice_values
+                                if d > distance
+                            )
                             self.backgammon_board.dice_values.remove(used_dice)
                             self.moves_made += 1
                         else:
                             print("Cannot bear off from that point (logic error)!")
                     else:
-                        print(f"No dice value matches for bearing off (must move furthest checker first)")
+                        print(
+                            "No dice value matches for bearing off (must move furthest checker first)"
+                        )
 
                 else:
                     print(f"No dice value matches for bearing off ({distance})")
-            
+
             elif clicked_point is None:
                 # This was a bear-off click, but 'is_bearing_off' was False
                 print("You cannot bear off yet (all pieces not in home).")
@@ -385,17 +414,13 @@ class Game:
                     if self.backgammon_board.move_checker(
                         self.selected_point, clicked_point
                     ):
-                        print(
-                            f"Moved from {self.selected_point} to {clicked_point}"
-                        )
+                        print(f"Moved from {self.selected_point} to {clicked_point}")
                         self.backgammon_board.dice_values.remove(distance)
                         self.moves_made += 1
                     else:
-                        print(f"Invalid move!")
+                        print("Invalid move!")
                 else:
-                    print(
-                        f"Wrong direction for {self.backgammon_board.current_player}"
-                    )
+                    print(f"Wrong direction for {self.backgammon_board.current_player}")
             else:
                 print(f"No dice value matches distance {distance}")
 
@@ -408,7 +433,7 @@ class Game:
                 # Check for win condition
                 if self.backgammon_board.board.borne_off[player] == 15:
                     print(f"🎉 PLAYER {player} WINS! 🎉")
-                    self.do_reset() # Reset board after win
+                    self.do_reset()  # Reset board after win
                 else:
                     print("Turn complete!")
                     self.do_next_turn()
@@ -424,13 +449,6 @@ class Game:
         # Draw board and pieces
         self.backgammon_board.render(self.screen)
 
-        # --- REMOVED: Old right panel drawing (stripes) ---
-        # No specific code was drawing a "red and yellow box" directly from config in the previous render.
-        # It's likely an internal part of BackgammonBoard or BoardInteraction.
-        # If there's still a striped area, it's coming from those files.
-        # For now, I'm assuming the changes here will handle the visible elements.
-
-
         # Draw buttons
         self.roll_button.draw(self.screen)
         self.reset_button.draw(self.screen)
@@ -441,66 +459,104 @@ class Game:
             "White" if self.backgammon_board.current_player == "W" else "Black"
         )
         player_text: str = f"Current Player: {player_color}"
-        text_surface: pygame.Surface = self.font.render(player_text, True, (255, 255, 255))
-        self.screen.blit(text_surface, (self.bear_off_area_x, 660)) 
+        text_surface: pygame.Surface = self.font.render(
+            player_text, True, (255, 255, 255)
+        )
+        self.screen.blit(text_surface, (self.bear_off_area_x, 660))
 
         # Display bar pieces if any
-        bar_pieces = self.backgammon_board.board.bar[self.backgammon_board.current_player]
+        bar_pieces = self.backgammon_board.board.bar[
+            self.backgammon_board.current_player
+        ]
         if bar_pieces > 0:
             bar_text: str = f"On Bar: {bar_pieces}"
-            bar_surface: pygame.Surface = self.font.render(bar_text, True, (255, 100, 100))
+            bar_surface: pygame.Surface = self.font.render(
+                bar_text, True, (255, 100, 100)
+            )
             self.screen.blit(bar_surface, (self.bear_off_area_x, 620))
-        
+
         borne_off_w = self.backgammon_board.board.borne_off["W"]
         borne_off_b = self.backgammon_board.board.borne_off["B"]
 
         # Draw Black's container
-        pygame.draw.rect(self.screen, self.bear_off_bg_color, self.bear_off_rect_b, 0, 8)
+        pygame.draw.rect(
+            self.screen, self.bear_off_bg_color, self.bear_off_rect_b, 0, 8
+        )
         pygame.draw.rect(self.screen, (255, 255, 255), self.bear_off_rect_b, 2, 8)
-        
+
         # Draw White's container
-        pygame.draw.rect(self.screen, self.bear_off_bg_color, self.bear_off_rect_w, 0, 8)
+        pygame.draw.rect(
+            self.screen, self.bear_off_bg_color, self.bear_off_rect_w, 0, 8
+        )
         pygame.draw.rect(self.screen, (255, 255, 255), self.bear_off_rect_w, 2, 8)
 
         # Draw Black's borne-off checkers (stacked from bottom up)
         for i in range(borne_off_b):
             x = self.bear_off_rect_b.centerx
             # Stack with a 1.5x overlap
-            y = self.bear_off_rect_b.bottom - (i * self.checker_radius // 1.5) - self.checker_radius - 5
-            if y < self.bear_off_rect_b.top + self.checker_radius: break # Stop if full
-            pygame.draw.circle(self.screen, self.checker_color_b, (x, y), self.checker_radius)
-            pygame.draw.circle(self.screen, self.checker_outline, (x, y), self.checker_radius, 2)
+            y = (
+                self.bear_off_rect_b.bottom
+                - (i * self.checker_radius // 1.5)
+                - self.checker_radius
+                - 5
+            )
+            if y < self.bear_off_rect_b.top + self.checker_radius:
+                break  # Stop if full
+            pygame.draw.circle(
+                self.screen, self.checker_color_b, (x, y), self.checker_radius
+            )
+            pygame.draw.circle(
+                self.screen, self.checker_outline, (x, y), self.checker_radius, 2
+            )
 
         # Draw White's borne-off checkers (stacked from top down)
         for i in range(borne_off_w):
             x = self.bear_off_rect_w.centerx
-            y = self.bear_off_rect_w.top + (i * self.checker_radius // 1.5) + self.checker_radius + 5
-            if y > self.bear_off_rect_w.bottom - self.checker_radius: break # Stop if full
-            pygame.draw.circle(self.screen, self.checker_color_w, (x, y), self.checker_radius)
-            pygame.draw.circle(self.screen, self.checker_outline, (x, y), self.checker_radius, 2)
-        
+            y = (
+                self.bear_off_rect_w.top
+                + (i * self.checker_radius // 1.5)
+                + self.checker_radius
+                + 5
+            )
+            if y > self.bear_off_rect_w.bottom - self.checker_radius:
+                break  # Stop if full
+            pygame.draw.circle(
+                self.screen, self.checker_color_w, (x, y), self.checker_radius
+            )
+            pygame.draw.circle(
+                self.screen, self.checker_outline, (x, y), self.checker_radius, 2
+            )
+
         # Draw text labels for borne-off
         borne_off_text_w: str = f"White Off: {borne_off_w}"
         borne_off_text_b: str = f"Black Off: {borne_off_b}"
-        borne_off_surf_w: pygame.Surface = self.font.render(borne_off_text_w, True, (200, 200, 200))
-        borne_off_surf_b: pygame.Surface = self.font.render(borne_off_text_b, True, (200, 200, 200))
+        borne_off_surf_w: pygame.Surface = self.font.render(
+            borne_off_text_w, True, (200, 200, 200)
+        )
+        borne_off_surf_b: pygame.Surface = self.font.render(
+            borne_off_text_b, True, (200, 200, 200)
+        )
         # Place text relative to the new rects
-        self.screen.blit(borne_off_surf_b, (self.bear_off_rect_b.x, self.bear_off_rect_b.y - 40))
-        self.screen.blit(borne_off_surf_w, (self.bear_off_rect_w.x, self.bear_off_rect_w.y - 40))
-
-
+        self.screen.blit(
+            borne_off_surf_b, (self.bear_off_rect_b.x, self.bear_off_rect_b.y - 40)
+        )
+        self.screen.blit(
+            borne_off_surf_w, (self.bear_off_rect_w.x, self.bear_off_rect_w.y - 40)
+        )
 
         # Display dice info
         if self.backgammon_board.dice_values:
             dice_text: str = f"Dice: {self.backgammon_board.dice_values}"
-            dice_surface: pygame.Surface = self.font.render(dice_text, True, (255, 255, 255))
-            self.screen.blit(dice_surface, (self.bear_off_rect_w.x, 700)) # Moved text
+            dice_surface: pygame.Surface = self.font.render(
+                dice_text, True, (255, 255, 255)
+            )
+            self.screen.blit(dice_surface, (self.bear_off_rect_w.x, 700))  # Moved text
         else:
             if self.dice_rolled:
                 all_used: pygame.Surface = self.font.render(
                     "All dice used!", True, (255, 255, 0)
                 )
-                self.screen.blit(all_used, (self.bear_off_rect_w.x, 700)) # Moved text
+                self.screen.blit(all_used, (self.bear_off_rect_w.x, 700))  # Moved text
 
         pygame.display.flip()
 
@@ -509,7 +565,7 @@ def main() -> None:
     """
     Main function to create and run the game.
     """
-    game = Game()
+    game = GameUI()
     game.run()
 
 
