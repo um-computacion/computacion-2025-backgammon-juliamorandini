@@ -21,3 +21,4 @@ version 1.0.2
 [19/10] diagrama UML
 [28/10] read me
 [31/10] arreglo de nombre de claso pygame
+Finish
