@@ -454,7 +454,7 @@ class GameUI:
         self.reset_button.draw(self.screen)
         self.next_turn_button.draw(self.screen)
 
-        # --- Draw Text Info ---
+            # --- Draw Text Info ---
         player_color: str = (
             "White" if self.backgammon_board.current_player == "W" else "Black"
         )
@@ -462,7 +462,7 @@ class GameUI:
         text_surface: pygame.Surface = self.font.render(
             player_text, True, (255, 255, 255)
         )
-        self.screen.blit(text_surface, (self.bear_off_area_x, 660))
+        self.screen.blit(text_surface, (580, 730))
 
         # Display bar pieces if any
         bar_pieces = self.backgammon_board.board.bar[
@@ -473,7 +473,7 @@ class GameUI:
             bar_surface: pygame.Surface = self.font.render(
                 bar_text, True, (255, 100, 100)
             )
-            self.screen.blit(bar_surface, (self.bear_off_area_x, 620))
+            self.screen.blit(bar_surface, (850, 730))
 
         borne_off_w = self.backgammon_board.board.borne_off["W"]
         borne_off_b = self.backgammon_board.board.borne_off["B"]

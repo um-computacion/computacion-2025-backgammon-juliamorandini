@@ -9,10 +9,10 @@ class BoardInteraction:
         self._mouse_pos: Tuple[int, int] = (0, 0)
 
     def handle_event(self, event: pygame.event.Event) -> Optional[dict]:
-        if event.type == pygame.MOUSEMOTION:
+        if event.type == pygame.MOUSEMOTION: # pylint: disable=no-member
             self._mouse_pos = event.pos
             return None
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN: # pylint: disable=no-member
             mouse_pos = pygame.mouse.get_pos()
             if mouse_pos[1] < 600:  # Don't handle clicks in button area
                 point = self.get_clicked_point(mouse_pos)
@@ -36,7 +36,7 @@ class BoardInteraction:
 
         # Calculate section widths
         left_section_width = Config.BAR_X - inner_left
-        right_section_width = inner_right - (Config.BAR_X + Config.BAR_WIDTH)
+        right_section_width = inner_right - (Config.BAR_X + Config.BAR_WIDTH) # pylint: disable=unused-variable
         point_width = left_section_width // 6
 
         is_top = y < (Config.BOARD_Y + Config.BOARD_HEIGHT) // 2
@@ -71,7 +71,7 @@ class BoardInteraction:
             return None
 
         inner_left = Config.BOARD_X + Config.BORDER_THICKNESS
-        inner_right = Config.BOARD_X + Config.BOARD_WIDTH - Config.BORDER_THICKNESS
+        inner_right = Config.BOARD_X + Config.BOARD_WIDTH - Config.BORDER_THICKNESS # pylint: disable=unused-variable
         inner_top = Config.BOARD_Y + Config.BORDER_THICKNESS
         inner_bottom = Config.BOARD_Y + Config.BOARD_HEIGHT - Config.BORDER_THICKNESS
 
