@@ -115,9 +115,6 @@ python generate_reports.py
 - **dice_renderer.py**: Renderizado de dados
 - **button.py**: Componentes de botones
 
-## Diagrama UML
-
-![alt text](<Untitled Diagram.drawio.png>)
 
 ## Testing Coverage
 
