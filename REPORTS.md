@@ -3,7 +3,7 @@
 ```text
 Name                     Stmts   Miss  Cover   Missing
 ------------------------------------------------------
-PygameUI.py                281      7    98%   240-243, 355, 394, 504, 522, 573
+PygameUI.py                281      7    98%   240-243, 355, 394, 504, 522, 574
 cli/CLI.py                 263     16    94%   112, 145, 151-152, 165, 167, 172, 299, 303, 307, 365-366, 396-397, 452-453
 cli/__init__.py              0      0   100%
 config.py                   35      0   100%
@@ -107,9 +107,9 @@ test/test_board.py:1:0: R0801: Similar lines in 2 files
 ==computacion-2025-backgammon-juliamorandini.test.test_boardrender:[28:35]
 ==computacion-2025-backgammon-juliamorandini.test.test_checkerrender:[43:50]
         mock_config = self.patcher.start()
-
         self.addCleanup(self.patcher.stop)
 
+        # Configuración del mock de Config
         mock_config.BOARD_X = 10
         mock_config.BOARD_Y = 10
         mock_config.BORDER_THICKNESS = 5 (duplicate-code)
