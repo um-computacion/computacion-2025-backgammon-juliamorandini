@@ -44,10 +44,10 @@ core/Checker.py:100:0: C0325: Unnecessary parens after 'not' keyword (superfluou
 core/Checker.py:1:0: C0103: Module name "Checker" doesn't conform to snake_case naming style (invalid-name)
 core/Checker.py:3:0: W0611: Unused Optional imported from typing (unused-import)
 ************* Module computacion-2025-backgammon-juliamorandini.test.test_cli
+test/test_cli.py:481:109: C0303: Trailing whitespace (trailing-whitespace)
+test/test_cli.py:498:0: C0301: Line too long (116/100) (line-too-long)
 test/test_cli.py:7:0: E0401: Unable to import 'cli.CLI' (import-error)
 test/test_cli.py:15:0: E0401: Unable to import 'core.BackgammonGame' (import-error)
-test/test_cli.py:481:50: W0613: Unused argument 'mock_input' (unused-argument)
-test/test_cli.py:497:43: W0613: Unused argument 'mock_input' (unused-argument)
 test/test_cli.py:199:0: R0904: Too many public methods (27/20) (too-many-public-methods)
 ************* Module computacion-2025-backgammon-juliamorandini.test.test_checkerrender
 test/test_checkerrender.py:19:0: R0903: Too few public methods (0/2) (too-few-public-methods)
@@ -107,9 +107,9 @@ test/test_board.py:1:0: R0801: Similar lines in 2 files
 ==computacion-2025-backgammon-juliamorandini.test.test_boardrender:[28:35]
 ==computacion-2025-backgammon-juliamorandini.test.test_checkerrender:[43:50]
         mock_config = self.patcher.start()
+
         self.addCleanup(self.patcher.stop)
 
-        # Configuración del mock de Config
         mock_config.BOARD_X = 10
         mock_config.BOARD_Y = 10
         mock_config.BORDER_THICKNESS = 5 (duplicate-code)
