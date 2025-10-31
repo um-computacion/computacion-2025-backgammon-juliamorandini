@@ -478,7 +478,7 @@ class TestBackgammonCLI(unittest.TestCase):
 
     @patch("sys.stdout", new_callable=StringIO)
     @patch("builtins.input", side_effect=["move 1 3", "quit"])
-    def test_run_move_command_invalid_logic(self, mock_input, mock_stdout):
+    def test_run_move_command_invalid_logic(self, mock_input, mock_stdout): # pylint: disable=unused-argument 
         """Test move command in game loop that fails game logic."""
         cli = BackgammonCLI()
         cli.state_manager.set_roll([2])
@@ -494,8 +494,8 @@ class TestBackgammonCLI(unittest.TestCase):
 
     @patch("sys.stdout", new_callable=StringIO)
     @patch("builtins.input", side_effect=["move invalid", "quit"])
-    def test_run_invalid_move_format(self, mock_input, mock_stdout):
-        """Test invalid move *format* in game loop."""
+    def test_run_invalid_move_format(self, mock_input, mock_stdout): # pylint: disable=unused-argument
+        """Test invalid move *format* in game loop.""" #uso lo de pylint disable xq si lo saco el codigo no funciona 
         cli = BackgammonCLI()
         cli.state_manager.set_roll([1])
 
